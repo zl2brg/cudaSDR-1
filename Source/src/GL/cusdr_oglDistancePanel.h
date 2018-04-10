@@ -33,16 +33,17 @@
 #include "cusdr_fonts.h"
 #include "cusdr_oglText.h"
 
-//#include <QtOpenGL/QGLWidget>
+//#include <QtOpenGL/QOpenGLWidget>
 //#include <QImage>
 //#include <QFontMetrics>
 #include <QWheelEvent>
+#include <QGL>
 //#include <QQueue>
 //#include <QDebug>
 
 
 
-class QGLDistancePanel : public QGLWidget {
+class QGLDistancePanel : public QOpenGLWidget {
 
     Q_OBJECT
 

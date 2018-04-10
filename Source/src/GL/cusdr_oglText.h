@@ -34,7 +34,7 @@
 #include "cusdr_settings.h"
 
 #include <QtGlobal>
-
+#include <QOpenGLTexture>
 class QChar;
 class QFont;
 class QFontMetrics;
@@ -50,13 +50,13 @@ public:
 
     QFont font() const;
     QFontMetrics fontMetrics() const;
-
+    
     void renderText(float x, float y, const QString &text);
 	void renderText(float x, float y, float z, const QString &text);
-
+  
 private:
     Q_DISABLE_COPY(OGLText)
-
+   
     OGLTextPrivate *const d;
 };
 

@@ -27,7 +27,7 @@
 #ifndef _CUSDR_OPENGLTYPES_H
 #define _CUSDR_OPENGLTYPES_H
 
-#include <QGLWidget>
+#include <QOpenGLWidget>
 //#include <QList>
 //#include <QRect>
 //#include <QColor>

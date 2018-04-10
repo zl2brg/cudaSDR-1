@@ -43,7 +43,7 @@
 #endif
 
 QGLWidebandPanel::QGLWidebandPanel(QWidget *parent)
-		: QGLWidget(QGLFormat(QGL::SampleBuffers|QGL::AlphaChannel), parent)
+		: QOpenGLWidget(parent)
 		, set(Settings::instance())
 		, m_serverMode(set->getCurrentServerMode())
 		, m_hwInterface(set->getHWInterface())
@@ -74,7 +74,7 @@ QGLWidebandPanel::QGLWidebandPanel(QWidget *parent)
 	
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	setAutoBufferSwap(true);
+	//setAutoBufferSwap(true);
 	setAutoFillBackground(false);
 	
 	setMouseTracking(true);
@@ -341,7 +341,7 @@ void QGLWidebandPanel::paintGL() {
 				drawHamBand(28000000, 29700000, "10m");
 				drawHamBand(50000000, 51990000, "6m");
 
-				//qglColor(QColor(255, 255, 255, 130));
+				//glColor4i(QColor(255, 255, 255, 130));
 				//m_oglTextSmall->renderText(m_panRect.right() - 100, m_panRect.top(), 5.0f, "Region 1");
 
 				if (m_mouseRegion == panRegion && m_crossHairCursor)
@@ -720,7 +720,7 @@ void QGLWidebandPanel::drawSpectrum() {
 		drawGLRect(rect, QColor(160, 235, 255, 80), 0.0f);
 
 		// small vertical line
-//		qglColor(QColor(255, 0, 0, 255));
+//		glColor4i(QColor(255, 0, 0, 255));
 //		glBegin(GL_LINES);
 //			glVertex3f(centerFreq, y2 + 15, 4.0f);
 //			glVertex3f(centerFreq, y2 + 30, 4.0f);
@@ -842,7 +842,7 @@ void QGLWidebandPanel::drawGrid() {
 	int height = m_panRect.height();
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glColor4f(m_redGrid, m_greenGrid, m_blueGrid, 1.0);
+	glColor4i(m_redGrid, m_greenGrid, m_blueGrid, 1.0);
 	
 	glDisable(GL_MULTISAMPLE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -900,7 +900,7 @@ void QGLWidebandPanel::drawCrossHair() {
 	glDisable(GL_LINE_SMOOTH);
 	glLineWidth(1.0f);
 
-	qglColor(QColor(255, 255, 255, 80));
+	glColor4i(255, 255, 255, 80);
 
 	// set a scissor box
 	glScissor(rect.left(), rect.top(), rect.width() - 1, rect.height());
@@ -919,7 +919,7 @@ void QGLWidebandPanel::drawCrossHair() {
 	glEnd();
 
 	// cross hair
-	qglColor(QColor(255, 255, 255, 180));
+	glColor4i(255, 255, 255, 180);
 	glBegin(GL_LINES);
 		glVertex3f(x     , y - 20, 5.0f);
 		glVertex3f(x     , y + 20, 5.0f);
@@ -931,7 +931,7 @@ void QGLWidebandPanel::drawCrossHair() {
 	if (m_mouseRegion == panRegion) {
 		
 		QString str;
-		qglColor(QColor(255, 255, 255, 255));
+		glColor4i(255, 255, 255, 255);
 
 		qreal unit = (qreal)((MAXHPFREQUENCY * m_freqScaleZoomFactor) / m_panRect.width());
 		qreal frequency = (unit * x) + m_lowerFrequency;
@@ -983,7 +983,7 @@ void QGLWidebandPanel::drawHamBand(
 	//QFontMetrics d_fm(m_smallFont);
 	int fontWidth = m_fonts.smallFontMetrics->boundingRect(band).width();
 
-	qglColor(QColor(255, 255, 255, 180));
+	glColor4i(255, 255, 255, 180);
 	m_oglTextSmall->renderText((x2 + x1 - fontWidth)/2.0f, y1, 5.0f, band);
 }
 
@@ -1367,7 +1367,7 @@ void QGLWidebandPanel::enterEvent(QEvent *event) {
 	m_mouseRegion = elsewhere;
 	update();
 
-	QGLWidget::enterEvent(event);
+	QOpenGLWidget::enterEvent(event);
 }
 
 void QGLWidebandPanel::leaveEvent(QEvent *event) {
@@ -1376,7 +1376,7 @@ void QGLWidebandPanel::leaveEvent(QEvent *event) {
 	m_mouseRegion = elsewhere;
 	update();
 
-	QGLWidget::leaveEvent(event);
+	QOpenGLWidget::leaveEvent(event);
 }
 
 void QGLWidebandPanel::wheelEvent(QWheelEvent* event) {

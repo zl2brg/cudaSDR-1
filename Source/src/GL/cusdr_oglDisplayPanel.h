@@ -40,7 +40,10 @@
 //#include <QQueue>
 //#include <QDebug>
 //#include <QMutex>
-//#include <QtOpenGL/QGLWidget>
+//#include <QtOpenGL/QOpenGLWidget>
+#include <QOpenGLWidget>
+#include <QtGui/QOpenGLFramebufferObject>
+#include <QOpenGLFunctions>
 
 #ifdef LOG_DISPLAYPANEL
 #   define DISPLAYPANEL_DEBUG qDebug().nospace() << "DisplayPanel::\t"
@@ -49,7 +52,7 @@
 #endif
 
 
-class OGLDisplayPanel : public QGLWidget {
+class OGLDisplayPanel : public QOpenGLWidget,  protected QOpenGLFunctions {
 
     Q_OBJECT
 
@@ -87,7 +90,7 @@ private:
 	QSDR::_HWInterfaceMode		m_hwInterface;
 	QSDR::_DataEngineState		m_dataEngineState;
 
-	QGLFramebufferObject		*m_smeterFBO;
+	QOpenGLFramebufferObject		*m_smeterFBO;
 
 	QList<TFrequency>			m_frequencyList;
 

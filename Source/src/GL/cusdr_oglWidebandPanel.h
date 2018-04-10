@@ -39,7 +39,7 @@
 #include <QWheelEvent>
 //#include <QQueue>
 //#include <QDebug>
-//#include <QtOpenGL/QGLWidget>
+//#include <QtOpenGL/QOpenGLWidget>
 //#include <QGLFramebufferObject>
 
 #ifdef LOG_WBGRAPHICS
@@ -49,7 +49,7 @@
 #endif
 
 
-class QGLWidebandPanel : public QGLWidget {
+class QGLWidebandPanel : public QOpenGLWidget {
 
     Q_OBJECT
 

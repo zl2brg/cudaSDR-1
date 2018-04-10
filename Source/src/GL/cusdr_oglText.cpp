@@ -68,31 +68,23 @@ OGLTextPrivate::~OGLTextPrivate() {
 
 void OGLTextPrivate::allocateTexture() {
 	
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	// the texture ends at the edges (clamp)
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	// select modulate to mix texture with color for shading
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	
 	
 	QImage image(TEXTURE_SIZE, TEXTURE_SIZE, QImage::Format_ARGB32);
+	
 	image.fill(Qt::transparent);
-	image = QGLWidget::convertToGLFormat(image);
+	
+     QOpenGLTexture *fonttext = new QOpenGLTexture(QOpenGLTexture::Target2D);
+     fonttext->setData((QOpenGLTexture::PixelFormat::RGBA));
+     fonttext->setData(image);
+     fonttext->allocateStorage(QOpenGLTexture::RGB_Integer, QOpenGLTexture::UInt8);
+     //fonttext->allocateStorage();
 
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+     fonttext->bind();
+//	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
-
-    textures += texture;
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+    textures += fonttext->textureId();
 }
 
 CharData &OGLTextPrivate::createCharacter(QChar c) {
@@ -133,11 +125,12 @@ CharData &OGLTextPrivate::createCharacter(QChar c) {
     //painter.drawText(0, fontMetrics.ascent(), c);
 	painter.drawText(pixmap.rect(), Qt::TextSingleLine | Qt::TextDontClip | Qt::AlignCenter, c);
     painter.end();
-
-
-    QImage image = QGLWidget::convertToGLFormat(pixmap.toImage());
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, xOffset, yOffset, width, height, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+//    fonttexture = new QOpenGLTexture(pixmap.toImage());
+   // glBindTexture(GL_TEXTURE_2D, fonttexture);
+    fonttext->setData((QOpenGLTexture::PixelType::RGB8I));
+    fonttext->setData(pixmap);
+    fonttext->allocateStorage(QOpenGLTexture::RGB_Integer, QOpenGLTexture::UInt8);
+  //  glTexSubImage2D(GL_TEXTURE_2D, 0, xOffset, yOffset, width, height, GL_RGBA, GL_UNSIGNED_BYTE, fonttexture);
 
     CharData& character = characters[unicodeC];
     character.textureId = texture;

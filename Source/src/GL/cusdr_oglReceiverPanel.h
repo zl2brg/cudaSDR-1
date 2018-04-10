@@ -37,7 +37,8 @@
 #include "cusdr_radioPopupWidget.h"
 
 #include <QWheelEvent>
-#include <QtOpenGL/QGLWidget>
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
 
 
 #ifdef LOG_GRAPHICS
@@ -47,7 +48,7 @@
 #endif
 
 
-class QGLReceiverPanel : public QGLWidget {
+class QGLReceiverPanel : public QOpenGLWidget {
 
     Q_OBJECT
 

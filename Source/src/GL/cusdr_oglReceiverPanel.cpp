@@ -48,7 +48,7 @@
 #define	btn_widths		34
 
 QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
-	: QGLWidget(QGLFormat(QGL::SampleBuffers|QGL::AlphaChannel), parent)
+	: QOpenGLWidget(parent)
 
 	, set(Settings::instance())
 	, m_serverMode(set->getCurrentServerMode())
@@ -104,7 +104,7 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	setAutoBufferSwap(true);
+	//setAutoBufferSwap(true);
 	setAutoFillBackground(false);
 	
 	setMouseTracking(true);
@@ -590,7 +590,7 @@ void QGLReceiverPanel::initializeGL() {
 	if (!isValid()) return;
 	
 
-	/*QOpenGLInfo glInfo;
+	/*QGLInfo glInfo;
 	glInfo.getInfo();
 	glInfo.printSelf();*/
 
@@ -782,7 +782,7 @@ void QGLReceiverPanel::drawPanadapter() {
 			QString str = "ADC  Overload";
 			int rectWidth = m_fonts.hugeFontMetrics->boundingRect(str).width();
 
-			qglColor(QColor(255, 0, 0, 155));
+			glColor4i(QColor(255, 0, 0, 155));
 			m_oglTextHuge->renderText((x2-rectWidth)/2, y1+30, -3.5f, str);
 		}
 #endif
@@ -1161,9 +1161,9 @@ void QGLReceiverPanel::drawPanadapterGrid() {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	
 	if (m_receiver == m_currentReceiver)
-		glColor4f(m_redGrid, m_greenGrid, m_blueGrid, 1.0f);
+		glColor4i(m_redGrid, m_greenGrid, m_blueGrid, 1.0f);
 	else
-		glColor4f(m_redGrid, m_greenGrid, m_blueGrid, 0.8f);
+		glColor4i(m_redGrid, m_greenGrid, m_blueGrid, 0.8f);
 
 	
 	glDisable(GL_MULTISAMPLE);
@@ -1317,7 +1317,7 @@ void QGLReceiverPanel::drawPanFilter() {
 
 		glDisable(GL_MULTISAMPLE);
 		glLineWidth(1);
-		qglColor(color);
+		glColor4i(color.red(),color.green(),color.blue(),color.alpha());
 		glBegin(GL_LINES);
 			glVertex3f(m_filterLeft, m_filterTop, 4.0f);
 			glVertex3f(m_filterLeft, m_filterBottom, 4.0f);
@@ -1328,7 +1328,7 @@ void QGLReceiverPanel::drawPanFilter() {
 		QString str1 = QString("Filter Lo");
 		QString str2 = frequencyString(m_filterLowerFrequency, true);
 
-		qglColor(QColor(0, 0, 0, 255));
+		glColor4i(0, 0, 0, 255);
 		if (m_smallSize) {
 
 			m_oglTextSmall->renderText(m_filterLeft + 5, m_filterTop + 44, 4.0f, str1);
@@ -1340,7 +1340,7 @@ void QGLReceiverPanel::drawPanFilter() {
 			m_oglTextBig1->renderText(m_filterLeft + 5, m_filterTop + 64, 4.0f, str2);
 		}
 
-		qglColor(QColor(255, 255, 255, 255));
+		glColor4i(255, 255, 255, 255);
 		if (m_smallSize) {
 
 			m_oglTextSmall->renderText(m_filterLeft + 3, m_filterTop + 42, 5.0f, str1);
@@ -1359,7 +1359,7 @@ void QGLReceiverPanel::drawPanFilter() {
 
 		glDisable(GL_MULTISAMPLE);
 		glLineWidth(1);
-		qglColor(color);
+		glColor4i(color.red(),color.green(),color.blue(),color.alpha());
 		glBegin(GL_LINES);
 			glVertex3f(m_filterRight, m_filterTop, 4.0f);
 			glVertex3f(m_filterRight, m_filterBottom, 4.0f);
@@ -1370,7 +1370,7 @@ void QGLReceiverPanel::drawPanFilter() {
 		QString str1 = QString("Filter Hi");
 		QString str2 = frequencyString(m_filterUpperFrequency, true);
 
-		qglColor(QColor(0, 0, 0, 255));
+		glColor4i(0, 0, 0, 255);
 		if (m_smallSize) {
 
 			m_oglTextSmall->renderText(m_filterRight + 5, m_filterTop + 44, 4.0f, str1);
@@ -1382,7 +1382,7 @@ void QGLReceiverPanel::drawPanFilter() {
 			m_oglTextBig1->renderText(m_filterRight + 5, m_filterTop + 64, 4.0f, str2);
 		}
 
-		qglColor(QColor(255, 255, 255, 255));
+		glColor4i(255, 255, 255, 255);
 		if (m_smallSize) {
 
 			m_oglTextSmall->renderText(m_filterRight + 3, m_filterTop + 42, 5.0f, str1);
@@ -1408,7 +1408,7 @@ void QGLReceiverPanel::drawWaterfall() {
 	//int height = this->size().height();
 
 
-	glColor4f(1.0, 1.0, 1.0, 1.0);
+	glColor4i(1.0, 1.0, 1.0, 1.0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
@@ -1613,7 +1613,7 @@ void QGLReceiverPanel::drawCrossHair() {
 	glDisable(GL_LINE_SMOOTH);
 	glLineWidth(1.0f);
 
-	qglColor(QColor(95, 95, 95, 255));
+	glColor4i(95, 95, 95, 255);
 
 	// set a scissor box
 	glScissor(rect.left(), rect.top(), rect.width() - 1, rect.height());
@@ -1632,7 +1632,7 @@ void QGLReceiverPanel::drawCrossHair() {
 	glEnd();
 
 	// cross hair
-	qglColor(QColor(180, 180, 180, 255));
+	glColor4i(180, 180, 180, 255);
 	glBegin(GL_LINES);
 		glVertex3f(x     , y - 20, 5.0f);
 		glVertex3f(x     , y + 20, 5.0f);
@@ -1692,18 +1692,18 @@ void QGLReceiverPanel::drawCrossHair() {
 	}
 
 	// delta frequency and frequency
-	//qglColor(QColor(200, 55, 55, 255));
-	qglColor(QColor(200, 200, 200, 255));
+	//glColor4i(QColor(200, 55, 55, 255));
+	glColor4i(200, 200, 200, 255);
 	if (m_smallSize) {
 
 		m_oglTextSmall->renderText(tx, ty, 5.0f, dFstr);
-		//qglColor(QColor(200, 200, 200, 255));
+		//glColor4i(QColor(200, 200, 200, 255));
 		m_oglTextSmall->renderText(tx, ty + fontHeight, 5.0f, fstr);
 	}
 	else {
 
 		m_oglTextBig1->renderText(tx, ty, 5.0f, dFstr);
-		//qglColor(QColor(200, 200, 200, 255));
+		//glColor4i(QColor(200, 200, 200, 255));
 		m_oglTextBig1->renderText(tx, ty + fontHeight, 5.0f, fstr);
 	}
 
@@ -1746,16 +1746,16 @@ void QGLReceiverPanel::drawVFOControl() {
 		
 		if (m_dataEngineState == QSDR::DataEngineUp) {
 				
-			qglColor(QColor(0, 0, 0, 255));
+			glColor4i(0, 0, 0, 255);
 			m_oglTextSmall->renderText(x1+3, y1, 0.0f, str);
-			qglColor(QColor(255, 170, 90, 200));
+			glColor4i(255, 170, 90, 200);
 			m_oglTextSmall->renderText(x1+1, y1-2, 1.0f, str);
 		}
 		else {
 
-			qglColor(QColor(0, 0, 0, 255));
+			glColor4i(0, 0, 0, 255);
 			m_oglTextSmall->renderText(x1+3, y1, 0.0f, str);
-			qglColor(QColor(150, 150, 150, 100));
+			glColor4i(150, 150, 150, 100);
 			m_oglTextSmall->renderText(x1+1, y1-2, 1.0f, str);
 		}
 	}
@@ -1768,16 +1768,16 @@ void QGLReceiverPanel::drawVFOControl() {
 
 		if (m_dataEngineState == QSDR::DataEngineUp) {
 				
-			qglColor(QColor(0, 0, 0, 255));
+			glColor4i(0, 0, 0, 255);
 			m_oglTextSmall->renderText(x1+3, y1, 0.0f, str);
-			qglColor(QColor(255, 170, 90, 200));
+			glColor4i(255, 170, 90, 200);
 			m_oglTextSmall->renderText(x1+1, y1-2, 1.0f, str);
 		}
 		else {
 
-			qglColor(QColor(0, 0, 0, 255));
+			glColor4i(0, 0, 0, 255);
 			m_oglTextSmall->renderText(x1+3, y1, 0.0f, str);
-			qglColor(QColor(150, 150, 150, 100));
+			glColor4i(150, 150, 150, 100);
 			m_oglTextSmall->renderText(x1+1, y1-2, 1.0f, str);
 		}
 	}
@@ -1793,9 +1793,9 @@ void QGLReceiverPanel::drawVFOControl() {
 
 		if (m_dataEngineState == QSDR::DataEngineUp) {
 				
-			qglColor(QColor(0, 0, 0, 255));
+			glColor4i(0, 0, 0, 255);
 			m_oglTextSmall->renderText(x1+3, y1, 0.0f, str.arg(m_sampleSize));
-			qglColor(QColor(255, 170, 90, 200));
+			glColor4i(255, 170, 90, 200);
 			m_oglTextSmall->renderText(x1+1, y1-2, 1.0f, str.arg(m_sampleSize));
 		}
 		
@@ -1829,9 +1829,9 @@ void QGLReceiverPanel::drawVFOControl() {
 
 		if (m_dataEngineState == QSDR::DataEngineUp) {
 				
-			qglColor(QColor(0, 0, 0, 255));
+			glColor4i(0, 0, 0, 255);
 			m_oglTextSmall->renderText(x1+3, y1, 0.0f, str.arg(s));
-			qglColor(QColor(255, 170, 90, 200));
+			glColor4i(255, 170, 90, 200);
 			m_oglTextSmall->renderText(x1+1, y1-2, 1.0f, str.arg(s));
 		}
 	}
@@ -1850,7 +1850,7 @@ void QGLReceiverPanel::drawVFOControl() {
 
 		QRect rect = QRect(x, y, m_fonts.smallFontMetrics->width(str) + 4, m_fonts.fontHeightSmallFont + 2);
 		drawGLRect(rect, col, 2.0f);
-		qglColor(QColor(255, 255, 255, 255));
+		glColor4i(255, 255, 255, 255);
 		m_oglTextSmall->renderText(x+1, y-2, 3.0f, str);
 	}
 
@@ -1865,11 +1865,11 @@ void QGLReceiverPanel::drawVFOControl() {
 
 		QRect rect = QRect(x, y, m_fonts.smallFontMetrics->width(str) + 4, m_fonts.fontHeightSmallFont + 2);
 		drawGLRect(rect, col, 2.0f);
-		qglColor(QColor(255, 255, 255, 255));
+		glColor4i(255, 255, 255, 255);
 		m_oglTextSmall->renderText(x+1, y-2, 3.0f, str);
 	}
 
-	//qglColor(QColor(0, 0, 0));
+	//glColor4i(QColor(0, 0, 0));
 	//m_oglTextSmall->renderText(x1+1, y1-2, 3.0f, str);
 
 	// set Center = VFO frequency button
@@ -1894,7 +1894,7 @@ void QGLReceiverPanel::drawVFOControl() {
 	
 	m_midToVfoButtonRect = QRect(x1, y1, m_fonts.smallFontMetrics->width(str) + 5, m_fonts.fontHeightSmallFont + 2);
 	drawGLRect(m_midToVfoButtonRect, col, 2.0f);
-	qglColor(QColor(0, 0, 0));
+	glColor4i(QColor(0, 0, 0));
 	m_oglTextSmall->renderText(x1+1, y1-2, 3.0f, str);*/
 
 
@@ -1914,7 +1914,7 @@ void QGLReceiverPanel::drawVFOControl() {
 
 	m_vfoToMidButtonRect = QRect(x1, y1, m_fonts.smallFontMetrics->width(str) + 5, m_fonts.fontHeightSmallFont + 2);
 	drawGLRect(m_vfoToMidButtonRect, col, 2.0f);
-	qglColor(QColor(0, 0, 0));
+	glColor4i(QColor(0, 0, 0));
 	m_oglTextSmall->renderText(x1+1, y1-2, 3.0f, str);*/
 }
 
@@ -1941,7 +1941,7 @@ void QGLReceiverPanel::drawReceiverInfo() {
 
 	rect = QRect(x1+2, y1, m_fonts.smallFontMetrics->tightBoundingRect(str).width() + 5, m_fonts.fontHeightSmallFont + 2);
 	drawGLRect(rect, col, 2.0f);
-	qglColor(QColor(0, 0, 0));
+	glColor4i(QColor(0, 0, 0));
 	m_oglTextSmall->renderText(x1+3, y1-2, 3.0f, str);*/
 
 
@@ -1970,7 +1970,7 @@ void QGLReceiverPanel::drawReceiverInfo() {
 
 	//m_agcButtonRect = QRect(x1+2, y1, m_fonts.smallFontMetrics->tightBoundingRect(str).width() + 5, m_fonts.fontHeightSmallFont + 2);
 	//drawGLRect(m_agcButtonRect, col, 2.0f);
-	//qglColor(QColor(0, 0, 0));
+	//glColor4i(QColor(0, 0, 0));
 	//m_oglTextSmall->renderText(x1+3, y1-2, 3.0f, str);
 
 
@@ -2032,7 +2032,7 @@ void QGLReceiverPanel::drawReceiverInfo() {
 
 		rect = QRect(x1, y1, m_fonts.smallFontMetrics->width(str) + 4, m_fonts.fontHeightSmallFont + 2);
 		drawGLRect(rect, colFlt, 2.0f);
-		qglColor(QColor(0, 0, 0));
+		glColor4i(0, 0, 0,255);
 		m_oglTextSmall->renderText(x1+1, y1-2, 3.0f, str);
 
 		// DSP mode
@@ -2043,7 +2043,7 @@ void QGLReceiverPanel::drawReceiverInfo() {
 		
 		rect = QRect(x1, y1, m_fonts.smallFontMetrics->width(str) + 3, m_fonts.fontHeightSmallFont + 2);
 		drawGLRect(rect, colDSP, 2.0f);
-		qglColor(QColor(0, 0, 0));
+		glColor4i(0, 0, 0,255);
 		m_oglTextSmall->renderText(x1+1, y1-2, 3.0f, str);
 
 		// AGC mode
@@ -2054,7 +2054,7 @@ void QGLReceiverPanel::drawReceiverInfo() {
 
 		rect = QRect(x1, y1, m_fonts.smallFontMetrics->width(str) + 4, m_fonts.fontHeightSmallFont + 2);
 		drawGLRect(rect, colAGC, 2.0f);
-		qglColor(QColor(0, 0, 0));
+		glColor4i(0, 0, 0,255);
 		m_oglTextSmall->renderText(x1+1, y1-2, 3.0f, str);
 
 		// ADC mode
@@ -2065,7 +2065,7 @@ void QGLReceiverPanel::drawReceiverInfo() {
 
 		rect = QRect(x1, y1, m_fonts.smallFontMetrics->width(str) + 4, m_fonts.fontHeightSmallFont + 2);
 		drawGLRect(rect, colADC, 2.0f);
-		qglColor(QColor(0, 0, 0));
+		glColor4i(0, 0, 0,255);
 		m_oglTextSmall->renderText(x1+1, y1-2, 3.0f, str);
 
 		// VFO frequency
@@ -2080,30 +2080,30 @@ void QGLReceiverPanel::drawReceiverInfo() {
 		QString fstr = str.arg(f1/1000).arg(f1 - 1000 * (int)(f1/1000), 3, 10, QLatin1Char('0'));
 		//int fLength = m_fonts.bigFont1Metrics->width(fstr) + 55;
 
-		qglColor(QColor(0, 0, 0, alpha));
+		glColor4i(0, 0, 0, alpha);
 		m_oglTextBig1->renderText(x+2, 14, 4.0f, fstr);
 		
-		qglColor(QColor(255, 255, 255, alpha));
+		glColor4i(255, 255, 255, alpha);
 		m_oglTextBig1->renderText(x, 12, 5.0f, fstr);
 
 		str = "%1";
 		if (f1 / 1000 < 10) {
 
-			qglColor(QColor(0, 0, 0, alpha));
+			glColor4i(0, 0, 0, alpha);
 			m_oglTextBig2->renderText(x + 36, 14, 4.0f, str.arg(f2, 3, 10, QLatin1Char('0')));
 			m_oglTextBig1->renderText(x + 60, 14, 4.0f, "MHz");
 
-			qglColor(QColor(255, 255, 255, alpha));
+			glColor4i(255, 255, 255, alpha);
 			m_oglTextBig2->renderText(x + 34, 12, 5.0f, str.arg(f2, 3, 10, QLatin1Char('0')));
 			m_oglTextBig1->renderText(x + 58, 12, 5.0f, "MHz");
 		}
 		else {
 
-			qglColor(QColor(0, 0, 0, alpha));
+			glColor4i(0, 0, 0, alpha);
 			m_oglTextBig2->renderText(x + 39, 13, 4.0f, str.arg(f2, 3, 10, QLatin1Char('0')));
 			m_oglTextBig1->renderText(x + 65, 13, 4.0f, "MHz");
 
-			qglColor(QColor(255, 255, 255, alpha));
+			glColor4i(255, 255, 255, alpha);
 			m_oglTextBig2->renderText(x + 41, 11, 5.0f, str.arg(f2, 3, 10, QLatin1Char('0')));
 			m_oglTextBig1->renderText(x + 63, 11, 5.0f, "MHz");
 		}
@@ -2123,7 +2123,7 @@ void QGLReceiverPanel::drawReceiverInfo() {
 		QString fstr = str.arg(f1/1000).arg(f1 - 1000 * (int)(f1/1000), 3, 10, QLatin1Char('0'));
 		GLint x = m_panRect.width()/2 + 10;
 		
-		qglColor(QColor(80, 180, 240, 180));
+		glColor4i(80, 180, 240, 180);
 		m_oglTextBig1->renderText(x, 27, 5.0f, fstr);
 
 		str = "%1";
@@ -2157,17 +2157,17 @@ void QGLReceiverPanel::drawAGCControl() {
 		//GRAPHICS_DEBUG << "m_agcFixedGainLevelPixel = " << m_agcFixedGainLevelPixel;
 
 		QString str = "AGC-F";
-		qglColor(QColor(0, 0, 0, 255));
+		glColor4i(0, 0, 0, 255);
 		m_oglTextSmall->renderText(m_panRect.right() - 32, m_agcFixedGainLevelPixel - 13, 4.0f, str);
-		qglColor(QColor(225, 125, 225, 255));
+		glColor4i(225, 125, 225, 255);
 		m_oglTextSmall->renderText(m_panRect.right() - 34, m_agcFixedGainLevelPixel - 15, 5.0f, str);
 
 		// AGC fixed gain line
 		glBegin(GL_LINES);
-			qglColor(QColor(0, 0, 0, 255));
+			glColor4i(0, 0, 0, 255);
 			glVertex3f(m_dBmScalePanRect.right() - 1, m_agcFixedGainLevelPixel + 2, 4.0f);
 			glVertex3f(m_panRect.right() - 1, m_agcFixedGainLevelPixel, 4.0f);
-			qglColor(QColor(225, 125, 225, 255));
+			glColor4i(225, 125, 225, 255);
 			glVertex3f(m_dBmScalePanRect.right() - 3, m_agcFixedGainLevelPixel, 5.0f);
 			glVertex3f(m_panRect.right() - 1, m_agcFixedGainLevelPixel, 4.0f);
 		glEnd();
@@ -2181,17 +2181,17 @@ void QGLReceiverPanel::drawAGCControl() {
 			m_agcHangLevelPixel = dBmToGLPixel(m_panRect, m_dBmPanMax, m_dBmPanMin, m_agcHangLevelOld);
 
 		QString str = "AGC-T";
-		qglColor(QColor(0, 0, 0, 255));
+		glColor4i(0, 0, 0, 255);
 		m_oglTextSmall->renderText(m_panRect.right() - 32, m_agcThresholdPixel - 13, 4.0f, str);
-		qglColor(QColor(225, 125, 125, 255));
+		glColor4i(225, 125, 125, 255);
 		m_oglTextSmall->renderText(m_panRect.right() - 34, m_agcThresholdPixel - 15, 5.0f, str);
 
 		// AGC threshold line
 		glBegin(GL_LINES);
-			qglColor(QColor(0, 0, 0, 255));
+			glColor4i(0, 0, 0, 255);
 			glVertex3f(m_dBmScalePanRect.right() - 1, m_agcThresholdPixel + 2, 4.0f);
 			glVertex3f(m_panRect.right() - 1, m_agcThresholdPixel, 4.0f);
-			qglColor(QColor(225, 125, 125, 255));
+			glColor4i(225, 125, 125, 255);
 			glVertex3f(m_dBmScalePanRect.right() - 3, m_agcThresholdPixel, 5.0f);
 			glVertex3f(m_panRect.right() - 1, m_agcThresholdPixel, 4.0f);
 		glEnd();
@@ -2200,16 +2200,16 @@ void QGLReceiverPanel::drawAGCControl() {
 		if (m_agcHangEnabled) {
 
 			str = "AGC-H";
-			qglColor(QColor(0, 0, 0, 255));
+			glColor4i(0, 0, 0, 255);
 			m_oglTextSmall->renderText(m_panRect.right() - 32, m_agcHangLevelPixel - 13, 4.0f, str);
-			qglColor(QColor(125, 225, 125, 255));
+			glColor4i(125, 225, 125, 255);
 			m_oglTextSmall->renderText(m_panRect.right() - 34, m_agcHangLevelPixel - 15, 5.0f, str);
 
 			glBegin(GL_LINES);
-				qglColor(QColor(0, 0, 0, 255));
+				glColor4i(0, 0, 0, 255);
 				glVertex3f(m_dBmScalePanRect.right() - 1, m_agcHangLevelPixel + 2, 4.0f);
 				glVertex3f(m_panRect.right() - 1, m_agcHangLevelPixel, 4.0f);
-				qglColor(QColor(125, 225, 125, 255));
+				glColor4i(125, 225, 125, 255);
 				glVertex3f(m_dBmScalePanRect.right() - 3, m_agcHangLevelPixel, 5.0f);
 				glVertex3f(m_panRect.right() - 1, m_agcHangLevelPixel, 4.0f);
 			glEnd();
@@ -2871,7 +2871,7 @@ void QGLReceiverPanel::enterEvent(QEvent *event) {
 	setCursor(Qt::BlankCursor);
 	update();
 
-	QGLWidget::enterEvent(event);
+	QOpenGLWidget::enterEvent(event);
 }
 
 void QGLReceiverPanel::leaveEvent(QEvent *event) {
@@ -2881,7 +2881,7 @@ void QGLReceiverPanel::leaveEvent(QEvent *event) {
 
 	update();
 
-	QGLWidget::leaveEvent(event);
+	QOpenGLWidget::leaveEvent(event);
 }
 
 void QGLReceiverPanel::wheelEvent(QWheelEvent* event) {
@@ -4485,6 +4485,7 @@ void QGLReceiverPanel::setAGCLineLevels(QObject *sender, int rx, qreal thresh, q
 	m_agcHangLevelOld = hang;
 	//GRAPHICS_DEBUG << "m_agcThresholdOld = " << m_agcThresholdOld;
 	//GRAPHICS_DEBUG << "m_agcHangLevelOld = " << m_agcHangLevelOld;
+    update();
 }
 
 void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value) {
@@ -4496,6 +4497,7 @@ void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value
 
 	m_agcFixedGain = value;
 	//GRAPHICS_DEBUG << "m_agcFixedGain = " << m_agcFixedGain;
+    update();
 }
 
 void QGLReceiverPanel::setADCMode(QObject *sender, int rx, ADCMode mode) {
