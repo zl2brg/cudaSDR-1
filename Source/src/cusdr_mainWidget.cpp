@@ -411,7 +411,7 @@ void MainWindow::setup() {
 	setCentralWidget(centralwidget);
 
 	// update the display panel
-	m_oglDisplayPanel->updateGL();
+    m_oglDisplayPanel->update();
 
 	// set the Alex configuration
 	alexConfigurationChanged(m_alexConfig);
