@@ -35,6 +35,7 @@
 #include "cusdr_settings.h"
 #include "QtDSP/qtdsp_dspEngine.h"
 #include "Util/cusdr_highResTimer.h"
+#include "QtWDSP/qtwdsp_dspEngine.h"
 
 #ifdef LOG_RECEIVER
 #   define RECEIVER_DEBUG qDebug().nospace() << "Receiver::\t"
@@ -95,6 +96,7 @@ public:
 	QVector<float>	newSpectrum;
 
 	QDSPEngine	*qtdsp;
+	QWDSPEngine *qtwdsp;
 	HResTimer	*highResTimer;
 
 	CPX			inBuf;
@@ -145,8 +147,12 @@ private slots:
 	void 	setFramesPerSecond(QObject *sender, int rx, int value);
 
 	bool	initQtDSPInterface();
-	void	deleteQtDSP();
+	bool	initQtWDSPInterface();
 
+    void	deleteQtDSP();
+    void	deleteQtWDSP();
+
+    
 	//void	setAGCMaximumGain_dBm(QObject* sender, int rx, int value);
 	void	setAGCMaximumGain_dB(QObject* sender, int rx, qreal value);
 	void	setAGCFixedGain_dB(QObject* sender, int rx, qreal value);
@@ -200,7 +206,7 @@ private:
 	long	m_vfoFrequency;
 
 	float	m_audioVolume;
-	float	m_sMeterValue;
+	double	m_sMeterValue;
 
 	qreal	m_agcGain;
 	qreal	m_agcFixedGain_dB;
@@ -217,6 +223,7 @@ private:
 	qreal	m_filterHi;
 	qreal	m_dBmPanScaleMin;
 	qreal	m_dBmPanScaleMax;
+	int     m_refreshrate;
 
 	bool	m_connected;
 	bool	m_hangEnabled;

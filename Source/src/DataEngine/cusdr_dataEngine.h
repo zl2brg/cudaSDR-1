@@ -54,6 +54,7 @@
 #include "QtDSP/qtdsp_filter.h"
 #include "QtDSP/qtdsp_dualModeAverager.h"
 #include "AudioEngine/cusdr_audio_engine.h"
+#include "QtWDSP/qtwdsp_dspEngine.h"
 
 #ifdef LOG_DATA_ENGINE
 #   define DATA_ENGINE_DEBUG qDebug().nospace() << "DataEngine::\t"
@@ -411,8 +412,8 @@ private:
 	int				m_sendState;
 	int				m_chirpStartSample;
 
-	float			m_lsample;
-	float			m_rsample;
+	double			m_lsample;
+	double			m_rsample;
 	float			m_micSample_float;
 
 	unsigned long	m_IQSequence;

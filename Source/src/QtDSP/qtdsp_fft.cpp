@@ -36,9 +36,9 @@ QFFT::QFFT(int size)
 	, m_size(size)
 	, half_sz(size/2)
 {
-    cpxbuf = (fftwf_complex *) fftwf_malloc(sizeof(fftwf_complex) * m_size);
-    plan_fwd = fftwf_plan_dft_1d(m_size , cpxbuf, cpxbuf, FFTW_FORWARD, FFTW_MEASURE);
-    plan_rev = fftwf_plan_dft_1d(m_size , cpxbuf, cpxbuf, FFTW_BACKWARD, FFTW_MEASURE);
+    cpxbuf = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * m_size);
+    plan_fwd = fftw_plan_dft_1d(m_size , cpxbuf, cpxbuf, FFTW_FORWARD, FFTW_MEASURE);
+    plan_rev = fftw_plan_dft_1d(m_size , cpxbuf, cpxbuf, FFTW_BACKWARD, FFTW_MEASURE);
 
     memset(cpxbuf, 0, m_size * sizeof(cpxbuf));
 
@@ -46,19 +46,19 @@ QFFT::QFFT(int size)
 }
 
 QFFT::~QFFT() {
-	
-	fftwf_destroy_plan(plan_fwd);
-	fftwf_destroy_plan(plan_rev);
-	
-	if (cpxbuf) 
-		fftwf_free(cpxbuf);
+
+	fftw_destroy_plan(plan_fwd);
+	fftw_destroy_plan(plan_rev);
+
+	if (cpxbuf)
+		fftw_free(cpxbuf);
 
 	buf.clear();
 }
 
 void QFFT::DoFFTWForward(CPX &in, CPX &out, int size) {
     memcpy(cpxbuf, in.data(), sizeof(cpx) * size);
-    fftwf_execute(plan_fwd);
+    fftw_execute(plan_fwd);
     memcpy(out.data(), cpxbuf, sizeof(cpx) * size);
 }
 
@@ -66,7 +66,7 @@ void QFFT::DoFFTWForward(CPX &in, CPX &out, int size) {
 void QFFT::DoFFTWInverse(CPX &in, CPX &out, int size)  {
 
     memcpy(cpxbuf, in.data(), sizeof(cpx) * size);
-    fftwf_execute(plan_rev);
+    fftw_execute(plan_rev);
     memcpy(out.data(), cpxbuf, sizeof(cpx) * size);
 }
 
@@ -75,7 +75,7 @@ void QFFT::DoFFTWMagnForward(CPX &in, int size, float baseline, float correction
 
     memcpy(cpxbuf, in.data(), sizeof(cpx) * size);
 
-    fftwf_execute(plan_fwd);
+    fftw_execute(plan_fwd);
 
     for (int i = 0, j = size-1; i < size; i++, j--) {
 

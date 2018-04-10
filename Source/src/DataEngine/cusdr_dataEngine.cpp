@@ -31,12 +31,12 @@
 
 #define LOG_DATA_ENGINE
 // use DATA_ENGINE_DEBUG
-#define LOG_DATA_PROCESSOR
+//#define LOG_DATA_PROCESSOR
 // use DATA_PROCESSOR_DEBUG
 #define LOG_AUDIO_PROCESSOR
 // use AUDIO_PROCESSOR
 #define LOG_WIDEBAND_PROCESSOR
-// use WIDEBAND_PROCESSOR_DEBUG
+ //use WIDEBAND_PROCESSOR_DEBUG
 
 #include "cusdr_dataEngine.h"
 
@@ -981,7 +981,6 @@ bool DataEngine::start() {
 
 	// start the "frames-per-second" timer for all receivers
 	for (int i = 0; i < rcvrs; i++)
-		RX.at(i)->highResTimer->start();
 
 	// just give them a little time..
 	SleeperThread::msleep(100);
@@ -2868,8 +2867,8 @@ void DataProcessor::processInputBuffer(const QByteArray &buffer) {
                 m_rightSample += (int)((unsigned char) buffer.at(s++)) << 8;
                 m_rightSample += (int)((unsigned char) buffer.at(s++));
 
-				m_lsample = (float)(m_leftSample / 8388607.0f);
-				m_rsample = (float)(m_rightSample / 8388607.0f);
+				m_lsample = (double)(m_leftSample / 8388607.0f);
+				m_rsample = (double)(m_rightSample / 8388607.0f);
 
 				/*if (m_serverMode == QSDR::ChirpWSPR &&
 					m_chirpInititalized &&
@@ -2879,7 +2878,7 @@ void DataProcessor::processInputBuffer(const QByteArray &buffer) {
 					chirpData << m_rsample;
 				}*/
 
-				if (de->RX.at(r)->qtdsp) {
+				if (de->RX.at(r)->qtwdsp) {
 
 					de->RX[r]->inBuf[m_rxSamples].re = m_lsample; // 24 bit sample
 					de->RX[r]->inBuf[m_rxSamples].im = m_rsample; // 24 bit sample
@@ -2941,7 +2940,7 @@ void DataProcessor::processInputBuffer(const QByteArray &buffer) {
 
 				for (int r = 0; r < de->io.receivers; r++) {
 
-					if (de->RX.at(r)->qtdsp) {
+					if (de->RX.at(r)->qtwdsp) {
 						
 						QMetaObject::invokeMethod(de->RX.at(r), "dspProcessing", Qt::DirectConnection);// Qt::QueuedConnection);
 					}
@@ -3694,7 +3693,6 @@ WideBandDataProcessor::WideBandDataProcessor(THPSDRParameter *ioData, QSDR::_Ser
 	, m_stopped(false)
 {
 	m_WBDatagram.resize(0);
-
 	switch (m_serverMode) {
 		
 		case QSDR::SDRMode:
@@ -3763,7 +3761,6 @@ void WideBandDataProcessor::processWideBandData() {
 void WideBandDataProcessor::processWideBandInputBuffer(const QByteArray &buffer) {
 
 	int size;
-
 	//if (m_mercuryFW > 32 || m_hermesFW > 16)
 	if (io->mercuryFW > 32 || io->hermesFW > 11)
 		size = 2 * BIGWIDEBANDSIZE;

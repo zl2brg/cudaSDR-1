@@ -37,7 +37,7 @@ SignalMeter::SignalMeter(QObject *parent, int size)
 	, m_size(size)
 	, m_instValue(-80.0)
 	//, m_correction(59.0f)
-	, m_correction(-8.0f)
+	, m_correction(-0.0f)
 {
 }
 
@@ -48,25 +48,25 @@ void SignalMeter::ProcessBlock(CPX &in, int bsize) {
 
 	Q_UNUSED(bsize)
 
-    float tmp = 0.0f;
+    double tmp = 0.0f;
 
     for (int i = 0; i < m_size; i++)
     	tmp += (in.at(i).re * in.at(i).re + in.at(i).im * in.at(i).im);
 
-    m_instValue = (float)(10.0f * log10(tmp + 1.5E-45));
+    m_instValue = (double)(10.0f * log10(tmp + 1.5E-45));
 }
 
-float SignalMeter::getInstFValue() const {
+double  SignalMeter::getInstFValue() const {
 
 	return m_instValue + m_correction;
 }
 
-float SignalMeter::getCorrection() const {
+double SignalMeter::getCorrection() const {
 
 	return m_correction;
 }
 
-void SignalMeter::setCorrection(const float value) {
+void SignalMeter::setCorrection(const double value) {
 
 	if (m_correction == value) return;
 	

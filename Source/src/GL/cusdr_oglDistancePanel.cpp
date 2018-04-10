@@ -433,7 +433,6 @@ void QGLDistancePanel::paintChirpWSPRDisplay() {
 }
 
 void QGLDistancePanel::drawPanadapter() {
-
 	GLint vertexArrayLength = (GLint)m_panadapterBins.size();
 
 	GLint height = m_panRect.height();

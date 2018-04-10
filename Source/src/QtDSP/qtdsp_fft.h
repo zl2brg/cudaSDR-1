@@ -50,10 +50,10 @@ public slots:
     void DoFFTWMagnForward(CPX &in, int size, float baseline, float correction, float* fbr);
 
 private:    
-    fftwf_complex	*cpxbuf;
+    fftw_complex	*cpxbuf;
 
-    fftwf_plan		plan_fwd;
-    fftwf_plan		plan_rev;
+    fftw_plan		plan_fwd;
+    fftw_plan		plan_rev;
 
     CPX		buf;
 

@@ -51,19 +51,19 @@ public:
 
 	void 	ProcessBlock(CPX &in, int bsize);
 
-	float 	getInstFValue() const;
-	float 	getCorrection() const;
+	double 	getInstFValue() const;
+	double 	getCorrection() const;
 
 public slots:
-	void 	setCorrection(const float value);
+	void 	setCorrection(const double value);
 
 private:
 	Settings	*set;
 
     int 		m_size;
     
-    float 		m_instValue;
-    float 		m_correction;
+    double 		m_instValue;
+    double 		m_correction;
 };
 
 #endif // _QTDSP_SIGNALMETER_H

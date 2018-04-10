@@ -25,6 +25,7 @@
  */
 
 #define LOG_GRAPHICS
+//#define GRAPHICS_DEBUG
 
 // use: GRAPHICS_DEBUG
 
@@ -211,10 +212,10 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 	m_secWaterfallMin = -(1.0/m_fps) * m_secScaleWaterfallRect.height();
 
 	
-	m_dBmPanLogGain = 47;//49;//69 // allow user to calibrate this value
+	m_dBmPanLogGain = -20;//49;//69 // allow user to calibrate this value
 
-	m_cameraDistance = 0;
-	m_cameraAngle = QPoint(0, 0);
+	m_cameraDistance = 100;
+	m_cameraAngle = QPoint(200, 200);
 
 	m_mousePos = QPoint(-100, -100);
 	
@@ -3770,7 +3771,6 @@ void QGLReceiverPanel::setSpectrumBuffer(int rx, const qVectorFloat& buffer) {
 
 
 	if (m_dataEngineState == QSDR::DataEngineUp) {
-	
 		if (m_spectrumAveraging) {
 	
 			spectrumBufferMutex.lock();
