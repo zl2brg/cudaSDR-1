@@ -753,9 +753,9 @@ void QGLDistancePanel::drawPanadapterGrid() {
 	int height = m_panRect.height();
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	//glColor4i(0.35, 0.46, 0.51, 0.7);
-	//glColor4i(0.45, 0.56, 0.61, 1.0);
-	glColor4i(0.45f, 0.56f, 0.61f, 0.8f);
+    //glColor4f(0.35, 0.46, 0.51, 0.7);
+    //glColor4f(0.45, 0.56, 0.61, 1.0);
+    glColor4f(0.45f, 0.56f, 0.61f, 0.8f);
 	
 	glDisable(GL_MULTISAMPLE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -806,7 +806,7 @@ void QGLDistancePanel::drawPanFilter() {
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-	//glColor4i(0.65, 0.65, 0.65, 0.25);
+    //glColor4f(0.65, 0.65, 0.65, 0.25);
 	QColor color = QColor(150, 150, 150, 100);
 
 	GLint x1 = m_panRect.left() + qRound((qreal)(m_panRect.width()/2.0f) + freqLo * m_panRect.width() / m_freqScaleZoomFactor);
@@ -862,7 +862,7 @@ void QGLDistancePanel::drawCrossHair() {
 	glDisable(GL_LINE_SMOOTH);
 	glLineWidth(1.0f);
 
-	glColor4i(255, 255, 255, 80);
+    glColor4f(255, 255, 255, 80);
 
 	// set a scissor box
 	glScissor(rect.left(), rect.top(), rect.width() - 1, rect.height());
@@ -881,7 +881,7 @@ void QGLDistancePanel::drawCrossHair() {
 	glEnd();
 
 	// cross hair
-	glColor4i(255,255,255,180);
+    glColor4f(255,255,255,180);
 	glBegin(GL_LINES);
 		glVertex3f(x     , y - 20, 5.0f);
 		glVertex3f(x     , y + 20, 5.0f);
@@ -893,7 +893,7 @@ void QGLDistancePanel::drawCrossHair() {
 	//if (m_mouseRegion == panadapterRegion) {
 		
 	QString str;
-	glColor4i(255, 255, 255, 255);
+    glColor4f(255, 255, 255, 255);
 
 	int dx = m_panRect.width()/2 - x;
 	qreal unit = (qreal)((m_sampleRate * m_freqScaleZoomFactor) / m_panRect.width());

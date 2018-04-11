@@ -92,9 +92,8 @@ OGLDisplayPanel::OGLDisplayPanel(QWidget *parent)
        format.setDepthBufferSize(24);
        setFormat(format);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-//	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-	//setAutoBufferSwap(true);
-	setAutoFillBackground(false);
+    //setAutoBufferSwap(true);
+    setAutoFillBackground(false);
 	setMouseTracking(true);
 
 	m_freqStringLeftPos = 20;
@@ -429,13 +428,13 @@ void OGLDisplayPanel::setupTextstrings() {
 
     m_hermesStepAttnString = QString("Hermes Step-Attn:");
     m_hermesStepAttnStringWidth = m_oglTextSmall->fontMetrics().width(m_hermesStepAttnString);
-
+    update();
 }
 
 void OGLDisplayPanel::initializeGL() {
 
 	if (!isValid()) return;
-    initializeOpenGLFunctions();
+  //  initializeOpenGLFunctions();
 	// default initialization
 
 	//glShadeModel(GL_FLAT);
@@ -484,7 +483,7 @@ void OGLDisplayPanel::paintGL() {
 	paintLowerRegion();
 	paintSMeter();
 	//m_mutex.unlock();
-    update();
+  //  update();
 
 }
 
@@ -513,7 +512,7 @@ void OGLDisplayPanel::paintUpperRegion() {
 			drawGLRect(rect, QColor(242, 56, 109), -2.0f);
 			break;
 	}
-	glColor4i(0, 0, 0,0);
+    glColor4f(0, 0, 0,0);
 	m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y1, m_SYNCString);
 	
 	// ADC status
@@ -535,7 +534,7 @@ void OGLDisplayPanel::paintUpperRegion() {
 			drawGLRect(rect, QColor(242, 56, 109), -2.0f);
 			break;
 	}
-	glColor4i(0, 0, 0,255);
+    glColor4f(0, 0, 0,255);
 	m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y1, m_ADCString);
 	
 	// Packet loss status
@@ -557,7 +556,7 @@ void OGLDisplayPanel::paintUpperRegion() {
 			drawGLRect(rect, QColor(242, 56, 109), -2.0f);
 			break;
 	}
-	glColor4i(0, 0, 0,255);
+    glColor4f(0, 0, 0,255);
 	m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y1, m_PacketLossString);
 
 //	// send IQ data status
@@ -568,20 +567,20 @@ void OGLDisplayPanel::paintUpperRegion() {
 //
 //		case 0:
 //			drawGLRect(rect, QColor(68, 68, 68), -2.0f);
-//			//glColor4i(QColor(100, 100, 100));
+//			//glColor4f(QColor(100, 100, 100));
 //			break;
 //
 //		case 1:
 //			drawGLRect(rect, QColor(56, 242, 115), -2.0f);
-//			//glColor4i(QColor(56, 242, 115));
+//			//glColor4f(QColor(56, 242, 115));
 //			break;
 //
 //		case 2:
 //			drawGLRect(rect, QColor(242, 56, 109), -2.0f);
-//			//glColor4i(QColor(242, 56, 109));
+//			//glColor4f(QColor(242, 56, 109));
 //			break;
 //	}
-//	glColor4i(QColor(0, 0, 0));
+//	glColor4f(QColor(0, 0, 0));
 //	m_oglTextSmallItalic->renderText(m_syncWidth + m_adcWidth + 19, y1 + m_upperRectY, m_sendIQString);
 
 //	// receiver Audio status
@@ -592,20 +591,20 @@ void OGLDisplayPanel::paintUpperRegion() {
 //
 //		case 0:
 //			drawGLRect(rect, QColor(68, 68, 68), -2.0f);
-//			//glColor4i(QColor(100, 100, 100));
+//			//glColor4f(QColor(100, 100, 100));
 //			break;
 //
 //		case 1:
 //			drawGLRect(rect, QColor(56, 242, 115), -2.0f);
-//			//glColor4i(QColor(56, 242, 115));
+//			//glColor4f(QColor(56, 242, 115));
 //			break;
 //
 //		case 2:
 //			drawGLRect(rect, QColor(242, 56, 109), -2.0f);
-//			//glColor4i(QColor(242, 56, 109));
+//			//glColor4f(QColor(242, 56, 109));
 //			break;
 //	}
-//	glColor4i(QColor(0, 0, 0));
+//	glColor4f(QColor(0, 0, 0));
 //	m_oglTextSmallItalic->renderText(m_syncWidth + m_adcWidth + m_sendIQWidth + 29, y1 + m_upperRectY, m_recvAudioString);
 
 
@@ -624,15 +623,15 @@ void OGLDisplayPanel::paintUpperRegion() {
 		if (m_dataEngineState == QSDR::DataEngineUp) {
 
 			str.append(m_metisVersion);
-			glColor4i(206, 236, 248,255);
+            glColor4f(206, 236, 248,255);
 		}
 		else
-			glColor4i(0, 0, 0,255);
+            glColor4f(0, 0, 0,255);
 	}
 	else {
 
 		drawGLRect(rect, QColor(68, 68, 68), -2.0f);
-		glColor4i(0, 0, 0,255);
+        glColor4f(0, 0, 0,255);
 	}
 	m_oglTextSmallItalic->renderText(x1, y1, 1.0f, str);
 
@@ -656,15 +655,15 @@ void OGLDisplayPanel::paintUpperRegion() {
 
 		if (m_dataEngineState == QSDR::DataEngineUp) {
 			str.append(m_mercuryVersion);
-			glColor4i(206, 236, 248,255);
+            glColor4f(206, 236, 248,255);
 		}
 		else
-			glColor4i(0, 0, 0,255);
+            glColor4f(0, 0, 0,255);
 	}
 	else {
 
 		drawGLRect(rect, QColor(68, 68, 68), -2.0f);
-		glColor4i(0, 0, 0,255);
+        glColor4f(0, 0, 0,255);
 	}
 
 	//m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y1, 1.0f, str);
@@ -691,10 +690,10 @@ void OGLDisplayPanel::paintUpperRegion() {
 
 		if (m_dataEngineState == QSDR::DataEngineUp) {
 			str.append(m_penelopeVersion);
-			glColor4i(206, 236, 248,255);
+            glColor4f(206, 236, 248,255);
 		}
 		else
-			glColor4i(0, 0, 0,255);
+            glColor4f(0, 0, 0,255);
 	}
 	else if (set->getPennyLanePresence() && m_hwInterface == QSDR::Metis) {
 		str = m_pennylaneString;
@@ -708,10 +707,10 @@ void OGLDisplayPanel::paintUpperRegion() {
 
 		if (m_dataEngineState == QSDR::DataEngineUp) {
 			str.append(m_pennylaneVersion);
-			glColor4i(206, 236, 248,255);
+            glColor4f(206, 236, 248,255);
 		}
 		else
-			glColor4i(0, 0, 0,255);
+            glColor4f(0, 0, 0,255);
 	}
 	else {
 //        if (m_dataEngineState == QSDR::DataEngineUp && m_hwInterface == QSDR::Metis)
@@ -720,7 +719,7 @@ void OGLDisplayPanel::paintUpperRegion() {
 			rect = QRect(x1, y1, m_penelopeStringWidth, m_blankHeight);
 
         drawGLRect(rect, QColor(68, 68, 68), -2.0f);
-		glColor4i(0, 0, 0,255);
+        glColor4f(0, 0, 0,255);
 	}
 
 	m_oglTextSmallItalic->renderText(x1, y1, 1.0f, str);
@@ -758,14 +757,14 @@ void OGLDisplayPanel::paintUpperRegion() {
 
 		if (m_dataEngineState == QSDR::DataEngineUp) {
 			str.append(m_hermesVersion);
-			glColor4i(206, 236, 248,255);
+            glColor4f(206, 236, 248,255);
 		}
 		else
-			glColor4i(0, 0, 0,255);
+            glColor4f(0, 0, 0,255);
 	}
 	else {
 		drawGLRect(rect, QColor(68, 68, 68), -2.0f);
-		glColor4i(0, 0, 0,255);
+        glColor4f(0, 0, 0,255);
 	}
 
 	//m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y1, 1.0f, str);
@@ -790,15 +789,15 @@ void OGLDisplayPanel::paintUpperRegion() {
 		if (m_dataEngineState == QSDR::DataEngineUp) {
 
 			str.append(m_excaliburVersion);
-			glColor4i(206, 236, 248,255);
+            glColor4f(206, 236, 248,255);
 		}
 		else
-			glColor4i(0, 0, 0,255);
+            glColor4f(0, 0, 0,255);
 	}
 	else {
 
 		drawGLRect(rect, QColor(68, 68, 68), -2.0f);
-		glColor4i(0, 0, 0,255);
+        glColor4f(0, 0, 0,255);
 	}
 	//m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y1, 1.0f, str);
     m_oglTextSmallItalic->renderText(x1, y1, 1.0f, str);
@@ -817,15 +816,15 @@ void OGLDisplayPanel::paintUpperRegion() {
 		if (m_dataEngineState == QSDR::DataEngineUp) {
 
 			str.append(m_alexVersion);
-			glColor4i(206, 236, 248,255);
+            glColor4f(206, 236, 248,255);
 		}
 		else
-			glColor4i(0, 0, 0,255);
+            glColor4f(0, 0, 0,255);
 	}
 	else {
 
 		drawGLRect(rect, QColor(68, 68, 68), -2.0f);
-		glColor4i(0, 0, 0,255);
+        glColor4f(0, 0, 0,255);
 	}
 	//m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y1, 1.0f, str);
     m_oglTextSmallItalic->renderText(x1, y1, 1.0f, str);
@@ -839,7 +838,7 @@ void OGLDisplayPanel::paintLowerRegion() {
 	GLint y2 = m_rxRect.height() - m_lowerRectY;
 	
 	// Attenuator
-	glColor4i(106, 136, 148,255);
+    glColor4f(106, 136, 148,255);
 	m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y2, m_AttnString);
 
     x1 += m_AttnWidth + 2*m_blankWidth;
@@ -849,16 +848,16 @@ void OGLDisplayPanel::paintLowerRegion() {
 		str = "-20 dB";
 
 	int attnValueWidth = m_oglTextSmall->fontMetrics().tightBoundingRect(str).width();
-	glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+    glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 	m_oglTextSmallItalic->renderText(x1, y2, str);
 
 	// Dither status
     x1 += attnValueWidth + 5*m_blankWidth;
 
 	if (m_dither == 1)
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 	else
-		glColor4i(68, 68, 68,255);
+        glColor4f(68, 68, 68,255);
 
 	m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y2, m_ditherString);
 
@@ -866,9 +865,9 @@ void OGLDisplayPanel::paintLowerRegion() {
     x1 += m_ditherWidth + 5*m_blankWidth;
 
 	if (m_random == 1)
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 	else
-		glColor4i(68, 68, 68,255);
+        glColor4f(68, 68, 68,255);
 
 	m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y2, m_randomString);
 
@@ -876,7 +875,7 @@ void OGLDisplayPanel::paintLowerRegion() {
     x1 += m_randomWidth + 10*m_blankWidth;
 	str = "%1";
 
-	glColor4i(166, 196, 208,255);
+    glColor4f(166, 196, 208,255);
 	m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y2, str.arg(m_sample_rate, 3, 10, QLatin1Char(' ')));
 
 	int samplerateWidth = m_oglTextSmall->fontMetrics().tightBoundingRect(str.arg(m_sample_rate, 3, 10, QLatin1Char(' '))).width();
@@ -918,7 +917,7 @@ void OGLDisplayPanel::paintLowerRegion() {
 	}
 	int serverModeStringWidth = m_oglTextSmall->fontMetrics().tightBoundingRect(str).width();
 
-	glColor4i(166, 196, 208,255);
+    glColor4f(166, 196, 208,255);
 	m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y2, str);
 
 	if (m_hwInterface == QSDR::Metis) {
@@ -926,28 +925,28 @@ void OGLDisplayPanel::paintLowerRegion() {
 		x1 += serverModeStringWidth + 15*m_blankWidth;
 
 		// 10 MHz source status
-		glColor4i(106, 136, 148,255);
+        glColor4f(106, 136, 148,255);
 		m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y2, m_10MHzString);
 
 		x1 += m_10MHzWidth + 4*m_blankWidth;
-		glColor4i(166, 196, 208,255);
+        glColor4f(166, 196, 208,255);
 		int src10MHStringWidth = m_oglTextSmall->fontMetrics().tightBoundingRect(m_src10mhz).width();
 		m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y2, m_src10mhz);
 
 		// 122.88 MHz source status
 		x1 += src10MHStringWidth + 10*m_blankWidth;
-		glColor4i(106, 136, 148,255);
+        glColor4f(106, 136, 148,255);
 		m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y2, m_12288MHzString);
 
 		x1 += m_12288MHzWidth + 4*m_blankWidth;
-		glColor4i(166, 196, 208,255);
+        glColor4f(166, 196, 208,255);
 		m_oglTextSmallItalic->renderText(x1 + m_blankWidth, y2, m_src122_88mhz);
 	}
 	else if (m_hwInterface == QSDR::Hermes) {
 
 		//x1 += serverModeStringWidth + 10*m_blankWidth;
 
-		//glColor4i(QColor(166, 196, 208));
+        //glColor4f(QColor(166, 196, 208));
 		//m_oglTextSmallItalic->renderText(x1, y2, m_hermesStepAttnString);
 
 		//x1 += m_hermesStepAttnStringWidth + 2*m_blankWidth;
@@ -986,9 +985,9 @@ void OGLDisplayPanel::paintLowerRegion() {
 		//drawGLTriangleRight(rect, triCol, -2.0f);
 
 		//if (m_dataEngineState == QSDR::DataEngineUp)
-		//	glColor4i(QColor(166, 196, 208));
+        //	glColor4f(QColor(166, 196, 208));
 		//else
-		//	glColor4i(QColor(0, 0, 0));
+        //	glColor4f(QColor(0, 0, 0));
 
 		//x1 += 12;
 		//m_oglTextSmallItalic->renderText(x1, y2, "-19 dB");
@@ -1006,12 +1005,12 @@ void OGLDisplayPanel::paintRxRegion() {
 	if (m_dataEngineState == QSDR::DataEngineUp) {
 
 		drawGLRect(m_rect, Qt::black, m_bkgColor2, -3.0f, false);
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 	}
 	else {
 
 		drawGLRect(m_rect, QColor(0, 0, 0, 255), -3.0f);
-		glColor4i(68, 68, 68,255);
+        glColor4f(68, 68, 68,255);
 	}
 
 	str = "%1.%2";
@@ -1138,7 +1137,7 @@ void OGLDisplayPanel::paintSMeter() {
 
 		// S-Meter needle
 		glLineWidth(2);
-		glColor4i(255, 255, 255,255);
+        glColor4f(255, 255, 255,255);
 		if (m_sMeterValue > 0) {
 
 			glBegin(GL_LINES);
@@ -1149,7 +1148,7 @@ void OGLDisplayPanel::paintSMeter() {
 
 		// actual S-Meter value
 		glEnable(GL_MULTISAMPLE);
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
 		QString str = "%1";
 		m_sMeterNumValueString = QString(str.arg(m_sMeterOrgValue, 0, 'f', 1));
@@ -1204,10 +1203,10 @@ void OGLDisplayPanel::renderSMeterA() {
 	float R0 = 320.0;
 
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		//glColor4i(QColor(106, 136, 148));
-		glColor4i(180, 180, 180,255);
+        //glColor4f(QColor(106, 136, 148));
+        glColor4f(180, 180, 180,255);
 	else
-		glColor4i(68, 68, 68,255);
+        glColor4f(68, 68, 68,255);
 	
 	glLineWidth(2);
 	glBegin(GL_LINE_STRIP);
@@ -1223,9 +1222,9 @@ void OGLDisplayPanel::renderSMeterA() {
 	R0 = 321.0;
 	t = (float)(-126*ONEPI/256.0);
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		glColor4i(105, 110, 250,255);
+        glColor4f(105, 110, 250,255);
 	else
-		glColor4i(68, 68, 68,255);
+        glColor4f(68, 68, 68,255);
 	
 	glLineWidth(3);
 	glBegin(GL_LINE_STRIP);
@@ -1239,10 +1238,10 @@ void OGLDisplayPanel::renderSMeterA() {
 
 	// circle 1
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		//glColor4i(QColor(106, 136, 148));
-		glColor4i(180, 180, 180,255);
+        //glColor4f(QColor(106, 136, 148));
+        glColor4f(180, 180, 180,255);
 	else
-		glColor4i(68, 68, 68,255);
+        glColor4f(68, 68, 68,255);
 	
 	glLineWidth(2);
 	float R1 = 312.0;
@@ -1259,9 +1258,9 @@ void OGLDisplayPanel::renderSMeterA() {
 
 	// circle 2
 	/*if (m_dataEngineState == QSDR::DataEngineUp)
-		glColor4i(QColor(106, 136, 148));
+        glColor4f(QColor(106, 136, 148));
 	else
-		glColor4i(QColor(68, 68, 68));
+        glColor4f(QColor(68, 68, 68));
 	
 	glLineWidth(2);
 	float R2 = 290.0;
@@ -1278,9 +1277,9 @@ void OGLDisplayPanel::renderSMeterA() {
 
 	// circle 3
 	/*if (m_dataEngineState == QSDR::DataEngineUp)
-		glColor4i(QColor(106, 136, 148));
+        glColor4f(QColor(106, 136, 148));
 	else
-		glColor4i(QColor(68, 68, 68));
+        glColor4f(QColor(68, 68, 68));
 	
 	glLineWidth(2);
 	float R3 = 270.0;
@@ -1297,10 +1296,10 @@ void OGLDisplayPanel::renderSMeterA() {
 		
 	// S-Meter ticks
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		//glColor4i(QColor(106, 136, 148));
-		glColor4i(180, 180, 180,255);
+        //glColor4f(QColor(106, 136, 148));
+        glColor4f(180, 180, 180,255);
 	else
-		glColor4i(68, 68, 68,255);
+        glColor4f(68, 68, 68,255);
 
 	QFontMetrics fm = m_oglTextNormal->fontMetrics();
 
@@ -1376,9 +1375,9 @@ void OGLDisplayPanel::renderSMeterA() {
 	m_oglTextNormal->renderText(X + (R0+28) * qCos(t) - d/2, Y + (R0+28) * qSin(t), "9");
 
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		glColor4i(85, 90, 250,255);
+        glColor4f(85, 90, 250,255);
 	else
-		glColor4i(68, 68, 68,255);
+        glColor4f(68, 68, 68,255);
 
 	t = (float)(-123*ONEPI/256.0f);
 	glBegin(GL_LINES);
@@ -1445,7 +1444,7 @@ void OGLDisplayPanel::renderSMeterScale() {
 	if (m_dataEngineState == QSDR::DataEngineUp)
 		drawGLRect(rect, Qt::black, m_bkgColor2, -3.0f, false);
 	else
-		drawGLRect(rect, Qt::black);
+        drawGLRect(rect, Qt::black);
 
 	glDisable(GL_MULTISAMPLE);
 	glDisable(GL_LINE_SMOOTH);
@@ -1453,9 +1452,9 @@ void OGLDisplayPanel::renderSMeterScale() {
 
 	// draw horizontal lines
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 	else
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
 	glBegin(GL_LINES);
 		glVertex3f(0,		m_sMeterPosY, 0.0);
@@ -1466,9 +1465,9 @@ void OGLDisplayPanel::renderSMeterScale() {
 
 	// draw integer step scale
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		glColor4i(126, 156, 168,255);
+        glColor4f(126, 156, 168,255);
 	else
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
 	int vertexArrayLength = m_sMeterWidth;
 	vertexArrayLength += vertexArrayLength%2;
@@ -1497,9 +1496,9 @@ void OGLDisplayPanel::renderSMeterScale() {
 	QString marker;
 
 	if (m_dataEngineState == QSDR::DataEngineUp)
-			glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+            glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 		else
-			glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+            glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
 	for (int i = 1, z = -120; z < 10; i++, z += 10) {
 		
@@ -1574,10 +1573,10 @@ void OGLDisplayPanel::renderSMeterScale() {
 		else {
 
 			if (m_dataEngineState == QSDR::DataEngineUp)
-				glColor4i(255, 80, 80,255);
-				//glColor4i(QColor(55, 180, 220));
+                glColor4f(255, 80, 80,255);
+                //glColor4f(QColor(55, 180, 220));
 			else
-				glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+                glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
 			int idx = (10*i - 33)*m_unit;
 			glBegin(GL_LINES);
@@ -1615,9 +1614,9 @@ void OGLDisplayPanel::renderSMeterScale() {
 	glEnd();
 
 	/*if (m_dataEngineState == QSDR::DataEngineUp)
-		glColor4i(m_activeTextColor);
+        glColor4f(m_activeTextColor);
 	else
-		glColor4i(m_inactiveTextColor);*/
+        glColor4f(m_inactiveTextColor);*/
 		
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_MULTISAMPLE);
@@ -1652,9 +1651,9 @@ void OGLDisplayPanel::renderSMeterB() {
 
 	// Draw horizontal lines
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 	else
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
 	glBegin(GL_LINES);
 		glVertex3f(0,		m_sMeterPosY, 0.0);
@@ -1664,9 +1663,9 @@ void OGLDisplayPanel::renderSMeterB() {
 	glEnd();
 
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		glColor4i(100, 100, 100,255);
+        glColor4f(100, 100, 100,255);
 	else
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
 	TGL3float *vertexArray = new TGL3float[width];
 
@@ -1699,9 +1698,9 @@ void OGLDisplayPanel::renderSMeterB() {
 	QString marker;
 
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 	else
-		glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
 	//for (int x = 21, y = 9, z = 0; z < 5; x += markerSpacing, y += markerSpacing, z++) {
 	for (int x = markerSpacing - 3, y = x - markerSpacing/2, z = 0; z < 5; x += markerSpacing, y += markerSpacing, z++) {
@@ -1738,9 +1737,9 @@ void OGLDisplayPanel::renderSMeterB() {
 	//for (int x = next + markerSpacing, y = next + markerSpacing/2, z = 0; z < 8; x += markerSpacing, y += 2 * markerSpacing, z++) {
 		
 		if (m_dataEngineState == QSDR::DataEngineUp)
-			glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+            glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 		else
-			glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+            glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
 		if (z == 0) marker = "+20";
 		else if (z == 1) marker = "+40";
@@ -1754,18 +1753,18 @@ void OGLDisplayPanel::renderSMeterB() {
 		glEnd();
 		
 		if (m_dataEngineState == QSDR::DataEngineUp)
-			glColor4i(255, 80, 80,255);
+            glColor4f(255, 80, 80,255);
 		else
-			glColor4i(68, 68, 68,255);
+            glColor4f(68, 68, 68,255);
 
 		m_oglTextNormal->renderText(y, m_sMeterPosY + 18, marker);
 	}
 
 	// Draw the dbm items
 	if (m_dataEngineState == QSDR::DataEngineUp)
-			glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+            glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 		else
-			glColor4i(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+            glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
 	//for (int x = 4, y = 14, z = -130; z < 10; x += markerSpacing, y += markerSpacing, z += 10) {
 	for (int x = markerSpacing - 16, y = x + markerSpacing/2, z = -130; z < 10; x += markerSpacing, y += markerSpacing, z += 10) {
@@ -1825,9 +1824,9 @@ void OGLDisplayPanel::renderSMeterB() {
 //
 //	// Draw horizontal lines
 //	if (m_dataEngineState == QSDR::DataEngineUp)
-//		glColor4i(m_activeTextColor);
+//		glColor4f(m_activeTextColor);
 //	else
-//		glColor4i(QColor(68, 68, 68));
+//		glColor4f(QColor(68, 68, 68));
 //
 //	glBegin(GL_LINES);
 //		glVertex3f(0,		m_sMeterPosY, 0.0);
@@ -1837,9 +1836,9 @@ void OGLDisplayPanel::renderSMeterB() {
 //	glEnd();
 //
 //	if (m_dataEngineState == QSDR::DataEngineUp)
-//		glColor4i(QColor(100, 100, 100));
+//		glColor4f(QColor(100, 100, 100));
 //	else
-//		glColor4i(QColor(68, 68, 68));
+//		glColor4f(QColor(68, 68, 68));
 //
 //	TGL3float *vertexArray = new TGL3float[width];
 //
@@ -1869,9 +1868,9 @@ void OGLDisplayPanel::renderSMeterB() {
 //	QString marker;
 //
 //	if (m_dataEngineState == QSDR::DataEngineUp)
-//		glColor4i(m_activeTextColor);
+//		glColor4f(m_activeTextColor);
 //	else
-//		glColor4i(QColor(68, 68, 68));
+//		glColor4f(QColor(68, 68, 68));
 //
 //	for (int x = 21, y = 9, z = 0; z < 5; x += markerSpacing, y += markerSpacing, z++) {
 //		
@@ -1905,9 +1904,9 @@ void OGLDisplayPanel::renderSMeterB() {
 //	for (int x = 118 + markerSpacing, y = 128 + markerSpacing, z = 0; z < 8; x += markerSpacing, y += 2 * markerSpacing, z++) {
 //		
 //		if (m_dataEngineState == QSDR::DataEngineUp)
-//			glColor4i(m_activeTextColor);
+//			glColor4f(m_activeTextColor);
 //		else
-//			glColor4i(QColor(68, 68, 68));
+//			glColor4f(QColor(68, 68, 68));
 //
 //		if (z == 0) marker = "+20";
 //		else if (z == 1) marker = "+40";
@@ -1927,9 +1926,9 @@ void OGLDisplayPanel::renderSMeterB() {
 //		glEnd();*/
 //
 //		if (m_dataEngineState == QSDR::DataEngineUp)
-//			glColor4i(QColor(255, 80, 80));
+//			glColor4f(QColor(255, 80, 80));
 //		else
-//			glColor4i(QColor(68, 68, 68));
+//			glColor4f(QColor(68, 68, 68));
 //
 //		m_oglTextNormal->renderText(y, m_sMeterPosY + 18, marker);
 //	}
@@ -1938,9 +1937,9 @@ void OGLDisplayPanel::renderSMeterB() {
 //	for (int x = 4, y = 14, z = -130; z < 10; x += markerSpacing, y += markerSpacing, z += 10)	{
 //		
 //		if (m_dataEngineState == QSDR::DataEngineUp)
-//			glColor4i(m_activeTextColor);
+//			glColor4f(m_activeTextColor);
 //		else
-//			glColor4i(QColor(68, 68, 68));
+//			glColor4f(QColor(68, 68, 68));
 //
 //		marker = QString::number(z, 'f', 0);
 //		int d = fm.width(marker);

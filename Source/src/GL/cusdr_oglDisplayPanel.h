@@ -52,7 +52,7 @@
 #endif
 
 
-class OGLDisplayPanel : public QOpenGLWidget,  protected QOpenGLFunctions {
+class OGLDisplayPanel : public QOpenGLWidget {
 
     Q_OBJECT
 
