@@ -88,9 +88,6 @@ OGLDisplayPanel::OGLDisplayPanel(QWidget *parent)
 	, m_sMeterMinValueB(1000.0f)
 {
 //	QOpenGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
-    QSurfaceFormat format;
-       format.setDepthBufferSize(24);
-       setFormat(format);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     //setAutoBufferSwap(true);
     setAutoFillBackground(false);
@@ -432,12 +429,11 @@ void OGLDisplayPanel::setupTextstrings() {
 }
 
 void OGLDisplayPanel::initializeGL() {
+    initializeOpenGLFunctions();
+    if (!isValid()) return;
+  // default initialization
 
-	if (!isValid()) return;
-  //  initializeOpenGLFunctions();
-	// default initialization
-
-	//glShadeModel(GL_FLAT);
+    //glShadeModel(GL_FLAT);
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
 	//glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // 4-byte pixel alignment

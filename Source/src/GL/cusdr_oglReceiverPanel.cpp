@@ -276,8 +276,8 @@ QGLReceiverPanel::~QGLReceiverPanel() {
 
 	disconnect(set, 0, this, 0);
 	
-	makeCurrent();
-	glFinish();
+//	makeCurrent();
+//	glFinish();
 
 	if (m_frequencyScaleFBO) {
 
@@ -589,7 +589,7 @@ void QGLReceiverPanel::setupConnections() {
 void QGLReceiverPanel::initializeGL() {
 
 	if (!isValid()) return;
-
+     initializeOpenGLFunctions();
 	/*QGLInfo glInfo;
 	glInfo.getInfo();
 	glInfo.printSelf();*/
@@ -1550,9 +1550,9 @@ void QGLReceiverPanel::drawWaterfall() {
 		}
 		else {
 
-			drawGLRect(m_waterfallRect, Qt::black);
+            drawGLRect(m_waterfallRect, Qt::red);
 		}
-	}
+    }
 	else {
 	}
 }

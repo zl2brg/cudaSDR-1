@@ -52,7 +52,7 @@
 #endif
 
 
-class OGLDisplayPanel : public QOpenGLWidget {
+class OGLDisplayPanel : public QOpenGLWidget, protected QOpenGLFunctions {
 
     Q_OBJECT
 
@@ -81,7 +81,7 @@ protected:
 	void keyPressEvent(QKeyEvent* event);
 	void closeEvent(QCloseEvent *event);
 	void showEvent(QShowEvent *event);
-	void timerEvent(QTimerEvent *);
+    void timerEvent(QTimerEvent *);
 
 private:
 	Settings*	set;

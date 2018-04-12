@@ -48,7 +48,7 @@
 #endif
 
 
-class QGLReceiverPanel : public QOpenGLWidget {
+class QGLReceiverPanel : public QOpenGLWidget, protected QOpenGLFunctions {
 
     Q_OBJECT
 
