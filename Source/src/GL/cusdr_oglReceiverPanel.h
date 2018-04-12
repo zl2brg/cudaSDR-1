@@ -121,13 +121,13 @@ private:
 
 	QQueue<QVector<float> >			specAv_queue;
 
-	QGLFramebufferObject*		m_frequencyScaleFBO;
-	QGLFramebufferObject*		m_dBmScaleFBO;
-	QGLFramebufferObject*		m_panadapterGridFBO;
-	QGLFramebufferObject*		m_textureFBO;
-	QGLFramebufferObject*		m_waterfallLineFBO;
-	QGLFramebufferObject*		m_waterfallFBO;
-	QGLFramebufferObject*		m_secScaleWaterfallFBO;
+	QOpenGLFramebufferObject*	m_frequencyScaleFBO;
+	QOpenGLFramebufferObject*	m_dBmScaleFBO;
+	QOpenGLFramebufferObject*	m_panadapterGridFBO;
+    QOpenGLFramebufferObject*	m_textureFBO;
+	QOpenGLFramebufferObject*	m_waterfallLineFBO;
+	QOpenGLFramebufferObject*	m_waterfallFBO;
+	QOpenGLFramebufferObject*	m_secScaleWaterfallFBO;
 
 	QRect						m_panRect;
 	QRect						m_dBmScalePanRect;

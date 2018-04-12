@@ -36,7 +36,7 @@
 //#include <QTimer>
 //#include <QImage>
 //#include <QString>
-//#include <QGLFramebufferObject>
+//#include <QOpenGLFrameBufferObject>
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D
@@ -103,10 +103,10 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 //	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
+    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
 	//setAutoBufferSwap(true);
 	setAutoFillBackground(false);
-	
+        
 	setMouseTracking(true);
 	setFocusPolicy(Qt::StrongFocus);
 
@@ -1080,7 +1080,7 @@ void QGLReceiverPanel::drawPanVerticalScale() {
 				delete m_dBmScaleFBO;
 				m_dBmScaleFBO = 0;
 			}
-			m_dBmScaleFBO = new QGLFramebufferObject(width, height);
+			m_dBmScaleFBO = new QOpenGLFramebufferObject(width, height);
 			//if (m_dBmScaleFBO)
 			//	GRAPHICS_DEBUG << "m_dBmScaleFBO generated.";
 			
@@ -1123,7 +1123,7 @@ void QGLReceiverPanel::drawPanHorizontalScale() {
 				m_frequencyScaleFBO = 0;
 			}
 
-			m_frequencyScaleFBO = new QGLFramebufferObject(width, height);
+			m_frequencyScaleFBO = new QOpenGLFramebufferObject(width, height);
 			//if (m_frequencyScaleFBO)
 			//	GRAPHICS_DEBUG << "m_frequencyScaleFBO generated.";
 		}
@@ -1180,7 +1180,7 @@ void QGLReceiverPanel::drawPanadapterGrid() {
 				m_panadapterGridFBO = 0;
 			}
 
-			m_panadapterGridFBO = new QGLFramebufferObject(width, height);
+			m_panadapterGridFBO = new QOpenGLFramebufferObject(width, height);
 			//if (m_panadapterGridFBO)
 			//	GRAPHICS_DEBUG << "m_panadapterGridFBO generated.";
 		}
@@ -1436,21 +1436,21 @@ void QGLReceiverPanel::drawWaterfall() {
 				m_textureFBO = 0;
 			}
 
-			if (QGLFramebufferObject::hasOpenGLFramebufferBlit()) {
+			if (QOpenGLFramebufferObject::hasOpenGLFramebufferBlit()) {
 			
-				//QGLFramebufferObjectFormat format;
+				//QOpenGLFramebufferObjectFormat format;
 				//format.setSamples(2);
-				//format.setAttachment(QGLFramebufferObject::CombinedDepthStencil);
+				//format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
 
-				m_waterfallLineFBO = new QGLFramebufferObject(width, 1);
+				m_waterfallLineFBO = new QOpenGLFramebufferObject(width, 1);
 				//if (m_waterfallLineFBO)
 				//GRAPHICS_DEBUG << "m_waterfallLineFBO generated.";
 
-				m_waterfallFBO = new QGLFramebufferObject(width, height);
+				m_waterfallFBO = new QOpenGLFramebufferObject(width, height);
 				//if (m_waterfallFBO)
 				//GRAPHICS_DEBUG << "m_waterfallFBO generated.";
 
-				m_textureFBO = new QGLFramebufferObject(width, height);
+                m_textureFBO = new QOpenGLFramebufferObject(width, height);
 				//if (m_textureFBO)
 				//GRAPHICS_DEBUG << "m_textureFBO generated.";
 				
@@ -1461,7 +1461,7 @@ void QGLReceiverPanel::drawWaterfall() {
 			}
 
 			m_waterfallUpdate = false;
-			drawGLRect(m_waterfallRect, Qt::black);
+            drawGLRect(m_waterfallRect, Qt::black);
 
 			m_waterfallLineCnt = 0;
 						
@@ -1543,10 +1543,13 @@ void QGLReceiverPanel::drawWaterfall() {
 				QRect rect(0, top + m_waterfallLineCnt, width, height - m_waterfallLineCnt);
 				drawGLRect(rect, QColor(0, 0, 0, 255), 3.0f);
 			}
+            m_waterfallFBO->release();
 
 			// copy the next waterfall image to the waterfall FBO
-			QRect copyRect(0, 0, width, height);
-			QGLFramebufferObject::blitFramebuffer(m_waterfallFBO, copyRect, m_textureFBO, copyRect);
+        QRect copyRect(0, 0, width, height);
+        QOpenGLFramebufferObject::blitFramebuffer(m_waterfallFBO, copyRect, m_textureFBO, copyRect);
+
+            
 		}
 		else {
 
@@ -1579,7 +1582,7 @@ void QGLReceiverPanel::drawWaterfallVerticalScale() {
 				delete m_secScaleWaterfallFBO;
 				m_secScaleWaterfallFBO = 0;
 			}
-			m_secScaleWaterfallFBO = new QGLFramebufferObject(width, height);
+			m_secScaleWaterfallFBO = new QOpenGLFramebufferObject(width, height);
 			//if (m_secScaleWaterfallFBO)
 			//	GRAPHICS_DEBUG << "m_secScaleWaterfallFBO generated.";
 		}

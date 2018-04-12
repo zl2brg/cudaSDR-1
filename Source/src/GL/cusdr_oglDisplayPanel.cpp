@@ -92,7 +92,7 @@ OGLDisplayPanel::OGLDisplayPanel(QWidget *parent)
     //setAutoBufferSwap(true);
     setAutoFillBackground(false);
 	setMouseTracking(true);
-
+    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
 	m_freqStringLeftPos = 20;
 	setupDisplayRegions(size());
 
@@ -844,14 +844,14 @@ void OGLDisplayPanel::paintLowerRegion() {
 		str = "-20 dB";
 
 	int attnValueWidth = m_oglTextSmall->fontMetrics().tightBoundingRect(str).width();
-    glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+    glColor4f(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 	m_oglTextSmallItalic->renderText(x1, y2, str);
 
 	// Dither status
     x1 += attnValueWidth + 5*m_blankWidth;
 
 	if (m_dither == 1)
-        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 	else
         glColor4f(68, 68, 68,255);
 
@@ -861,7 +861,7 @@ void OGLDisplayPanel::paintLowerRegion() {
     x1 += m_ditherWidth + 5*m_blankWidth;
 
 	if (m_random == 1)
-        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 	else
         glColor4f(68, 68, 68,255);
 
@@ -1001,12 +1001,12 @@ void OGLDisplayPanel::paintRxRegion() {
 	if (m_dataEngineState == QSDR::DataEngineUp) {
 
 		drawGLRect(m_rect, Qt::black, m_bkgColor2, -3.0f, false);
-        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+       glColor4ub(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 	}
 	else {
 
 		drawGLRect(m_rect, QColor(0, 0, 0, 255), -3.0f);
-        glColor4f(68, 68, 68,255);
+        glColor4ub(68, 68, 68,255);
 	}
 
 	str = "%1.%2";
@@ -1144,7 +1144,7 @@ void OGLDisplayPanel::paintSMeter() {
 
 		// actual S-Meter value
 		glEnable(GL_MULTISAMPLE);
-        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 
 		QString str = "%1";
 		m_sMeterNumValueString = QString(str.arg(m_sMeterOrgValue, 0, 'f', 1));
@@ -1448,7 +1448,7 @@ void OGLDisplayPanel::renderSMeterScale() {
 
 	// draw horizontal lines
 	if (m_dataEngineState == QSDR::DataEngineUp)
-        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 	else
         glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
@@ -1463,7 +1463,7 @@ void OGLDisplayPanel::renderSMeterScale() {
 	if (m_dataEngineState == QSDR::DataEngineUp)
         glColor4f(126, 156, 168,255);
 	else
-        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 
 	int vertexArrayLength = m_sMeterWidth;
 	vertexArrayLength += vertexArrayLength%2;
@@ -1492,7 +1492,7 @@ void OGLDisplayPanel::renderSMeterScale() {
 	QString marker;
 
 	if (m_dataEngineState == QSDR::DataEngineUp)
-            glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+            glColor4f(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 		else
             glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
@@ -1616,7 +1616,7 @@ void OGLDisplayPanel::renderSMeterScale() {
 		
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_MULTISAMPLE);
-    update();
+  //  update();
 }
 
 void OGLDisplayPanel::renderSMeterB() {
@@ -1647,7 +1647,7 @@ void OGLDisplayPanel::renderSMeterB() {
 
 	// Draw horizontal lines
 	if (m_dataEngineState == QSDR::DataEngineUp)
-        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 	else
         glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
@@ -1694,7 +1694,7 @@ void OGLDisplayPanel::renderSMeterB() {
 	QString marker;
 
 	if (m_dataEngineState == QSDR::DataEngineUp)
-        glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+        glColor4f(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 	else
         glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
@@ -1733,7 +1733,7 @@ void OGLDisplayPanel::renderSMeterB() {
 	//for (int x = next + markerSpacing, y = next + markerSpacing/2, z = 0; z < 8; x += markerSpacing, y += 2 * markerSpacing, z++) {
 		
 		if (m_dataEngineState == QSDR::DataEngineUp)
-            glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+            glColor4f(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 		else
             glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
@@ -1758,7 +1758,7 @@ void OGLDisplayPanel::renderSMeterB() {
 
 	// Draw the dbm items
 	if (m_dataEngineState == QSDR::DataEngineUp)
-            glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
+            glColor4f(m_activeTextColor.red(),m_activeTextColor.green(),m_activeTextColor.blue(),m_activeTextColor.alpha());
 		else
             glColor4f(m_inactiveTextColor.red(),m_inactiveTextColor.green(),m_inactiveTextColor.blue(),m_inactiveTextColor.alpha());
 
