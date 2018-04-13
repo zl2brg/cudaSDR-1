@@ -82,6 +82,7 @@ protected:
 	void closeEvent(QCloseEvent *event);
 	void showEvent(QShowEvent *event);
     void timerEvent(QTimerEvent *);
+    void qglColor(QColor color);
 
 private:
 	Settings*	set;
