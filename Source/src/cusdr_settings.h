@@ -281,6 +281,7 @@ enum {
 // type definitions
 
 typedef QVector<float> qVectorFloat;
+typedef QVector<double> qVectorDouble;
 
 typedef struct _frequency {
 
@@ -497,6 +498,24 @@ typedef enum _waterfallColorMode {
 
 } WaterfallColorMode;
 
+typedef enum _panAveragingMode {
+
+    AV_MODE_NONE,
+    AV_MODE_RECURSIVE,
+    AV_MODE_TIME_WINDOW,
+    AV_MODE_LOG_RECURSIVE
+}PanAveragingMode;
+
+typedef enum _panDetectorMode {
+
+    DET_MODE_PEAK,
+    DET_MODE_ROSENFELL,
+    DET_MODE_AVERAGE,
+    DET_MODE_SAMPLE
+}PanDetectorMode;
+
+
+
 Q_DECLARE_METATYPE (TNetworkDevicecard)
 Q_DECLARE_METATYPE (QList<TNetworkDevicecard>)
 
@@ -512,6 +531,8 @@ typedef struct _receiver {
 	TDefaultFilterMode	defaultFilterMode;
 	PanGraphicsMode		panMode;
 	WaterfallColorMode	waterfallMode;
+	PanAveragingMode    panAvMode;
+	PanDetectorMode     panDetMode;
 
 	QList<long>			lastCenterFrequencyList;
 	QList<long>			lastVfoFrequencyList;
@@ -842,6 +863,8 @@ signals:
 	void wideBandScalePositionChanged(QObject *sender, float position);
 	//void widebandAveragingChanged(QObject *sender, bool value);
 	//void widebandAveragingCntChanged(QObject *sender, int value);
+    void panAveragingModeChanged(int rx, int mode);
+    void panDetectorModeChanged(int rx, int mode);
 
 
 	void iqPortChanged(QObject* sender, int rx, int port);
@@ -936,6 +959,8 @@ public:
 
 	PanGraphicsMode				getPanadapterMode(int rx);
 	WaterfallColorMode			getWaterfallColorMode(int rx);
+	PanAveragingMode            getPanAveragingMode(int rx);
+	PanDetectorMode             getPanDetectorMode(int rx);
 
 	QString	getServerModeString(QSDR::_ServerMode mode);
 	QString	getHWInterfaceModeString(QSDR::_HWInterfaceMode mode);
@@ -1361,8 +1386,11 @@ public slots:
 	void setWaterfallTime(int rx, int value);
 	void setWaterfallOffesetLo(int rx, int value);
 	void setWaterfallOffesetHi(int rx, int value);
+	void setPanAveragingMode(int rx,PanAveragingMode mode);
+    void setPanDetectorMode(int rx,PanDetectorMode mode);
 
-	void setSMeterHoldTime(int value);
+
+    void setSMeterHoldTime(int value);
 
 	void showNetworkIODialog();
 	void showWarningDialog(const QString &msg);

@@ -3775,7 +3775,7 @@ void QGLReceiverPanel::setSpectrumBuffer(int rx, const qVectorFloat& buffer) {
 	
 			spectrumBufferMutex.lock();
 			specBuf = buffer;
-			averager->ProcessDBAverager(specBuf, specBuf);
+		//	averager->ProcessDBAverager(specBuf, specBuf);
 			computeDisplayBins(specBuf, waterBuf);
 			spectrumBufferMutex.unlock();
 		}

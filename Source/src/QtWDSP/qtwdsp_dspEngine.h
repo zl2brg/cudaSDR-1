@@ -56,7 +56,8 @@ extern "C" {
 #   define WDSP_ENGINE_DEBUG nullDebug()
 #endif
 
-
+#define min(x,y) (x<y?x:y)
+#define max(x,y) (x<y?y:x)
 
 
 class QWDSPEngine : public QObject {
@@ -72,6 +73,7 @@ public:
 
 	double	getSMeterInstValue();
     void    init_analyzer(int refreshrate);
+    void    calcDisplayAveraging();
     int     spectrumDataReady;
     qVectorFloat spectrumBuffer;
 
@@ -95,6 +97,9 @@ public slots:
 	void	setAGCHangTime(int hang);
 	void 	setAGCHangLevel(double level);
 	void 	setFramesPerSecond(QObject* sender, int rx, int value);
+	void    setPanAdaptorAveragingMode( int rx, int value);
+    void    setPanAdaptorDetectorMode( int rx, int value);
+    void    setPanAdaptorAveragingCnt(QObject*, int rx , int value);
 
 private:
 	Settings*	set;
@@ -117,6 +122,11 @@ private:
 	int		m_samplerate;
 	int		m_fftMultiplier;
 	int     m_refreshrate;
+	int     m_averageCount;
+    double  m_display_avb;
+    int     m_display_average;
+    int     m_PanAvMode;
+    int     m_PanDetMode;
    	float	m_volume;
 	qreal	m_NcoFreq;
 	qreal	m_NcoInc;

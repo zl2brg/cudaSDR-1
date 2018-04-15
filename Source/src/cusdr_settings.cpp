@@ -704,7 +704,20 @@ int Settings::loadSettings() {
 			//SETTINGS_DEBUG << "DSP core for rx " << i << " is QtDSP.";
 		}
 
-		cstr = m_rxStringList.at(i);
+        cstr = m_rxStringList.at(i);
+        cstr.append("/PanAverageMode");
+
+        value = settings->value(cstr, 1).toInt();
+        m_receiverDataList[i].panAvMode = (PanAveragingMode) value;
+        qDebug() << "load pan av " << value;
+
+        cstr = m_rxStringList.at(i);
+        cstr.append("/PanDetectorMode");
+
+        value = settings->value(cstr, 1).toInt();
+        m_receiverDataList[i].panDetMode = (PanDetectorMode) value;
+
+        cstr = m_rxStringList.at(i);
 		cstr.append("/freqRulerPosition");
 
 		value = settings->value(cstr, 5).toInt();
@@ -1205,6 +1218,8 @@ int Settings::loadSettings() {
 		if ((value < 0) || (value > 50000000)) value = 3600000;
 		m_receiverDataList[i].vfoFrequency = value;
 
+
+
 		setVfoFrequency(i, value);
 		
 
@@ -1409,6 +1424,8 @@ int Settings::loadSettings() {
 	color = settings->value("colors/gridLine", QColor(7, 96, 96)).value<QColor>();
 	if (!color.isValid()) color = QColor(7, 96, 96);
 	m_panadapterColors.gridLineColor = color;
+
+
 
 	SETTINGS_DEBUG << "reading done.";
 
@@ -1798,20 +1815,31 @@ int Settings::saveSettings() {
 		settings->setValue("wideband/panMode", "SOLID");
 
 
+
 	//******************************************************************
 	// receiver data settings
 
 	for (int i = 0; i < MAX_RECEIVERS; i++) {
+
+
 
 		QString str = m_rxStringList.at(i);
 		str.append("/dspCore");
 
 		if (m_receiverDataList[i].dspCore == QSDR::QtDSP)
 			settings->setValue(str, "qtdsp");
-		//else
-		//	settings->setValue(str, "dttsp");
 
-		str = m_rxStringList.at(i);
+        str = m_rxStringList.at(i);
+        str.append("/PanAverageMode");
+        settings->setValue(str, (int)(m_receiverDataList[i].panAvMode));
+
+        str = m_rxStringList.at(i);
+        str.append("/PanDetectorMode");
+        settings->setValue(str, (int)(m_receiverDataList[i].panDetMode));
+        qDebug() << "save pan det mode" << m_receiverDataList[i].panDetMode;
+
+
+        str = m_rxStringList.at(i);
 		str.append("/freqRulerPosition");
 		settings->setValue(str, (int)(m_receiverDataList[i].freqRulerPosition * 10));
 
@@ -2655,6 +2683,8 @@ bool Settings::getTxAllowed() {
 	return m_transmitter.txAllowed;
 }
 
+
+
 void Settings::setGraphicsState(
 
 	QObject *sender,
@@ -2686,6 +2716,18 @@ PanGraphicsMode Settings::getPanadapterMode(int rx)	{
 
 	return m_receiverDataList[rx].panMode;
 }
+
+PanAveragingMode  Settings::getPanAveragingMode(int rx)	{
+
+    return m_receiverDataList[rx].panAvMode;
+}
+
+
+PanDetectorMode Settings::getPanDetectorMode(int rx)	{
+
+    return m_receiverDataList[rx].panDetMode;
+}
+
 
 WaterfallColorMode	Settings::getWaterfallColorMode(int rx)	{
 
@@ -3759,7 +3801,7 @@ void Settings::setAGCMaximumGain_dB(QObject *sender, int rx, qreal value) {
 	if (m_receiverDataList[rx].agcMaximumGain_dB == value) return;
 	m_receiverDataList[rx].agcMaximumGain_dB = value;
 
-	//SETTINGS_DEBUG << "agcMaximumGain_dB = " << m_receiverDataList[rx].agcMaximumGain_dB << " (sender: " << sender << ")";
+	qDebug() << "agcMaximumGain_dB = " << m_receiverDataList[rx].agcMaximumGain_dB << " (sender: " << sender << ")";
 	emit agcMaximumGainChanged_dB(sender, rx, value);
 }
 
@@ -4836,5 +4878,30 @@ void Settings::showRadioPopupWidget() {
 	else
 		m_radioPopupVisible = true;
 
-	emit showRadioPopupChanged(m_radioPopupVisible);
+
 }
+
+void Settings::setPanAveragingMode(int rx, PanAveragingMode mode) {
+
+    if (m_receiverDataList.at(rx).panAvMode == mode) return;
+
+        m_receiverDataList[rx].panAvMode = mode;
+
+        qDebug() << "Pan average mode set to " << mode;
+
+        emit panAveragingModeChanged(rx,mode);
+
+}
+
+void Settings::setPanDetectorMode(int rx , PanDetectorMode mode) {
+
+    if (m_receiverDataList.at(rx).panDetMode == mode) return;
+
+    m_receiverDataList[rx].panDetMode = mode;
+
+    qDebug() << "Pan detector mode set to " <<  m_receiverDataList[rx].panDetMode;
+
+
+    emit panDetectorModeChanged(rx,mode);
+
+};

@@ -55,6 +55,10 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
     qRegisterMetaType<QVector<cpx> >();
 	qRegisterMetaType<CPX>();
     m_refreshrate = set->getFramesPerSecond(m_rx);
+    m_averageCount= set->getSpectrumAveragingCnt(m_rx);
+    m_PanAvMode = set->getPanAveragingMode(m_rx);
+    m_PanDetMode = set->getPanDetectorMode(m_rx);
+
 	spectrumBuffer.resize(BUFFER_SIZE*4);
 
 
@@ -89,7 +93,13 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
         WDSP_ENGINE_DEBUG <<  "XCreateAnalyzer id=%d failed: %d\n" <<  result;
     }
 	init_analyzer(m_refreshrate);
-	SetChannelState(m_rx,1,0);
+    calcDisplayAveraging();
+    SetDisplayAvBackmult(rx, 0, m_display_avb);
+    SetDisplayNumAverage(rx, 0, m_display_average);
+    SetDisplayDetectorMode(rx,0,m_PanDetMode);
+    SetDisplayAverageMode(rx,0,m_PanAvMode);
+
+    SetChannelState(m_rx,1,0);
 
 
 
@@ -133,6 +143,34 @@ void QWDSPEngine::setupConnections() {
 			SIGNAL(framesPerSecondChanged(QObject*, int, int)),
 			this,
 			SLOT(setFramesPerSecond(QObject*, int, int)));
+
+
+    CHECKED_CONNECT(
+            set,
+            SIGNAL(framesPerSecondChanged(QObject*, int, int)),
+            this,
+            SLOT(setFramesPerSecond(QObject*, int, int)));
+
+
+    CHECKED_CONNECT(
+            set,
+            SIGNAL(panAveragingModeChanged( int, int)),
+            this,
+            SLOT(setPanAdaptorAveragingMode( int, int)));
+
+
+    CHECKED_CONNECT(
+            set,
+            SIGNAL(panDetectorModeChanged( int, int)),
+            this,
+            SLOT(setPanAdaptorDetectorMode( int, int)));
+
+    CHECKED_CONNECT(
+            set,
+            SIGNAL(spectrumAveragingCntChanged(QObject*, int , int)),
+            this,
+            SLOT(setPanAdaptorAveragingCnt(QObject*, int, int)));
+
 
 
 //	CHECKED_CONNECT(
@@ -321,6 +359,7 @@ void QWDSPEngine::setSampleSize(int rx, int size) {
 
 		m_mutex.lock();
 		m_spectrumSize = size;
+		WDSP_ENGINE_DEBUG <<  "Set sample size" <<  size;
 		m_mutex.unlock();
 	}
 }
@@ -396,7 +435,40 @@ void QWDSPEngine::setFramesPerSecond(QObject* sender, int rx, int value){
 	m_mutex.lock();
 	m_refreshrate = value;
     init_analyzer(value);
+    calcDisplayAveraging();
+    SetDisplayAvBackmult(rx, 0, m_display_avb);
+    SetDisplayNumAverage(rx, 0, m_display_average);
     m_mutex.unlock();
     WDSP_ENGINE_DEBUG <<  "SetFramesPerSecond" <<  value;
 }
 
+
+void QWDSPEngine::setPanAdaptorAveragingMode(int rx, int mode) {
+    if (rx != m_rx) return;
+    WDSP_ENGINE_DEBUG <<  "Setpan av mode" <<  mode;
+    SetDisplayAverageMode(m_rx,0,mode);
+}
+
+
+void QWDSPEngine::setPanAdaptorDetectorMode(int rx, int mode) {
+    if (rx != m_rx) return;
+    WDSP_ENGINE_DEBUG <<  "Setpan av det  mode" <<  mode;
+    SetDisplayDetectorMode(rx,0,mode);
+
+}
+
+void QWDSPEngine::setPanAdaptorAveragingCnt(QObject* sender, int rx, int count){
+    Q_UNUSED(sender);
+    if (rx != m_rx) return;
+    m_averageCount = count;
+    calcDisplayAveraging();
+    SetDisplayAvBackmult(rx, 0, m_display_avb);
+    SetDisplayNumAverage(rx, 0, m_display_average);
+    WDSP_ENGINE_DEBUG <<  "Setpan av count mode" <<  m_display_avb << " " << m_display_average;
+}
+
+void QWDSPEngine::calcDisplayAveraging() {
+    double t=0.001*m_averageCount;
+    m_display_avb = exp(-1.0 / ((double)m_refreshrate * t));
+    m_display_average = max(2, (int)min(60, (double)m_refreshrate * t));
+}

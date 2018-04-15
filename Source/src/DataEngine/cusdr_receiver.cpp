@@ -376,11 +376,7 @@ void Receiver::stop() {
 void Receiver::dspProcessing() {
 int data;
 	//RECEIVER_DEBUG << "dspProcessing: " << this->thread();
-	//io.mutex.lock();
 	qtwdsp->processDSP(inBuf, outBuf, BUFFER_SIZE);
-    //qtdsp->processDSP(inBuf, outBuf, BUFFER_SIZE);
-	//io.mutex.unlock();
-
 	// spectrum
 
     if (qtwdsp->spectrumDataReady)

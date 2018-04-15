@@ -34,6 +34,7 @@
 //#include <QDebug>
 //#include <QDialog>
 //#include <QColorDialog>
+#include<QStringList>
 
 #include "cusdr_displayWidget.h"
 
@@ -42,6 +43,7 @@
 #define	btn_widths		38
 #define	btn_width2		52
 #define	btn_width3		60
+
 
 DisplayOptionsWidget::DisplayOptionsWidget(QWidget *parent)
 	: QWidget(parent)
@@ -68,8 +70,11 @@ DisplayOptionsWidget::DisplayOptionsWidget(QWidget *parent)
 	m_widebandOptions = set->getWidebandOptions();
 	m_panadapterMode = set->getPanadapterMode(m_currentReceiver);
 	m_waterColorMode = set->getWaterfallColorMode(m_currentReceiver);
-	
-	fonts = new CFonts(this);
+	m_panAvMode = set->getPanAveragingMode(m_currentReceiver);
+    m_panDetMode = set->getPanDetectorMode(m_currentReceiver);
+
+
+    fonts = new CFonts(this);
 	m_fonts = fonts->getFonts();
 
 	createFPSGroupBox();
@@ -289,6 +294,7 @@ void DisplayOptionsWidget::createFPSGroupBox() {
 	m_fpsSlider->setValue(m_framesPerSecond);
 	m_fpsSlider->setStyleSheet(set->getVolSliderStyle());
 
+
 	CHECKED_CONNECT(m_fpsSlider, SIGNAL(valueChanged(int)), this, SLOT(fpsValueChanged(int)));
 
 	QString str = "%1 ";
@@ -384,7 +390,7 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
 	m_avgSlider->setTickPosition(QSlider::NoTicks);
 	m_avgSlider->setFixedSize(130, 12);
 	m_avgSlider->setSingleStep(1);
-	m_avgSlider->setRange(1, 100);
+	m_avgSlider->setRange(1, 1000);
 	m_avgSlider->setValue(m_avgValue);
 	m_avgSlider->setStyleSheet(set->getVolSliderStyle());
 
@@ -401,7 +407,35 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
 	m_avgLabel->setFrameStyle(QFrame::Box | QFrame::Raised);
 	m_avgLabel->setStyleSheet(set->getLabelStyle());
 
-	QHBoxLayout *hbox1 = new QHBoxLayout;
+    m_panAvgModeLabel = new QLabel("Avg Mode:", this);
+    m_panAvgModeLabel->setFrameStyle(QFrame::Box | QFrame::Raised);
+    m_panAvgModeLabel->setStyleSheet(set->getLabelStyle());
+
+
+    m_panDetModeLabel = new QLabel("Avg Det:", this);
+    m_panDetModeLabel->setFrameStyle(QFrame::Box | QFrame::Raised);
+    m_panDetModeLabel->setStyleSheet(set->getLabelStyle());
+
+    m_panAverageCombo = new QComboBox(this);
+    m_panAverageCombo->addItems(QStringList() << "None" << "Recursive" <<  "TimeWindow" <<"LogRecursive");
+    m_panAverageCombo->setFont(m_fonts.normalFont);
+    m_panAverageCombo->setCurrentIndex(m_panAvMode);
+    m_panAverageCombo->setStyleSheet(set->getComboBoxStyle());
+
+    CHECKED_CONNECT(m_panAverageCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(panAverageModeChanged(int)));
+
+
+    m_panDetectorCombo = new QComboBox(this);
+    m_panDetectorCombo->addItems(QStringList() << "Peak" << "Rosenfall" <<  "Average" <<"Sample");
+    m_panDetectorCombo->setFont(m_fonts.normalFont);
+    m_panDetectorCombo->setCurrentIndex(m_panDetMode);
+    m_panDetectorCombo->setStyleSheet(set->getComboBoxStyle());
+
+    CHECKED_CONNECT(m_panDetectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(panDetectorModeChanged(int)));
+
+
+
+    QHBoxLayout *hbox1 = new QHBoxLayout;
 	hbox1->setSpacing(4);
 	hbox1->addStretch();
 	hbox1->addWidget(m_PanLineBtn);
@@ -416,11 +450,26 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
 	hbox2->addWidget(m_avgSlider);
 	hbox2->addWidget(m_avgLevelLabel);
 
-	QVBoxLayout *vbox = new QVBoxLayout;
+    QHBoxLayout* hbox3 = new QHBoxLayout;
+    hbox3->setSpacing(0);
+    hbox3->setMargin(0);
+    hbox3->addWidget(m_panAvgModeLabel);
+    hbox3->addWidget(m_panAverageCombo);
+
+    QHBoxLayout* hbox4 = new QHBoxLayout;
+    hbox4->setSpacing(0);
+    hbox4->setMargin(0);
+    hbox4->addWidget(m_panDetModeLabel);
+    hbox4->addWidget(m_panDetectorCombo);
+
+
+    QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->setSpacing(6);
 	vbox->addSpacing(6);
 	vbox->addLayout(hbox1);
 	vbox->addLayout(hbox2);
+    vbox->addLayout(hbox3);
+    vbox->addLayout(hbox4);
 
 	m_panSpectrumOptions = new QGroupBox(tr("Panadapter Spectrum"), this);
 	m_panSpectrumOptions->setMinimumWidth(m_minimumGroupBoxWidth);
@@ -513,7 +562,9 @@ void DisplayOptionsWidget::createWidebandPanOptions() {
 	m_wbAvgLabel->setFrameStyle(QFrame::Box | QFrame::Raised);
 	m_wbAvgLabel->setStyleSheet(set->getLabelStyle());
 
-	QHBoxLayout* hbox1 = new QHBoxLayout;
+
+
+    QHBoxLayout* hbox1 = new QHBoxLayout;
 	hbox1->setSpacing(4);
 	hbox1->addStretch();
 	hbox1->addWidget(m_wbPanLineBtn);
@@ -528,11 +579,14 @@ void DisplayOptionsWidget::createWidebandPanOptions() {
 	hbox2->addWidget(m_wbAvgSlider);
 	hbox2->addWidget(m_wbAvgLevelLabel);
 
-	QVBoxLayout* vbox = new QVBoxLayout;
+
+
+    QVBoxLayout* vbox = new QVBoxLayout;
 	vbox->setSpacing(6);
 	vbox->addSpacing(6);
 	vbox->addLayout(hbox1);
 	vbox->addLayout(hbox2);
+
 
 	m_widebandPanOptions = new QGroupBox(tr("Wideband Panadapter Spectrum"), this);
 	m_widebandPanOptions->setMinimumWidth(m_minimumGroupBoxWidth);
@@ -1053,4 +1107,17 @@ void DisplayOptionsWidget::callSignTextChanged(const QString& text) {
 void DisplayOptionsWidget::callSignChanged() {
 
 	set->setCallsign(m_callSingText);
+
 }
+
+void DisplayOptionsWidget::panAverageModeChanged(int mode)  {
+
+    set->setPanAveragingMode(m_currentReceiver,(PanAveragingMode) mode);
+}
+
+void DisplayOptionsWidget::panDetectorModeChanged(int mode)  {
+
+    set->setPanDetectorMode(m_currentReceiver,(PanDetectorMode) mode);
+
+}
+
