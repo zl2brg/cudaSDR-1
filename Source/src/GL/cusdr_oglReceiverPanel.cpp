@@ -3902,7 +3902,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 
 	m_panScale = (qreal)(1.0 * m_sampleSize / m_panRectWidth);
 	m_scaleMultOld = m_scaleMult;
-		
+
 	if (m_panScale < 0.125) {
 		m_scaleMult = 0.0625;
 	}
@@ -3921,7 +3921,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 
 	m_panSpectrumBinsLength = (GLint)(m_scaleMult * m_panRectWidth);
 
-	/*if (m_sampleSize != m_oldSampleSize) {
+	if (m_sampleSize != m_oldSampleSize) {
 	
 		GRAPHICS_DEBUG << "m_panSpectrumBinsLength = " << m_panSpectrumBinsLength;
 		GRAPHICS_DEBUG << "m_sampleSize =            " << m_sampleSize;
@@ -3929,7 +3929,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 		GRAPHICS_DEBUG << "";
 
 		m_oldSampleSize = m_sampleSize;
-	}*/
+	}
 
 	if (m_scaleMultOld != m_scaleMult) {
 
@@ -4483,8 +4483,8 @@ void QGLReceiverPanel::setAGCLineLevels(QObject *sender, int rx, qreal thresh, q
 
 	m_agcThresholdOld = thresh;
 	m_agcHangLevelOld = hang;
-	//GRAPHICS_DEBUG << "m_agcThresholdOld = " << m_agcThresholdOld;
-	//GRAPHICS_DEBUG << "m_agcHangLevelOld = " << m_agcHangLevelOld;
+	GRAPHICS_DEBUG << "m_agcThresholdOld = " << m_agcThresholdOld;
+	GRAPHICS_DEBUG << "m_agcHangLevelOld = " << m_agcHangLevelOld;
 }
 
 void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value) {
@@ -4495,7 +4495,7 @@ void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value
 	if (m_agcFixedGain == value) return;
 
 	m_agcFixedGain = value;
-	//GRAPHICS_DEBUG << "m_agcFixedGain = " << m_agcFixedGain;
+	GRAPHICS_DEBUG << "m_agcFixedGain = " << m_agcFixedGain;
 }
 
 void QGLReceiverPanel::setADCMode(QObject *sender, int rx, ADCMode mode) {
