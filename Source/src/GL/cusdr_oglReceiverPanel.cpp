@@ -172,10 +172,6 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 	m_agcFixedGain = m_rxDataList.at(m_receiver).agcFixedGain_dB;
 
 	m_dspModeString = set->getDSPModeString(m_rxDataList.at(m_receiver).dspModeList.at(m_receiver));
-//	m_agcThresholdOld = m_rxDataList.at(m_receiver).acgThreshold;
-//	m_agcThresholdNew = m_agcThresholdOld;
-//	m_agcHangLevelOld = m_rxDataList.at(m_receiver).agcHangLevel;
-//	m_agcHangLevelNew = m_agcHangLevelOld;
 
 	m_agcHangEnabled = m_rxDataList.at(m_receiver).hangEnabled;
 	m_showAGCLines = m_rxDataList.at(m_receiver).agcLines;
@@ -3124,7 +3120,8 @@ void QGLReceiverPanel::mouseMoveEvent(QMouseEvent* event) {
 				if (m_agcThresholdNew < m_dBmPanMin+2)
 					m_agcThresholdNew = m_dBmPanMin+2;
 
-				set->setAGCThreshold_dB(this, m_receiver, m_agcThresholdNew);
+		//		set->setAGCThreshold_dB(this, m_receiver, m_agcThresholdNew);
+				set->setAGCLineLevels(this, m_receiver, m_agcThresholdNew,m_agcHangLevelNew);
 			}
 			break;
 
@@ -3151,9 +3148,7 @@ void QGLReceiverPanel::mouseMoveEvent(QMouseEvent* event) {
 
 				if (m_agcHangLevelNew < m_dBmPanMin+2)
 					m_agcHangLevelNew = m_dBmPanMin+2;
-
-				set->setAGCHangLevel_dB(this, m_receiver, m_agcHangLevelNew);
-				//GRAPHICS_DEBUG << "set m_agcHangLevelNew = " << m_agcHangLevelNew;
+				set->setAGCLineLevels(this, m_receiver, m_agcThresholdOld,m_agcHangLevelNew);
 			}
 			break;
 
@@ -4477,14 +4472,17 @@ void QGLReceiverPanel::updateADCStatus() {
 void QGLReceiverPanel::setAGCLineLevels(QObject *sender, int rx, qreal thresh, qreal hang) {
 
 	Q_UNUSED(sender)
-
-	if (m_receiver != rx) return;
+    GRAPHICS_DEBUG << "LINE UPDATE";
+    if (m_receiver != rx) return;
 	if (m_agcThresholdOld == thresh && m_agcHangLevelOld == hang) return;
 
 	m_agcThresholdOld = thresh;
 	m_agcHangLevelOld = hang;
+
 	GRAPHICS_DEBUG << "m_agcThresholdOld = " << m_agcThresholdOld;
 	GRAPHICS_DEBUG << "m_agcHangLevelOld = " << m_agcHangLevelOld;
+
+
 }
 
 void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value) {
