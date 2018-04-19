@@ -159,7 +159,7 @@ private slots:
 	void	setAGCThreshold_dB(QObject* sender, int rx, qreal value);
 	void 	setAGCHangLevel_dB(QObject* sender, int rx, qreal value);
 	void 	setAGCHangThreshold(QObject* sender, int rx, int value);
-	void	setAGCVariableGain_dB(QObject* sender, int rx, qreal value);
+	void	setAGCSlope_dB(QObject *sender, int rx, qreal value);
 	void	setAGCAttackTime(QObject* sender, int rx, qreal value);
 	void 	setAGCDecayTime(QObject* sender, int rx, qreal value);
 	void 	setAGCHangTime(QObject* sender, int rx, qreal value);
@@ -214,7 +214,7 @@ private:
 	qreal	m_agcThreshold_dBm;
 	qreal	m_agcHangThreshold;
 	qreal	m_agcHangLevel;
-	qreal	m_agcVariableGain;
+	qreal	m_agcSlope;
 	qreal	m_agcAttackTime;
 	qreal	m_agcDecayTime;
 	qreal	m_agcHangTime;

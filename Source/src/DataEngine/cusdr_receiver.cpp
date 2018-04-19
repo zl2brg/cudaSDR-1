@@ -178,7 +178,7 @@ void Receiver::setupConnections() {
 		set,
 		SIGNAL(agcVariableGainChanged_dB(QObject *, int, qreal)),
 		this,
-		SLOT(setAGCVariableGain_dB(QObject *, int, qreal)));
+		SLOT(setAGCSlope_dB(QObject * , int, qreal)));
 
 	CHECKED_CONNECT(
 		set,
@@ -233,7 +233,7 @@ void Receiver::setReceiverData(TReceiver data) {
 	m_agcFixedGain_dB = m_receiverData.agcFixedGain_dB;
 	m_agcMaximumGain_dB = m_receiverData.agcMaximumGain_dB;
 	m_agcHangThreshold = m_receiverData.agcHangThreshold;
-	m_agcVariableGain = m_receiverData.agcVariableGain;
+	m_agcSlope = m_receiverData.agcSlope;
 
 	m_audioVolume = m_receiverData.audioVolume;
 
@@ -662,19 +662,19 @@ void Receiver::setAGCHangLevel_dB(QObject *sender, int rx, qreal value) {
 	//set->setAGCHangLeveldB(this, m_receiverID, value);
 }
 
-void Receiver::setAGCVariableGain_dB(QObject *sender, int rx, qreal value) {
+void Receiver::setAGCSlope_dB(QObject *sender, int rx, qreal value) {
 
         Q_UNUSED(sender)
 
 	if (m_receiver != rx) return;
-	if (m_agcVariableGain == value) return;
+	if (m_agcSlope == value) return;
 
-	m_agcVariableGain = value;
+	m_agcSlope = value;
 
 	if (qtwdsp) {
 
-		RECEIVER_DEBUG << "m_agcVariableGain = " << m_agcVariableGain;
-		qtwdsp->setAGCMaximumGain(m_agcVariableGain);
+		RECEIVER_DEBUG << "m_agcSlope = " << m_agcSlope;
+		qtwdsp->setAGCMaximumGain(m_agcSlope);
 	}
 }
 
