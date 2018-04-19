@@ -772,7 +772,7 @@ int Settings::loadSettings() {
 		value = settings->value(cstr, 0).toInt();
 		if (value < 0) value = 0;
 		if (value > 20) value = 20;
-		m_receiverDataList[i].agcVariableGain = (qreal)value;
+		m_receiverDataList[i].agcSlope = (qreal)value;
 
 		cstr = m_rxStringList.at(i);
 		cstr.append("/agcAttacktime");
@@ -1865,7 +1865,7 @@ int Settings::saveSettings() {
 
 		str = m_rxStringList.at(i);
 		str.append("/agcSlope");
-		settings->setValue(str, (int)m_receiverDataList[i].agcVariableGain);
+		settings->setValue(str, (int)m_receiverDataList[i].agcSlope);
 
 		str = m_rxStringList.at(i);
 		str.append("/agcAttacktime");
@@ -3801,7 +3801,7 @@ void Settings::setAGCMaximumGain_dB(QObject *sender, int rx, qreal value) {
 	if (m_receiverDataList[rx].agcMaximumGain_dB == value) return;
 	m_receiverDataList[rx].agcMaximumGain_dB = value;
 
-	qDebug() << "agcMaximumGain_dB = " << m_receiverDataList[rx].agcMaximumGain_dB << " (sender: " << sender << ")";
+    SETTINGS_DEBUG << "set agcMaximumGain_dB = " << m_receiverDataList[rx].agcMaximumGain_dB << " (sender: " << sender << ")";
 	emit agcMaximumGainChanged_dB(sender, rx, value);
 }
 
@@ -3817,7 +3817,7 @@ void Settings::setAGCFixedGain_dB(QObject *sender, int rx, qreal value) {
 	if (m_receiverDataList[rx].agcFixedGain_dB == value) return;
 	m_receiverDataList[rx].agcFixedGain_dB = value;
 
-	//SETTINGS_DEBUG << "m_receiverDataList[rx].agcFixedGain_dB = " << m_receiverDataList[rx].agcFixedGain_dB;
+	SETTINGS_DEBUG << "m_receiverDataList[rx].agcFixedGain_dB = " << m_receiverDataList[rx].agcFixedGain_dB;
 	emit agcFixedGainChanged_dB(sender, rx, value);
 }
 
@@ -3829,11 +3829,11 @@ qreal Settings::getAGCFixedGain_dB(int rx) {
 void Settings::setAGCThreshold_dB(QObject *sender, int rx, qreal value) {
 
 	//QMutexLocker locker(&settingsMutex);
-
+    SETTINGS_DEBUG << "acgThreshold = " <<value;
 	if (m_receiverDataList[rx].acgThreshold_dB == value) return;
 	m_receiverDataList[rx].acgThreshold_dB = value;
 
-	//SETTINGS_DEBUG << "acgThreshold = " << m_receiverDataList[rx].acgThreshold;
+	SETTINGS_DEBUG << "acgThreshold = " <<m_receiverDataList[rx].acgThreshold_dB;
 	emit agcThresholdChanged_dB(sender, rx, value);
 }
 
@@ -3877,10 +3877,11 @@ void Settings::setAGCHangLevel_dB(QObject *sender, int rx, qreal value) {
 void Settings::setAGCLineLevels(QObject *sender, int rx, qreal thresh, qreal hang) {
 
 	if (m_currentReceiver != rx) return;
+    if ((m_receiverDataList[rx].agcHangLevel == hang) && (m_receiverDataList[rx].acgThreshold_dB == thresh)) return;
 
-	m_receiverDataList[rx].agcHangLevel = hang;
-	//SETTINGS_DEBUG << "agcHangLevel = " << m_receiverDataList[rx].agcHangLevel;
-
+    m_receiverDataList[rx].agcHangLevel = hang;
+    m_receiverDataList[rx].acgThreshold_dB = thresh;
+    SETTINGS_DEBUG << "SET agcHangLevel = " << m_receiverDataList[rx].agcHangLevel;
 	emit agcLineLevelsChanged(sender, rx, thresh, hang);
 }
 
@@ -3888,10 +3889,10 @@ void Settings::setAGCVariableGain_dB(QObject *sender, int rx, qreal value) {
 
 	if (m_currentReceiver != rx) return;
 
-	if (m_receiverDataList[rx].agcVariableGain == value) return;
-	m_receiverDataList[rx].agcVariableGain = value;
+	if (m_receiverDataList[rx].agcSlope == value) return;
+	m_receiverDataList[rx].agcSlope = value;
 
-	SETTINGS_DEBUG << "agcVariableGain = " << m_receiverDataList[rx].agcVariableGain;
+	SETTINGS_DEBUG << "agcSlope = " << m_receiverDataList[rx].agcSlope;
 	emit agcVariableGainChanged_dB(sender, rx, value);
 }
 
@@ -4905,3 +4906,10 @@ void Settings::setPanDetectorMode(int rx , PanDetectorMode mode) {
     emit panDetectorModeChanged(rx,mode);
 
 };
+
+
+
+qreal Settings::getAGCSlope(int rx) {
+	return m_receiverDataList[rx].agcSlope;
+
+}

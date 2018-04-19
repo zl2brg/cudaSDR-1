@@ -561,7 +561,6 @@ typedef struct _receiver {
 	qreal	mouseWheelFreqStep;
 	qreal	filterLo;
 	qreal	filterHi;
-	qreal	agcSlope;
 	qreal	acgGain;
 	qreal	acgThreshold_dB;
 	qreal	agcHangThreshold;
@@ -571,7 +570,7 @@ typedef struct _receiver {
 	qreal	agcDecayTime;
 	qreal	agcHangTime;
 	qreal	agcFixedGain_dB;
-	qreal	agcVariableGain;
+	qreal	agcSlope;
 
 	int		sampleRate;
 	int		framesPerSecond;
@@ -1114,8 +1113,10 @@ public:
 	qreal	getAGCFixedGain_dB(int rx);
 	int		getAGCHangThreshold(int rx);
 	int		getAGCHangLeveldB(int rx);
-	
-	int		getLowerChirpFreq()				{ return m_lowerChirpFreq; }
+    qreal    getAGCSlope(int rx);
+
+
+    int		getLowerChirpFreq()				{ return m_lowerChirpFreq; }
 	int		getUpperChirpFreq()				{ return m_upperChirpFreq; }
 	qreal	getChirpAmplitude()				{ return m_chirpAmplitude; }
 	int		getChirpSamplingFreq()			{ return m_chirpSamplingFreq; }
