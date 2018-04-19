@@ -58,7 +58,9 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
     m_averageCount= set->getSpectrumAveragingCnt(m_rx);
     m_PanAvMode = set->getPanAveragingMode(m_rx);
     m_PanDetMode = set->getPanDetectorMode(m_rx);
-
+    m_agcSlope = set->getAGCSlope(m_rx);
+    m_agcMaximumGain = set->getAGCMaximumGain_dB(m_rx);
+	m_agcHangThreshold = set->getAGCHangThreshold(m_rx);
 	spectrumBuffer.resize(BUFFER_SIZE*4);
 
 
@@ -82,10 +84,6 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
 
 	SetRXAMode(m_rx, 1);
 	RXASetNC(m_rx,4096);
-	SetRXAAGCMode(m_rx,2);
-	SetRXAAGCThresh(m_rx, -100.0, 4096.0, m_samplerate);
-	SetRXAAGCSlope(m_rx,35.0);
-	SetRXAAGCTop(m_rx,80.0);
     SetRXAPanelRun(m_rx, 1);
     SetRXAPanelSelect(m_rx,3);
     XCreateAnalyzer(m_rx, &result,4096, 1, 1, "");
@@ -232,21 +230,58 @@ void QWDSPEngine::setDSPMode(DSPMode mode) {
 
 }
 
-void QWDSPEngine::setAGCMode(AGCMode mode) {
- SetRXAAGCMode(m_rx,(int) mode);
- WDSP_ENGINE_DEBUG << "Set AGC Mode " << mode;
+void QWDSPEngine::setAGCMode(AGCMode agc) {
+
+
+
+		SetRXAAGCMode(m_rx, agc);
+		//SetRXAAGCThresh(rx->id, agc_thresh_point, 4096.0, rx->sample_rate);
+		SetRXAAGCSlope(m_rx,m_agcSlope);
+		SetRXAAGCTop(m_rx,m_agcMaximumGain);
+		switch(agc) {
+			case agcOFF:
+				break;
+			case agcLONG:
+				SetRXAAGCAttack(m_rx,2);
+				SetRXAAGCHang(m_rx,2000);
+				SetRXAAGCDecay(m_rx,2000);
+				SetRXAAGCHangThreshold(m_rx,(int) m_agcHangThreshold);
+				break;
+			case agcSLOW:
+				SetRXAAGCAttack(m_rx,2);
+				SetRXAAGCHang(m_rx,1000);
+				SetRXAAGCDecay(m_rx,500);
+				SetRXAAGCHangThreshold(m_rx,(int)m_agcHangThreshold);
+				break;
+			case agcMED:
+				SetRXAAGCAttack(m_rx,2);
+				SetRXAAGCHang(m_rx,0);
+				SetRXAAGCDecay(m_rx,250);
+				SetRXAAGCHangThreshold(m_rx,100);
+				break;
+			case agcFAST:
+				SetRXAAGCAttack(m_rx,2);
+				SetRXAAGCHang(m_rx,0);
+				SetRXAAGCDecay(m_rx,50);
+				SetRXAAGCHangThreshold(m_rx,100);
+				break;
+		}
+
+ WDSP_ENGINE_DEBUG << "Set AGC Mode " << agc;
 
 }
 
 void QWDSPEngine::setAGCMaximumGain(qreal value) {
-SetRXAAGCTop(m_rx, value);
+	SetRXAAGCTop(m_rx, value);
+	m_agcMaximumGain = value;
     WDSP_ENGINE_DEBUG << "Set AGCMaximum gain " << value;
 }
 
 void QWDSPEngine::setAGCHangThreshold(qreal value) {
 
-SetRXAAGCHangThreshold(m_rx, (int) value);SetRXAAGCHangThreshold(m_rx, (int) value);
-   WDSP_ENGINE_DEBUG << "Set AGC Hang Threshold " << value;
+	m_agcHangThreshold = value;
+	SetRXAAGCHangThreshold(m_rx, (int) value);SetRXAAGCHangThreshold(m_rx, (int) value);
+   	WDSP_ENGINE_DEBUG << "Set AGC Hang Threshold " << value;
 
 }
 
@@ -272,7 +307,6 @@ void QWDSPEngine::setAGCHangLevel(double level) {
 void QWDSPEngine::setAGCThreshold(double threshold) {
 
 	SetRXAAGCThresh(m_rx,threshold,4096,this->m_samplerate);
-//	SetRXAAGCHangLevel(m_rx,threshold);
 	WDSP_ENGINE_DEBUG << "Set AGC threshold " << threshold;
 }
 
@@ -344,13 +378,6 @@ void QWDSPEngine::setNCOFrequency(int rx, long ncoFreq) {
 //		RXANBPSetShiftFrequency(m_rx, (double)ncoFreq);
 		SetRXAShiftRun(m_rx, 1);
 	}
-
-
-
-
-
- 	WDSP_ENGINE_DEBUG << "NCO: " << m_NcoFreq;
-
 }
 
 void QWDSPEngine::setSampleSize(int rx, int size) {
@@ -378,8 +405,8 @@ void QWDSPEngine::init_analyzer(int refreshrate) {
 	int n_pixout = 1;
 	int spur_elimination_ffts = 1;
 	int data_type = 1;
-	int fft_size = 4096;
-	int window_type = 4;
+	int fft_size = 2048;
+	int window_type = 5;
 	double kaiser_pi = 14.0;
 	int overlap = 2048;
 	int clip = 0;
@@ -395,7 +422,7 @@ void QWDSPEngine::init_analyzer(int refreshrate) {
 
 	int max_w = fft_size + (int) min(keep_time * (double) refreshrate, keep_time * (double) fft_size * (double) refreshrate);
 
-	overlap = (int) max(0.0, ceil(fft_size - (double) 48000 / (double) refreshrate));
+	overlap = (int) max(0.0, ceil(fft_size - (double) m_samplerate / (double) refreshrate));
 
 	fprintf(stderr, "SetAnalyzer id=%d buffer_size=%d overlap=%d\n", m_rx, m_size, overlap);
 
@@ -472,3 +499,4 @@ void QWDSPEngine::calcDisplayAveraging() {
     m_display_avb = exp(-1.0 / ((double)m_refreshrate * t));
     m_display_average = max(2, (int)min(60, (double)m_refreshrate * t));
 }
+

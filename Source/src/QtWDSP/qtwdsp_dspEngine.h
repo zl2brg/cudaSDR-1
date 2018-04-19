@@ -51,7 +51,7 @@ extern "C" {
 
 
 #ifdef LOG_WDSP_ENGINE
-# define  WDSP_ENGINE_DEBUG qDebug().nospace() << "WDSPEngine::\t"
+#define  WDSP_ENGINE_DEBUG qDebug().nospace() << "WDSPEngine::\t"
 #else
 #   define WDSP_ENGINE_DEBUG nullDebug()
 #endif
@@ -128,6 +128,9 @@ private:
     int     m_PanAvMode;
     int     m_PanDetMode;
    	float	m_volume;
+   	int     m_agcSlope;
+   	qreal   m_agcMaximumGain;
+   	qreal   m_agcHangThreshold;
 	qreal	m_NcoFreq;
 	qreal	m_NcoInc;
 	qreal	m_NcoTime;
