@@ -92,7 +92,7 @@ public slots:
 	void	setAGCHangThreshold(qreal);
 	//void	setAGCHangLeveldBLine(qreal value);
 	//void	setAGCThresholdLine(QObject *sender, int rx, qreal value);
-	void	setAGCLineValues(QObject *sender, int rx, qreal thresh, qreal hang);
+	void	setAGCLineValues(QObject *sender, int rx);
 	void 	setAGCThreshold( double threshold);
 	void	setAGCHangTime(int hang);
 	void 	setAGCHangLevel(double level);
@@ -129,8 +129,10 @@ private:
     int     m_PanDetMode;
    	float	m_volume;
    	int     m_agcSlope;
-   	qreal   m_agcMaximumGain;
+   	qreal   m_agcThreshold;
    	qreal   m_agcHangThreshold;
+   	qreal   m_agcMaximumGain;
+   	DSPMode	m_dspmode;
 	qreal	m_NcoFreq;
 	qreal	m_NcoInc;
 	qreal	m_NcoTime;

@@ -146,7 +146,7 @@ void Receiver::setupConnections() {
 
 	CHECKED_CONNECT(
 		set,
-		SIGNAL(agcMaximumGainChanged_dB(QObject *, int, qreal)),
+		SIGNAL(agcMaximumGainChanged(QObject *, int, qreal)),
 		this,
 		SLOT(setAGCMaximumGain_dB(QObject *, int, qreal)));
 
@@ -284,7 +284,6 @@ bool Receiver::initQtDSPInterface() {
 						getFilterFromDSPMode(set->getDefaultFilterList(), mode).filterHi);
 	qtdsp->wpagc->setMode(m_agcMode);
 	qtdsp->wpagc->setAGCFixedGainDb(m_agcFixedGain_dB);
-	qtdsp->wpagc->setMaximumGainDb(m_agcMaximumGain_dB);
 
 //	if (m_agcMode == (AGCMode) agcOFF)
 //		set->setAGCFixedGain_dB(this, m_receiver, m_agcFixedGain_dB);
@@ -602,14 +601,12 @@ void Receiver::setAGCFixedGain_dB(QObject *sender, int rx, qreal value) {
 void Receiver::setAGCMaximumGain_dB(QObject *sender, int rx, qreal value) {
 
 	Q_UNUSED(sender)
-
 	if (m_receiver != rx) return;
 	if (m_agcMaximumGain_dB == value) return;
 
 	m_agcMaximumGain_dB = value;
 
-	if (qtdsp) {
-		//RECEIVER_DEBUG << "setAGCMaximumGain_dB = " << m_agcMaximumGain_dB;
+	if (qtwdsp) {
 		qtwdsp->setAGCMaximumGain(m_agcMaximumGain_dB);
 	}
 }
@@ -624,9 +621,7 @@ void Receiver::setAGCThreshold_dB(QObject *sender, int rx, qreal value) {
 	m_agcThreshold_dBm = value;
 
 	if (qtwdsp) {
-
-		//RECEIVER_DEBUG << "AGCThreshDB (minus offset) for Rx " << m_receiver << ": "  << m_agcThreshold_dBm - AGCOFFSET;
-		qtwdsp->setAGCThreshold(value);
+		qtwdsp->setAGCThreshold((double)value);
 	}
 }
 

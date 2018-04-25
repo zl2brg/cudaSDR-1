@@ -71,10 +71,9 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
 	setupConnections();
 
     WDSP_ENGINE_DEBUG << "Opening WDSP channel" << m_rx << "m_size=" << m_size << "Sample rate=" << m_samplerate;
-
     OpenChannel(m_rx,
                 m_size,
-                4096, // ,
+                2048, // ,
                 m_samplerate,
                 48000, // dsp rate
                 48000, // output rate
@@ -82,11 +81,12 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
                 0, // run
                 0.010, 0.025, 0.0, 0.010, 0);
 
-	SetRXAMode(m_rx, 1);
+    SetRXAFMDeviation(m_rx, (double)8000.0);
+	SetRXAMode(m_rx, FMN);
 	RXASetNC(m_rx,4096);
     SetRXAPanelRun(m_rx, 1);
     SetRXAPanelSelect(m_rx,3);
-    XCreateAnalyzer(m_rx, &result,4096, 1, 1, "");
+	XCreateAnalyzer(m_rx, &result,262144, 1, 1, "");
     if(result != 0) {
         WDSP_ENGINE_DEBUG <<  "XCreateAnalyzer id=%d failed: %d\n" <<  result;
     }
@@ -191,6 +191,8 @@ void QWDSPEngine::setupConnections() {
 void QWDSPEngine::processDSP(CPX &in, CPX &out, int size) {
 
 int error;
+double thresh;
+double hang;
 	m_mutex.lock();
     fexchange0(m_rx, (double *) in.data(),  (double *) out.data(), &error);
 
@@ -198,10 +200,11 @@ int error;
         WDSP_ENGINE_DEBUG << "WDSP channel read error " << error;
     }
 
-//	int idx = (int)(wmyLog(m_fftMultiplier, 2));
-//	powerSpectraList.at(idx)->ProcessSpectrum(in, size * m_fftMultiplier, m_fftMultiplier*2-1);
-	Spectrum0(1, m_rx, 0, 0,(double *) in.data());
+    Spectrum0(1, m_rx, 0, 0,(double *) in.data());
     GetPixels(0,0,(float *) spectrumBuffer.data(), &spectrumDataReady);
+//   GetRXAAGCHangLevel(m_rx, &hang);
+//   GetRXAAGCThresh(m_rx, &thresh, 2048, (double)m_samplerate);
+//    emit set->agcThresholdChanged_dB(this,m_rx,thresh);
 	m_mutex.unlock();
 }
 
@@ -225,6 +228,7 @@ void QWDSPEngine::setQtDSPStatus(bool value) {
 
 void QWDSPEngine::setDSPMode(DSPMode mode) {
 
+	m_dspmode = mode;
 	WDSP_ENGINE_DEBUG << "WDSP mode set to " << mode;
 	SetRXAMode(m_rx, mode);
 
@@ -237,7 +241,7 @@ void QWDSPEngine::setAGCMode(AGCMode agc) {
 		SetRXAAGCMode(m_rx, agc);
 		//SetRXAAGCThresh(rx->id, agc_thresh_point, 4096.0, rx->sample_rate);
 		SetRXAAGCSlope(m_rx,m_agcSlope);
-		SetRXAAGCTop(m_rx,m_agcMaximumGain);
+	//	SetRXAAGCTop(m_rx,m_agcMaximumGain);
 		switch(agc) {
 			case agcOFF:
 				break;
@@ -266,15 +270,16 @@ void QWDSPEngine::setAGCMode(AGCMode agc) {
 				SetRXAAGCHangThreshold(m_rx,100);
 				break;
 		}
-
- WDSP_ENGINE_DEBUG << "Set AGC Mode " << agc;
+	emit setAGCLineValues(this,m_rx);
+	WDSP_ENGINE_DEBUG << "Set AGC Mode " << agc;
 
 }
 
 void QWDSPEngine::setAGCMaximumGain(qreal value) {
-	SetRXAAGCTop(m_rx, value);
+	SetRXAAGCTop(m_rx, (double)value);
 	m_agcMaximumGain = value;
     WDSP_ENGINE_DEBUG << "Set AGCMaximum gain " << value;
+	emit setAGCLineValues(this,m_rx);
 }
 
 void QWDSPEngine::setAGCHangThreshold(qreal value) {
@@ -283,16 +288,29 @@ void QWDSPEngine::setAGCHangThreshold(qreal value) {
 	SetRXAAGCHangThreshold(m_rx, (int) value);SetRXAAGCHangThreshold(m_rx, (int) value);
    	WDSP_ENGINE_DEBUG << "Set AGC Hang Threshold " << value;
 
+
 }
 
-void QWDSPEngine::setAGCLineValues(QObject *sender, int rx, qreal thresh, qreal hang) {
+void QWDSPEngine::setAGCLineValues(QObject *sender, int rx) {
     if (m_rx != rx) return;
+    double hang;
+    double thresh;
+
+    GetRXAAGCHangLevel(m_rx, &hang);
+    GetRXAAGCThresh(m_rx, &thresh, 2048, (double)m_samplerate);
+
+    if ((hang != m_agcHangThreshold) || (thresh != m_agcHangThreshold))
+	{
+		m_agcHangThreshold = hang;
+		m_agcThreshold = thresh;
+		emit set->agcLineLevelsChanged(this,m_rx,thresh,hang);
+		WDSP_ENGINE_DEBUG << "Set AGC line value" << hang;
+
+	}
 
 //    qreal noiseOffset = 10.0 * log10(qAbs(filter->filterHi() - filter->filterLo()) * 2 * m_size / m_samplerate);
 //    qreal threshold = 20.0 * log10(thresh) - noiseOffset + AGCOFFSET;
 
-    SetRXAAGCHangLevel(m_rx,hang);
-   WDSP_ENGINE_DEBUG << "Set AGC line value" << hang;
 
 }
 
@@ -301,12 +319,14 @@ void QWDSPEngine::setAGCHangLevel(double level) {
 
 	SetRXAAGCHangLevel(m_rx,level);
 	WDSP_ENGINE_DEBUG << "Set AGC line value" << level;
+
 }
 
 
 void QWDSPEngine::setAGCThreshold(double threshold) {
 
-	SetRXAAGCThresh(m_rx,threshold,4096,this->m_samplerate);
+	SetRXAAGCThresh(m_rx,threshold,2048,this->m_samplerate);
+	emit setAGCLineValues(this,m_rx);
 	WDSP_ENGINE_DEBUG << "Set AGC threshold " << threshold;
 }
 
@@ -324,7 +344,6 @@ void QWDSPEngine::setSampleRate(QObject *sender, int value) {
 
 	if (m_samplerate == value) return;
 
-	m_mutex.lock();
 	switch (value) {
 
 		case 48000:
@@ -348,17 +367,25 @@ void QWDSPEngine::setSampleRate(QObject *sender, int value) {
 			break;
 	}
  	SetChannelState(m_rx,0,1);
+
 	SetInputSamplerate(m_rx,m_samplerate);
+    init_analyzer(m_refreshrate);
+//    SetEXTANBSamplerate (m_rx, m_samplerate);
+//   SetEXTNOBSamplerate (m_rx, m_samplerate);
 	SetChannelState(m_rx,1,0);
 	WDSP_ENGINE_DEBUG << "sample rate set to " << m_samplerate ;
-	m_mutex.unlock();
 
 }
 
 
 void QWDSPEngine:: setFilter(double low,double high) {
 
+
+	if(m_dspmode == FMN) {
+		SetRXAFMDeviation(m_rx, (double)4000.0);
+		}
 	RXASetPassband(m_rx,low,high);
+	emit setAGCLineValues(this,m_rx);
     WDSP_ENGINE_DEBUG << "Set Filter:Low  " <<  low << "High " << high;
 }
 
@@ -447,10 +474,6 @@ void QWDSPEngine::init_analyzer(int refreshrate) {
 				span_max_freq, //frequency at last pixel value
 				max_w //max samples to hold in input ring buffers
 	);
-
-
-	SetDisplayDetectorMode(m_rx, 0, 0);
-//	SetDisplayAverageMode(m_rx, 0,  2);
 }
 
 

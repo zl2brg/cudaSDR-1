@@ -210,8 +210,8 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 	
 	m_dBmPanLogGain = -20;//49;//69 // allow user to calibrate this value
 
-	m_cameraDistance = 100;
-	m_cameraAngle = QPoint(200, 200);
+	m_cameraDistance = 0;
+	m_cameraAngle = QPoint(0, 0);
 
 	m_mousePos = QPoint(-100, -100);
 	
@@ -3120,8 +3120,8 @@ void QGLReceiverPanel::mouseMoveEvent(QMouseEvent* event) {
 				if (m_agcThresholdNew < m_dBmPanMin+2)
 					m_agcThresholdNew = m_dBmPanMin+2;
 
-		//		set->setAGCThreshold_dB(this, m_receiver, m_agcThresholdNew);
-				set->setAGCLineLevels(this, m_receiver, m_agcThresholdNew,m_agcHangLevelNew);
+				set->setAGCThreshold_dB(this, m_receiver, m_agcThresholdNew);
+		//		set->setAGCMaximumGain_dB(this, m_receiver, m_agcThresholdNew);
 			}
 			break;
 
@@ -3148,7 +3148,7 @@ void QGLReceiverPanel::mouseMoveEvent(QMouseEvent* event) {
 
 				if (m_agcHangLevelNew < m_dBmPanMin+2)
 					m_agcHangLevelNew = m_dBmPanMin+2;
-				set->setAGCLineLevels(this, m_receiver, m_agcThresholdOld,m_agcHangLevelNew);
+				set->setAGCHangThreshold(this, m_receiver, m_agcHangLevelNew);
 			}
 			break;
 
@@ -3956,6 +3956,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 					
 		// max value; later we try mean value also!
 		localMax = -10000.0F;
+
 		for (int j = lIdx; j < rIdx; j++) {
 
 			if (buffer.at(j) > localMax) {
@@ -3964,10 +3965,11 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 				idx = j;
 			}
 		}
+
 		// shift the beginning of the bins by half of the difference between
 		// full spectrum size and reduced spectrum size due to zooming
 		idx += deltaSampleSize/2;
-		
+
 		QColor pColor;
 		if (m_mercuryAttenuator) {
 
@@ -4472,17 +4474,14 @@ void QGLReceiverPanel::updateADCStatus() {
 void QGLReceiverPanel::setAGCLineLevels(QObject *sender, int rx, qreal thresh, qreal hang) {
 
 	Q_UNUSED(sender)
-    GRAPHICS_DEBUG << "LINE UPDATE";
-    if (m_receiver != rx) return;
+
+	if (m_receiver != rx) return;
 	if (m_agcThresholdOld == thresh && m_agcHangLevelOld == hang) return;
 
 	m_agcThresholdOld = thresh;
 	m_agcHangLevelOld = hang;
-
-	GRAPHICS_DEBUG << "m_agcThresholdOld = " << m_agcThresholdOld;
-	GRAPHICS_DEBUG << "m_agcHangLevelOld = " << m_agcHangLevelOld;
-
-
+	//GRAPHICS_DEBUG << "m_agcThresholdOld = " << m_agcThresholdOld;
+	//GRAPHICS_DEBUG << "m_agcHangLevelOld = " << m_agcHangLevelOld;
 }
 
 void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value) {
@@ -4493,7 +4492,7 @@ void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value
 	if (m_agcFixedGain == value) return;
 
 	m_agcFixedGain = value;
-	GRAPHICS_DEBUG << "m_agcFixedGain = " << m_agcFixedGain;
+	//GRAPHICS_DEBUG << "m_agcFixedGain = " << m_agcFixedGain;
 }
 
 void QGLReceiverPanel::setADCMode(QObject *sender, int rx, ADCMode mode) {
