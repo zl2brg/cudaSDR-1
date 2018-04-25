@@ -1218,8 +1218,6 @@ int Settings::loadSettings() {
 		if ((value < 0) || (value > 50000000)) value = 3600000;
 		m_receiverDataList[i].vfoFrequency = value;
 
-
-
 		setVfoFrequency(i, value);
 		
 
@@ -2683,8 +2681,6 @@ bool Settings::getTxAllowed() {
 	return m_transmitter.txAllowed;
 }
 
-
-
 void Settings::setGraphicsState(
 
 	QObject *sender,
@@ -3802,7 +3798,7 @@ void Settings::setAGCMaximumGain_dB(QObject *sender, int rx, qreal value) {
 	m_receiverDataList[rx].agcMaximumGain_dB = value;
 
     SETTINGS_DEBUG << "set agcMaximumGain_dB = " << m_receiverDataList[rx].agcMaximumGain_dB << " (sender: " << sender << ")";
-	emit agcMaximumGainChanged_dB(sender, rx, value);
+	emit agcMaximumGainChanged(sender,rx, value);
 }
 
 qreal Settings::getAGCMaximumGain_dB(int rx) {

@@ -940,7 +940,7 @@ signals:
 	void sMeterHoldTimeChanged(int value);
 	void dBmScaleMinChanged(int rx, qreal value);
 	void dBmScaleMaxChanged(int rx, qreal value);
-	
+    void agcMaximumGainChanged(QObject *sender,int, qreal value);
 
 	void showRadioPopupChanged(bool value);
 
