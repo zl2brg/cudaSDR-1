@@ -318,6 +318,7 @@ private slots:
 	void	setAudioFileBuffer(QObject *sender, qint64 position, qint64 length, const QByteArray &buffer);
 
 	void	setAudioFileBuffer(const QList<qreal> &buffer);
+
 	
 signals:
 	void	error(QUdpSocket::SocketError error);
@@ -332,7 +333,6 @@ signals:
 	void	audioDataReady();
 	void	clientConnectedEvent(int rx);
 	void	audioRxEvent(int rx);
-	void	outMultiplierEvent(int value);
 	void	systemMessageEvent(const QString &str, int time);
 	void	clearSystemMessageEvent();
 	void	DataProcessorReadyEvent();
@@ -371,6 +371,7 @@ private slots:
 	void	decodeCCBytes(const QByteArray &buffer);
 	void	encodeCCBytes();
 	void	setOutputBuffer(int rx, const CPX &buffer);
+	void 	setAudioBuffer(int rx, const CPX &buffer, int buffersize);
 	void	writeData();
 	
 private:

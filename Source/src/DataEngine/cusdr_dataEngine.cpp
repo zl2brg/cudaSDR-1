@@ -930,6 +930,12 @@ bool DataEngine::start() {
 				m_dataProcessor,
 				SLOT(setOutputBuffer(int, const CPX &)));
 
+		CHECKED_CONNECT(
+				RX.at(i),
+				SIGNAL(audioBufferSignal(int, const CPX &, int)),
+				m_dataProcessor,
+				SLOT(setAudioBuffer(int, const CPX &,int)));
+
 		m_dspThreadList.at(i)->start(QThread::NormalPriority);//QThread::TimeCriticalPriority);
 				
 		if (m_dspThreadList.at(i)->isRunning()) {
@@ -2169,31 +2175,26 @@ void DataEngine::setSampleRate(QObject *sender, int value) {
 
 	Q_UNUSED(sender)
 
-	io.mutex.lock();
 	switch (value) {
 	
 		case 48000:
 			io.samplerate = value;
 			io.speed = 0;
-			io.outputMultiplier = 1;
 			break;
 			
 		case 96000:
 			io.samplerate = value;
 			io.speed = 1;
-			io.outputMultiplier = 2;
 			break;
 			
 		case 192000:
 			io.samplerate = value;
 			io.speed = 2;
-			io.outputMultiplier = 4;
 			break;
 			
 		case 384000:
 			io.samplerate = value;
 			io.speed = 3;
-			io.outputMultiplier = 8;
 			break;
 
 		default:
@@ -2203,8 +2204,6 @@ void DataEngine::setSampleRate(QObject *sender, int value) {
 	}
 
 	io.mutex.unlock();
-
-	emit outMultiplierEvent(io.outputMultiplier);
 }
 
 void DataEngine::setMercuryAttenuator(QObject *sender, HamBand band, int value) {
@@ -3148,33 +3147,33 @@ void DataProcessor::setOutputBuffer(int rx, const CPX &buffer) {
 	}
 }
 
-void DataProcessor::processOutputBuffer(const CPX &buffer) {
+void DataProcessor::setAudioBuffer(int rx, const CPX &buffer, int buffersize){
 
 	//DATA_PROCESSOR_DEBUG << "processOutputBuffer: " << this->thread();
 
 	qint16 leftRXSample;
-    qint16 rightRXSample;
-    qint16 leftTXSample;
-    qint16 rightTXSample;
+	qint16 rightRXSample;
+	qint16 leftTXSample;
+	qint16 rightTXSample;
 
 	// process the output
-	for (int j = 0; j < BUFFER_SIZE; j += de->io.outputMultiplier) {
+	for (int j = 0; j < buffersize; j++) {
 
 		leftRXSample  = (qint16)(buffer.at(j).re * 32767.0f);
 		rightRXSample = (qint16)(buffer.at(j).im * 32767.0f);
 
 		leftTXSample = 0;
-        rightTXSample = 0;
+		rightTXSample = 0;
 
 		de->io.output_buffer[m_idx++] = leftRXSample  >> 8;
-        de->io.output_buffer[m_idx++] = leftRXSample;
-        de->io.output_buffer[m_idx++] = rightRXSample >> 8;
-        de->io.output_buffer[m_idx++] = rightRXSample;
-        de->io.output_buffer[m_idx++] = leftTXSample  >> 8;
-        de->io.output_buffer[m_idx++] = leftTXSample;
-        de->io.output_buffer[m_idx++] = rightTXSample >> 8;
-        de->io.output_buffer[m_idx++] = rightTXSample;
-		
+		de->io.output_buffer[m_idx++] = leftRXSample;
+		de->io.output_buffer[m_idx++] = rightRXSample >> 8;
+		de->io.output_buffer[m_idx++] = rightRXSample;
+		de->io.output_buffer[m_idx++] = leftTXSample  >> 8;
+		de->io.output_buffer[m_idx++] = leftTXSample;
+		de->io.output_buffer[m_idx++] = rightTXSample >> 8;
+		de->io.output_buffer[m_idx++] = rightTXSample;
+
 		if (m_idx == IO_BUFFER_SIZE) {
 
 			//if (de->m_audioBuffer.length() == 1024) {
@@ -3192,7 +3191,7 @@ void DataProcessor::processOutputBuffer(const CPX &buffer) {
 
 					de->io.audioDatagram.resize(IO_BUFFER_SIZE);
 					de->io.audioDatagram = QByteArray::fromRawData((const char *)&de->io.output_buffer, IO_BUFFER_SIZE);
-			
+
 					//if (m_dataIOThreadRunning) {
 					//	de->m_dataIO->writeData();
 					//}
@@ -3201,7 +3200,69 @@ void DataProcessor::processOutputBuffer(const CPX &buffer) {
 
 					writeData();
 					break;
-			
+
+				case QSDR::NoInterfaceMode:
+					break;
+			}
+			m_idx = IO_HEADER_SIZE;
+		}
+	}
+}
+
+void DataProcessor::processOutputBuffer(const CPX &buffer) {
+
+	//DATA_PROCESSOR_DEBUG << "processOutputBuffer: " << this->thread();
+
+	qint16 leftRXSample;
+    qint16 rightRXSample;
+    qint16 leftTXSample;
+    qint16 rightTXSample;
+
+	// process the output
+	for (int j = 0; j < BUFFER_SIZE; j++) {
+
+		leftRXSample  = (qint16)(buffer.at(j).re * 32767.0f);
+		rightRXSample = (qint16)(buffer.at(j).im * 32767.0f);
+
+		leftTXSample = 0;
+        rightTXSample = 0;
+
+		de->io.output_buffer[m_idx++] = leftRXSample  >> 8;
+        de->io.output_buffer[m_idx++] = leftRXSample;
+        de->io.output_buffer[m_idx++] = rightRXSample >> 8;
+        de->io.output_buffer[m_idx++] = rightRXSample;
+        de->io.output_buffer[m_idx++] = leftTXSample  >> 8;
+        de->io.output_buffer[m_idx++] = leftTXSample;
+        de->io.output_buffer[m_idx++] = rightTXSample >> 8;
+        de->io.output_buffer[m_idx++] = rightTXSample;
+
+		if (m_idx == IO_BUFFER_SIZE) {
+
+			//if (de->m_audioBuffer.length() == 1024) {
+
+			//	//m_audioEngine->setAudioBuffer(this, m_audioBuffer);
+			//	de->m_audioBuffer.resize(0);
+			//}
+			// set the C&C bytes
+			encodeCCBytes();
+
+			switch (m_hwInterface) {
+
+				case QSDR::Metis:
+				case QSDR::Hermes:
+
+					de->io.audioDatagram.resize(IO_BUFFER_SIZE);
+					de->io.audioDatagram = QByteArray::fromRawData((const char *)&de->io.output_buffer, IO_BUFFER_SIZE);
+
+					//if (m_dataIOThreadRunning) {
+					//	de->m_dataIO->writeData();
+					//}
+
+					de->m_dataIO->sendAudio(de->io.output_buffer); //RRK
+
+					writeData();
+					break;
+
 				case QSDR::NoInterfaceMode:
 					break;
 			}
