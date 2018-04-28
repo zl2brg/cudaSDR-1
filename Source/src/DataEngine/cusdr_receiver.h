@@ -86,21 +86,21 @@ public:
 	qreal	getdBmPanScaleMin()		{ return m_dBmPanScaleMin; }
 	qreal	getdBmPanScaleMax()		{ return m_dBmPanScaleMax; }
 	bool	getConnectedStatus()	{ return m_connected; }
+	void 	setAudioBufferSize();
 
     float	in[BUFFER_SIZE * 2];
     float	out[BUFFER_SIZE * 2];
 	float	temp[BUFFER_SIZE * 4];
 	float	spectrum[BUFFER_SIZE * 4];
-	float	postSpectrum[BUFFER_SIZE * 4];
 
 	QVector<float>	newSpectrum;
 
-	QDSPEngine	*qtdsp;
 	QWDSPEngine *qtwdsp;
 	HResTimer	*highResTimer;
 
 	CPX			inBuf;
     CPX			outBuf;
+    CPX			audioOutputBuf;
 
 	QHQueue<CPX>	inQueue;
 
@@ -146,10 +146,8 @@ private slots:
 	void	setSampleRate(QObject *sender, int value);
 	void 	setFramesPerSecond(QObject *sender, int rx, int value);
 
-	bool	initQtDSPInterface();
 	bool	initQtWDSPInterface();
 
-    void	deleteQtDSP();
     void	deleteQtWDSP();
 
     
@@ -191,7 +189,7 @@ private:
 	QMutex				m_mutex;
 
 	volatile bool	m_stopped;
-	
+
 	int		m_receiver;
 	int		m_samplerate;
 	int		m_audioMode; // 1 = audio on, 0 = audio off
@@ -223,6 +221,7 @@ private:
 	qreal	m_filterHi;
 	qreal	m_dBmPanScaleMin;
 	qreal	m_dBmPanScaleMax;
+	int 	m_audiobuffersize;
 	int     m_refreshrate;
 
 	bool	m_connected;
@@ -235,7 +234,8 @@ signals:
 	void	spectrumBufferChanged(int rx, const qVectorFloat& buffer);
 	void	sMeterValueChanged(int rx, float value);
 	void	outputBufferSignal(int rx, const CPX &buffer);
-	//void	audioReady(int rx);
+	void	audioBufferSignal(int rx, const CPX &buffer, int);
+
 };
 
 #endif  // CUSDR_RECEIVER_H
