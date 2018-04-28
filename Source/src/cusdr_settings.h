@@ -426,7 +426,6 @@ typedef struct _hpsdrParameter {
 
 	int		samplerate;
 	int		speed;
-	int		outputMultiplier;
 
 	int		metisFW;
 	int		hermesFW;
