@@ -96,7 +96,10 @@ public slots:
 	void 	setAGCThreshold( double threshold);
 	void	setAGCHangTime(int hang);
 	void 	setAGCHangLevel(double level);
-	void 	setFramesPerSecond(QObject* sender, int rx, int value);
+	void    setAGCAttackTime(qreal value);
+    void    setAGCDecayTime(qreal value);
+    void    setAGCSlope(qreal value);
+    void 	setFramesPerSecond(QObject* sender, int rx, int value);
 	void    setPanAdaptorAveragingMode( int rx, int value);
     void    setPanAdaptorDetectorMode( int rx, int value);
     void    setPanAdaptorAveragingCnt(QObject*, int rx , int value);
@@ -132,6 +135,8 @@ private:
    	qreal   m_agcThreshold;
    	qreal   m_agcHangThreshold;
    	qreal   m_agcMaximumGain;
+   	qreal   m_agcAttackTime;
+   	qreal   m_agcDecayTime;
    	DSPMode	m_dspmode;
 	qreal	m_NcoFreq;
 	qreal	m_NcoInc;
