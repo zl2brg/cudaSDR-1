@@ -62,7 +62,7 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
     m_agcMaximumGain = set->getAGCMaximumGain_dB(m_rx);
 	m_agcHangThreshold = set->getAGCHangThreshold(m_rx);
 	spectrumBuffer.resize(BUFFER_SIZE*4);
-
+	m_fftSize = getfftVal(set->getfftSize(m_rx));
 
 	setNCOFrequency(m_rx, m_rxData.vfoFrequency - m_rxData.ctrFrequency);
 	WDSP_ENGINE_DEBUG << "init DSPEngine with size: " << m_size;
@@ -169,6 +169,11 @@ void QWDSPEngine::setupConnections() {
             this,
             SLOT(setPanAdaptorAveragingCnt(QObject*, int, int)));
 
+	CHECKED_CONNECT(
+			set,
+			SIGNAL(fftSizeChanged( int , int)),
+			this,
+			SLOT(setfftSize(int, int)));
 
 
 //	CHECKED_CONNECT(
@@ -380,7 +385,6 @@ void QWDSPEngine::setSampleRate(QObject *sender, int value) {
 			break;
 	}
  	SetChannelState(m_rx,0,1);
-    SleeperThread::msleep(1000);
 	SetInputSamplerate(m_rx,m_samplerate);
 
 	init_analyzer(m_refreshrate);
@@ -446,8 +450,8 @@ void QWDSPEngine::init_analyzer(int refreshrate) {
 	int n_pixout = 1;
 	int spur_elimination_ffts = 1;
 	int data_type = 1;
-	int fft_size = 2048;
-	int window_type = 5;
+	int fft_size = m_fftSize;
+	int window_type = 6;
 	double kaiser_pi = 14.0;
 	int overlap = 2048;
 	int clip = 0;
@@ -465,7 +469,7 @@ void QWDSPEngine::init_analyzer(int refreshrate) {
 
 	overlap = (int) max(0.0, ceil(fft_size - (double) m_samplerate / (double) refreshrate));
 
-	fprintf(stderr, "SetAnalyzer id=%d buffer_size=%d overlap=%d\n", m_rx, m_size, overlap);
+	fprintf(stderr, "SetAnalyzer id=%d buffer_size=%d overlap=%d\n fft%d\n", m_rx, m_size, overlap,m_fftSize);
 
 
 	SetAnalyzer(m_rx,
@@ -511,6 +515,9 @@ void QWDSPEngine::setPanAdaptorAveragingMode(int rx, int mode) {
     if (rx != m_rx) return;
     WDSP_ENGINE_DEBUG <<  "Setpan av mode" <<  mode;
     SetDisplayAverageMode(m_rx,0,mode);
+    calcDisplayAveraging();
+    SetDisplayAvBackmult(rx, 0, m_display_avb);
+    SetDisplayNumAverage(rx, 0, m_display_average);
 }
 
 
@@ -536,4 +543,54 @@ void QWDSPEngine::calcDisplayAveraging() {
     m_display_avb = exp(-1.0 / ((double)m_refreshrate * t));
     m_display_average = max(2, (int)min(60, (double)m_refreshrate * t));
 }
+
+int QWDSPEngine::getfftVal(int size) {
+	int fftSize;
+	switch (size){
+
+		case 0:
+			fftSize = 2048;
+			break;
+		case 1:
+			fftSize = 4096;
+			break;
+		case 2:
+			fftSize = 8192;
+			break;
+		case 3:
+			fftSize = 16384;
+			break;
+		case 4:
+			fftSize = 32768;
+			break;
+		case 5:
+			fftSize = 655356;
+			break;
+		case 6:
+			fftSize = 131072;
+			break;
+		case 7:
+			fftSize = 655356;
+			break;
+		default:
+			WDSP_ENGINE_DEBUG <<  "invalid fft size set" <<  size;
+			break;
+	}
+	return fftSize;
+}
+
+
+void QWDSPEngine::setfftSize(int rx, int value) {
+	if (rx != m_rx) return;
+	m_fftSize = getfftVal(value);
+	WDSP_ENGINE_DEBUG <<  "mfftsize set" <<  m_fftSize;
+	m_mutex.lock();
+	init_analyzer(value);
+	calcDisplayAveraging();
+	SetDisplayAvBackmult(rx, 0, m_display_avb);
+	SetDisplayNumAverage(rx, 0, m_display_average);
+	m_mutex.unlock();
+
+}
+
 

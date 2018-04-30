@@ -1780,11 +1780,6 @@ void QGLReceiverPanel::drawVFOControl() {
 	}
 
 	// FFT size
-	//if (m_receiver == 0) {
-	if (set->getFFTAutoStatus(m_receiver)) {
-	}
-	else {
-
 		str = "sample size: %1";
 		x1 = m_panRect.right() - m_fonts.smallFontMetrics->width(str) - 65;
 
@@ -1831,7 +1826,7 @@ void QGLReceiverPanel::drawVFOControl() {
 			qglColor(QColor(255, 170, 90, 200));
 			m_oglTextSmall->renderText(x1+1, y1-2, 1.0f, str.arg(s));
 		}
-	}
+
 
 	int delta = qRound((m_deltaF * m_panRect.width())/m_freqScaleZoomFactor);
 	//GRAPHICS_DEBUG << "delta = " << delta;
@@ -3803,10 +3798,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 		deltaSampleSize = m_spectrumSize - m_sampleSize;
 	}
 
-	if (set->getFFTAutoStatus(m_receiver)) {
-	}
-	else {
-	
+
 		if (m_sampleSize < 2048) {
 
 			if (m_fftMult == 1) {
@@ -3892,7 +3884,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 
 				return;
 			}
-		}
+
 	}
 
 	m_panScale = (qreal)(1.0 * m_sampleSize / m_panRectWidth);
@@ -4565,3 +4557,4 @@ void QGLReceiverPanel::showRadioPopup(bool value) {
 //
 //	update();
 //}
+

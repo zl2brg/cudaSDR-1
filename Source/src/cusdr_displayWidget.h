@@ -98,7 +98,7 @@ private:
 	QSlider*				m_wbAvgSlider;
 	QComboBox*              m_panAverageCombo;
     QComboBox*              m_panDetectorCombo;
-
+	QComboBox*              m_fftSizeCombo;
 
     QSpinBox*				m_waterfallLoOffsetSpinBox;
 	QSpinBox*				m_waterfallHiOffsetSpinBox;
@@ -117,6 +117,7 @@ private:
 	QLabel*					m_sMeterHoldTimeLabel;
 	QLabel*                 m_panAvgModeLabel;
     QLabel*                 m_panDetModeLabel;
+	QLabel*					m_fftLabel;
 
 	AeroButton*				m_PanLineBtn;
 	AeroButton*				m_PanFilledLineBtn;
@@ -153,6 +154,7 @@ private:
 	int		m_sMeterHoldTime;
 	int     m_panAvMode;
     int     m_panDetMode;
+    int     m_fftSize;
 
 
     void	setupConnections();
@@ -198,6 +200,7 @@ private slots:
 	void	callSignChanged();
 	void    panAverageModeChanged(int value);
     void    panDetectorModeChanged(int value);
+	void    fftSizeChanged(int value);
 
 
 signals:

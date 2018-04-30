@@ -157,7 +157,6 @@ Settings::Settings(QObject *parent)
 	m_defaultFilterList = getDefaultFilterFrequencies();
 
 	m_transmitter.txAllowed = false;
-	//m_fft = 1;
 }
 
 Settings::~Settings() {
@@ -704,12 +703,19 @@ int Settings::loadSettings() {
 			//SETTINGS_DEBUG << "DSP core for rx " << i << " is QtDSP.";
 		}
 
+		cstr = m_rxStringList.at(i);
+		cstr.append("/fftSize");
+
+		value = settings->value(cstr, 1).toInt();
+		m_receiverDataList[i].fftsize =  value;
+		qDebug() << "load fft size" << value;
+
+
         cstr = m_rxStringList.at(i);
         cstr.append("/PanAverageMode");
 
         value = settings->value(cstr, 1).toInt();
         m_receiverDataList[i].panAvMode = (PanAveragingMode) value;
-        qDebug() << "load pan av " << value;
 
         cstr = m_rxStringList.at(i);
         cstr.append("/PanDetectorMode");
@@ -931,14 +937,6 @@ int Settings::loadSettings() {
 		else
 			m_receiverDataList[i].clickVFO = false;
 
-		cstr = m_rxStringList.at(i);
-		cstr.append("/fftAuto");
-		str = settings->value(cstr, "off").toString();
-		if (str.toLower() == "on")
-			m_receiverDataList[i].fftAuto = true;
-		else
-			m_receiverDataList[i].fftAuto = false;
-		
         cstr = m_rxStringList.at(i);
         cstr.append("/lastCenterFrequency2200m");
         value = settings->value(cstr, 135700).toDouble();
@@ -1827,6 +1825,10 @@ int Settings::saveSettings() {
 		if (m_receiverDataList[i].dspCore == QSDR::QtDSP)
 			settings->setValue(str, "qtdsp");
 
+		str = m_rxStringList.at(i);
+		str.append("/fftSize");
+		settings->setValue(str, (int)(m_receiverDataList[i].fftsize));
+
         str = m_rxStringList.at(i);
         str.append("/PanAverageMode");
         settings->setValue(str, (int)(m_receiverDataList[i].panAvMode));
@@ -1989,13 +1991,6 @@ int Settings::saveSettings() {
 		str = m_rxStringList.at(i);
 		str.append("/clickVFO");
 		if (m_receiverDataList[i].clickVFO)
-			settings->setValue(str, "on");
-		else
-			settings->setValue(str, "off");
-
-		str = m_rxStringList.at(i);
-		str.append("/fftAuto");
-		if (m_receiverDataList[i].fftAuto)
 			settings->setValue(str, "on");
 		else
 			settings->setValue(str, "off");
@@ -3968,43 +3963,6 @@ void Settings::setSampleSize(QObject* sender, int rx, int size) {
 
 	Q_UNUSED (sender)
 
-	/*if (rx == 0) {
-
-		SETTINGS_DEBUG << "set sample size to: " << size;
-		switch (size) {
-
-			case 4096:
-				m_fft = 1;
-				break;
-
-			case 8192:
-				m_fft = 2;
-				break;
-
-			case 16384:
-				m_fft = 4;
-				break;
-
-			case 32768:
-				m_fft = 8;
-				break;
-
-			case 65536:
-				m_fft = 16;
-				break;
-
-			case 131072:
-				m_fft = 32;
-				break;
-
-			case 262144:
-				m_fft = 64;
-				break;
-		}
-
-		emit sampleSizeChanged(0, size);
-	}*/
-
 	SETTINGS_DEBUG << "set sample size to: " << size << " for Rx " << rx;
 	switch (size) {
 
@@ -4788,10 +4746,6 @@ bool Settings::getHairCrossStatus(int rx) {
 	return m_receiverDataList[rx].hairCross;
 }
 
-bool Settings::getFFTAutoStatus(int rx) {
-
-	return m_receiverDataList[rx].fftAuto;
-}
 
 void Settings::setWaterfallTime(int rx, int value) {
 
@@ -4904,8 +4858,18 @@ void Settings::setPanDetectorMode(int rx , PanDetectorMode mode) {
 };
 
 
-
 qreal Settings::getAGCSlope(int rx) {
 	return m_receiverDataList[rx].agcSlope;
 
+}
+
+void Settings::setfftSize(int rx, int size) {
+    if (m_receiverDataList[rx].fftsize == size) return;
+    m_receiverDataList[rx].fftsize = size;
+	qDebug() << "fftsize set to " << size;
+	emit fftSizeChanged(rx,size);
+}
+
+int Settings::getfftSize(int rx) {
+	return  m_receiverDataList[rx].fftsize;
 }

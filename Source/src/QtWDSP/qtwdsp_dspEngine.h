@@ -74,7 +74,9 @@ public:
 	double	getSMeterInstValue();
     void    init_analyzer(int refreshrate);
     void    calcDisplayAveraging();
-    int     spectrumDataReady;
+	int  	getfftVal(int size);
+
+	int     spectrumDataReady;
     qVectorFloat spectrumBuffer;
 
 public slots:
@@ -103,6 +105,7 @@ public slots:
 	void    setPanAdaptorAveragingMode( int rx, int value);
     void    setPanAdaptorDetectorMode( int rx, int value);
     void    setPanAdaptorAveragingCnt(QObject*, int rx , int value);
+    void 	setfftSize(int rx, int value);
 
 private:
 	Settings*	set;
@@ -124,6 +127,7 @@ private:
 	int		m_spectrumSize;
 	int		m_samplerate;
 	int		m_fftMultiplier;
+	int 	m_fftSize;
 	int     m_refreshrate;
 	int     m_averageCount;
     double  m_display_avb;

@@ -72,6 +72,7 @@ DisplayOptionsWidget::DisplayOptionsWidget(QWidget *parent)
 	m_waterColorMode = set->getWaterfallColorMode(m_currentReceiver);
 	m_panAvMode = set->getPanAveragingMode(m_currentReceiver);
     m_panDetMode = set->getPanDetectorMode(m_currentReceiver);
+    m_fftSize = set->getfftSize(m_currentReceiver);
 
 
     fonts = new CFonts(this);
@@ -416,7 +417,19 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
     m_panDetModeLabel->setFrameStyle(QFrame::Box | QFrame::Raised);
     m_panDetModeLabel->setStyleSheet(set->getLabelStyle());
 
-    m_panAverageCombo = new QComboBox(this);
+	m_fftLabel = new QLabel("FFT Size:", this);
+	m_fftLabel->setFrameStyle(QFrame::Box | QFrame::Raised);
+	m_fftLabel->setStyleSheet(set->getLabelStyle());
+
+	m_fftSizeCombo = new QComboBox(this);
+	m_fftSizeCombo->addItems(QStringList() << "2k" << "4k" <<  "8k" <<"16k" << "32k" <<"64k" << "128K" << "256k");
+	m_fftSizeCombo->setFont(m_fonts.normalFont);
+	m_fftSizeCombo->setCurrentIndex(m_fftSize);
+	m_fftSizeCombo->setStyleSheet(set->getComboBoxStyle());
+	CHECKED_CONNECT(m_fftSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(fftSizeChanged(int)));
+
+
+	m_panAverageCombo = new QComboBox(this);
     m_panAverageCombo->addItems(QStringList() << "None" << "Recursive" <<  "TimeWindow" <<"LogRecursive");
     m_panAverageCombo->setFont(m_fonts.normalFont);
     m_panAverageCombo->setCurrentIndex(m_panAvMode);
@@ -462,6 +475,11 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
     hbox4->addWidget(m_panDetModeLabel);
     hbox4->addWidget(m_panDetectorCombo);
 
+	QHBoxLayout* hbox5 = new QHBoxLayout;
+	hbox5->setSpacing(0);
+	hbox5->setMargin(0);
+	hbox5->addWidget(m_fftLabel);
+	hbox5->addWidget(m_fftSizeCombo);
 
     QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->setSpacing(6);
@@ -470,6 +488,7 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
 	vbox->addLayout(hbox2);
     vbox->addLayout(hbox3);
     vbox->addLayout(hbox4);
+	vbox->addLayout(hbox5);
 
 	m_panSpectrumOptions = new QGroupBox(tr("Panadapter Spectrum"), this);
 	m_panSpectrumOptions->setMinimumWidth(m_minimumGroupBoxWidth);
@@ -563,7 +582,6 @@ void DisplayOptionsWidget::createWidebandPanOptions() {
 	m_wbAvgLabel->setStyleSheet(set->getLabelStyle());
 
 
-
     QHBoxLayout* hbox1 = new QHBoxLayout;
 	hbox1->setSpacing(4);
 	hbox1->addStretch();
@@ -579,14 +597,11 @@ void DisplayOptionsWidget::createWidebandPanOptions() {
 	hbox2->addWidget(m_wbAvgSlider);
 	hbox2->addWidget(m_wbAvgLevelLabel);
 
-
-
     QVBoxLayout* vbox = new QVBoxLayout;
 	vbox->setSpacing(6);
 	vbox->addSpacing(6);
 	vbox->addLayout(hbox1);
 	vbox->addLayout(hbox2);
-
 
 	m_widebandPanOptions = new QGroupBox(tr("Wideband Panadapter Spectrum"), this);
 	m_widebandPanOptions->setMinimumWidth(m_minimumGroupBoxWidth);
@@ -1118,6 +1133,9 @@ void DisplayOptionsWidget::panAverageModeChanged(int mode)  {
 void DisplayOptionsWidget::panDetectorModeChanged(int mode)  {
 
     set->setPanDetectorMode(m_currentReceiver,(PanDetectorMode) mode);
-
 }
 
+void DisplayOptionsWidget::fftSizeChanged(int mode)  {
+
+	set->setfftSize(m_currentReceiver, mode);
+}

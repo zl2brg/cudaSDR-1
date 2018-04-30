@@ -532,6 +532,7 @@ typedef struct _receiver {
 	WaterfallColorMode	waterfallMode;
 	PanAveragingMode    panAvMode;
 	PanDetectorMode     panDetMode;
+	int 				fftsize;
 
 	QList<long>			lastCenterFrequencyList;
 	QList<long>			lastVfoFrequencyList;
@@ -548,7 +549,6 @@ typedef struct _receiver {
 	bool	panGrid;
 	bool	peakHold;
 	bool	clickVFO;
-	bool	fftAuto;
 
 	long	ctrFrequency;
 	long	vfoFrequency;
@@ -863,6 +863,7 @@ signals:
 	//void widebandAveragingCntChanged(QObject *sender, int value);
     void panAveragingModeChanged(int rx, int mode);
     void panDetectorModeChanged(int rx, int mode);
+    void fftSizeChanged(int rx, int size);
 
 
 	void iqPortChanged(QObject* sender, int rx, int port);
@@ -1082,7 +1083,6 @@ public:
 	bool getPanLockedStatus(int rx);
 	bool getClickVFOStatus(int rx);
 	bool getHairCrossStatus(int rx);
-	bool getFFTAutoStatus(int rx);
 
 	int		getMercurySpeed()			{ return m_mercurySpeed; }
 	int		getOutputSampleIncrement()	{ return m_outputSampleIncrement; }
@@ -1112,7 +1112,8 @@ public:
 	qreal	getAGCFixedGain_dB(int rx);
 	int		getAGCHangThreshold(int rx);
 	int		getAGCHangLeveldB(int rx);
-    qreal    getAGCSlope(int rx);
+    qreal   getAGCSlope(int rx);
+    int 	getfftSize(int rx);
 
 
     int		getLowerChirpFreq()				{ return m_lowerChirpFreq; }
@@ -1315,8 +1316,7 @@ public slots:
 	void setAGCDecayTime(QObject *sender, int rx, qreal value);
 	void setAGCHangTime(QObject *sender, int rx, qreal value);
 	void setRXFilter(QObject* sender, int rx, qreal low, qreal high);
-	
-
+	void setfftSize(int rx, int size);
 	// wideband data & options
 	void setWidebandBuffers(QObject *sender, int value);
 	void setWidebandSpectrumBuffer(const qVectorFloat &buffer);
