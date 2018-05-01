@@ -1,4 +1,5 @@
 /**
+/**
 * @file  qtdsp_dspEngine.cpp
 * @brief QtDSP DSP engine class
 * @author Hermann von Hasseln, DL3HVH
@@ -27,7 +28,7 @@
  *   Free Software Foundation, Inc.,
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#define LOG_DSP_ENGINE
+//#define LOG_DSP_ENGINE
 
 // use: DSP_ENGINE_DEBUG << "debug message";
 
@@ -111,7 +112,6 @@ QDSPEngine::QDSPEngine(QObject *parent, int rx, int size)
 
 	//DSP_ENGINE_DEBUG << "set NCO to " << m_rxData.vfoFrequency - m_rxData.ctrFrequency;
 	setNCOFrequency(m_rx, m_rxData.vfoFrequency - m_rxData.ctrFrequency);
-
 	DSP_ENGINE_DEBUG << "init DSPEngine with size: " << m_size;
 	SleeperThread::msleep(100);
 
@@ -222,8 +222,8 @@ void QDSPEngine::processDSP(CPX &in, CPX &out, int size) {
 			break;
 	}*/
 
-	int idx = (int)(myLog(m_fftMultiplier, 2));
-	powerSpectraList.at(idx)->ProcessSpectrum(in, size * m_fftMultiplier * 2, m_fftMultiplier*2-1);
+//	int idx = (int)(myLog(m_fftMultiplier, 2));
+//	powerSpectraList.at(idx)->ProcessSpectrum(in, size * m_fftMultiplier * 2, m_fftMultiplier*2-1);
 
 	if (m_NcoFreq != 0)
 		ProcessFrequencyShift(in, in, size);
@@ -295,12 +295,17 @@ void QDSPEngine::setAGCLineValues(QObject *sender, int rx, qreal thresh, qreal h
 
 	qreal noiseOffset = 10.0 * log10(qAbs(filter->filterHi() - filter->filterLo()) * 2 * m_size / m_samplerate);
 	qreal threshold = 20.0 * log10(thresh) - noiseOffset + AGCOFFSET;
-
-	set->setAGCLineLevels(sender, m_rx, threshold, hang + AGCOFFSET);
 }
 
-void QDSPEngine::setSampleRate(QObject *sender, int value) {
+//void QDSPEngine::setAGCLineValues(QObject *sender, int rx, qreal thresh, qreal hang) {
+//
+//
+//	set->setAGCLineLevels(sender, m_rx, threshold, hang + AGCOFFSET);
+//}
 
+void QDSPEngine::setSampleRate(QObject *sender, int value) {
+	DSP_ENGINE_DEBUG << "sample rate \n" << value;
+	qDebug() << "got here\n";
 	Q_UNUSED(sender)
 
 	if (m_samplerate == value) return;
@@ -358,7 +363,7 @@ void QDSPEngine::setNCOFrequency(int rx, long ncoFreq) {
 }
 
 void QDSPEngine::setSampleSize(int rx, int size) {
-
+	qDebug() << " sample size " << size;
 	if (m_rx == rx) {
 
 		m_mutex.lock();

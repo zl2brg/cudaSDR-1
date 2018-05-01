@@ -41,8 +41,8 @@ using namespace std;
 
 typedef struct _QCOMPLEX {
 
-	float re;
-	float im;
+	double re;
+	double im;
 
 } cpx;
 
@@ -53,7 +53,7 @@ typedef QVector<cpx> CPX;
 
 Q_DECLARE_METATYPE (CPX)
 
-inline void InitCPX(CPX &vec, int size, float value) {
+inline void InitCPX(CPX &vec, int size, double value) {
 
 	cpx zero;
 	zero.re = value; zero.im = value;
@@ -71,7 +71,7 @@ inline cpx ToCPX(qreal x, qreal y) {
 	return z;
 }
 
-inline cpx ScaleCPX(const cpx &c, float a) {
+inline cpx ScaleCPX(const cpx &c, double a) {
 
 	cpx z;
 	z.re = a * c.re;
@@ -118,14 +118,14 @@ inline cpx MultCPX(cpx x, cpx y) {
 	return z;
 }
 
-inline float MagCPX(cpx z) {
+inline double MagCPX(cpx z) {
 
-	return (float) (z.re * z.re + z.im * z.im);
+	return (double) (z.re * z.re + z.im * z.im);
 }
 
-inline float SqrMagCPX(cpx z) {
+inline double SqrMagCPX(cpx z) {
 
-	return (float) sqrt(z.re * z.re + z.im * z.im);
+	return (double) sqrt(z.re * z.re + z.im * z.im);
 }
 
 inline QString ValidQReal(qreal value) {
@@ -141,6 +141,7 @@ inline QString ValidQReal(qreal value) {
     }
     else
         return "";
-} 
+}
+ 
 
 #endif // _QTDSP_QCOMPLEX_H

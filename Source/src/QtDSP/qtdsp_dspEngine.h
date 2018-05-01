@@ -51,7 +51,7 @@
 
 
 #ifdef LOG_DSP_ENGINE
-#   define DSP_ENGINE_DEBUG qDebug().nospace() << "DSPEngine::\t"
+#define DSP_ENGINE_DEBUG qDebug().nospace() << "DSPEngine::\t"
 #else
 #   define DSP_ENGINE_DEBUG nullDebug()
 #endif

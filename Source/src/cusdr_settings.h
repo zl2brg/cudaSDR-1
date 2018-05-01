@@ -281,6 +281,7 @@ enum {
 // type definitions
 
 typedef QVector<float> qVectorFloat;
+typedef QVector<double> qVectorDouble;
 
 typedef struct _frequency {
 
@@ -425,7 +426,6 @@ typedef struct _hpsdrParameter {
 
 	int		samplerate;
 	int		speed;
-	int		outputMultiplier;
 
 	int		metisFW;
 	int		hermesFW;
@@ -497,6 +497,24 @@ typedef enum _waterfallColorMode {
 
 } WaterfallColorMode;
 
+typedef enum _panAveragingMode {
+
+    AV_MODE_NONE,
+    AV_MODE_RECURSIVE,
+    AV_MODE_TIME_WINDOW,
+    AV_MODE_LOG_RECURSIVE
+}PanAveragingMode;
+
+typedef enum _panDetectorMode {
+
+    DET_MODE_PEAK,
+    DET_MODE_ROSENFELL,
+    DET_MODE_AVERAGE,
+    DET_MODE_SAMPLE
+}PanDetectorMode;
+
+
+
 Q_DECLARE_METATYPE (TNetworkDevicecard)
 Q_DECLARE_METATYPE (QList<TNetworkDevicecard>)
 
@@ -512,6 +530,9 @@ typedef struct _receiver {
 	TDefaultFilterMode	defaultFilterMode;
 	PanGraphicsMode		panMode;
 	WaterfallColorMode	waterfallMode;
+	PanAveragingMode    panAvMode;
+	PanDetectorMode     panDetMode;
+	int 				fftsize;
 
 	QList<long>			lastCenterFrequencyList;
 	QList<long>			lastVfoFrequencyList;
@@ -528,7 +549,6 @@ typedef struct _receiver {
 	bool	panGrid;
 	bool	peakHold;
 	bool	clickVFO;
-	bool	fftAuto;
 
 	long	ctrFrequency;
 	long	vfoFrequency;
@@ -540,7 +560,6 @@ typedef struct _receiver {
 	qreal	mouseWheelFreqStep;
 	qreal	filterLo;
 	qreal	filterHi;
-	qreal	agcSlope;
 	qreal	acgGain;
 	qreal	acgThreshold_dB;
 	qreal	agcHangThreshold;
@@ -550,7 +569,7 @@ typedef struct _receiver {
 	qreal	agcDecayTime;
 	qreal	agcHangTime;
 	qreal	agcFixedGain_dB;
-	qreal	agcVariableGain;
+	qreal	agcSlope;
 
 	int		sampleRate;
 	int		framesPerSecond;
@@ -842,6 +861,9 @@ signals:
 	void wideBandScalePositionChanged(QObject *sender, float position);
 	//void widebandAveragingChanged(QObject *sender, bool value);
 	//void widebandAveragingCntChanged(QObject *sender, int value);
+    void panAveragingModeChanged(int rx, int mode);
+    void panDetectorModeChanged(int rx, int mode);
+    void fftSizeChanged(int rx, int size);
 
 
 	void iqPortChanged(QObject* sender, int rx, int port);
@@ -918,7 +940,7 @@ signals:
 	void sMeterHoldTimeChanged(int value);
 	void dBmScaleMinChanged(int rx, qreal value);
 	void dBmScaleMaxChanged(int rx, qreal value);
-	
+    void agcMaximumGainChanged(QObject *sender,int, qreal value);
 
 	void showRadioPopupChanged(bool value);
 
@@ -936,6 +958,8 @@ public:
 
 	PanGraphicsMode				getPanadapterMode(int rx);
 	WaterfallColorMode			getWaterfallColorMode(int rx);
+	PanAveragingMode            getPanAveragingMode(int rx);
+	PanDetectorMode             getPanDetectorMode(int rx);
 
 	QString	getServerModeString(QSDR::_ServerMode mode);
 	QString	getHWInterfaceModeString(QSDR::_HWInterfaceMode mode);
@@ -1059,7 +1083,6 @@ public:
 	bool getPanLockedStatus(int rx);
 	bool getClickVFOStatus(int rx);
 	bool getHairCrossStatus(int rx);
-	bool getFFTAutoStatus(int rx);
 
 	int		getMercurySpeed()			{ return m_mercurySpeed; }
 	int		getOutputSampleIncrement()	{ return m_outputSampleIncrement; }
@@ -1089,8 +1112,11 @@ public:
 	qreal	getAGCFixedGain_dB(int rx);
 	int		getAGCHangThreshold(int rx);
 	int		getAGCHangLeveldB(int rx);
-	
-	int		getLowerChirpFreq()				{ return m_lowerChirpFreq; }
+    qreal   getAGCSlope(int rx);
+    int 	getfftSize(int rx);
+
+
+    int		getLowerChirpFreq()				{ return m_lowerChirpFreq; }
 	int		getUpperChirpFreq()				{ return m_upperChirpFreq; }
 	qreal	getChirpAmplitude()				{ return m_chirpAmplitude; }
 	int		getChirpSamplingFreq()			{ return m_chirpSamplingFreq; }
@@ -1290,8 +1316,7 @@ public slots:
 	void setAGCDecayTime(QObject *sender, int rx, qreal value);
 	void setAGCHangTime(QObject *sender, int rx, qreal value);
 	void setRXFilter(QObject* sender, int rx, qreal low, qreal high);
-	
-
+	void setfftSize(int rx, int size);
 	// wideband data & options
 	void setWidebandBuffers(QObject *sender, int value);
 	void setWidebandSpectrumBuffer(const qVectorFloat &buffer);
@@ -1361,8 +1386,11 @@ public slots:
 	void setWaterfallTime(int rx, int value);
 	void setWaterfallOffesetLo(int rx, int value);
 	void setWaterfallOffesetHi(int rx, int value);
+	void setPanAveragingMode(int rx,PanAveragingMode mode);
+    void setPanDetectorMode(int rx,PanDetectorMode mode);
 
-	void setSMeterHoldTime(int value);
+
+    void setSMeterHoldTime(int value);
 
 	void showNetworkIODialog();
 	void showWarningDialog(const QString &msg);

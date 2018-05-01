@@ -60,7 +60,8 @@ DualModeAverager::~DualModeAverager() {
 }
 
 void DualModeAverager::ProcessDBAverager(qVectorFloat &in, qVectorFloat &out) {
-
+//	out = in;
+//	return;
 	mutex.lock();
 	if (cnt < m_length) {
 

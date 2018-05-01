@@ -261,7 +261,7 @@ void AGCOptionsWidget::createAgcOptionsGroup() {
 	m_slopeSpinBox->setSingleStep(1);
 	m_slopeSpinBox->setStyleSheet(set->getSpinBoxStyle());
 	m_slopeSpinBox->setMinimumWidth(60);
-	m_slopeSpinBox->setValue((int) m_rxDataList.at(m_currentReceiver).agcVariableGain);
+	m_slopeSpinBox->setValue((int) m_rxDataList.at(m_currentReceiver).agcSlope);
 
 	CHECKED_CONNECT(
 		m_slopeSpinBox,

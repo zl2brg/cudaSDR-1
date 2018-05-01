@@ -71,8 +71,10 @@ private:
 	PanGraphicsMode				m_panadapterMode;
 	PanGraphicsMode				m_wbPanadapterMode;
 	WaterfallColorMode			m_waterColorMode;
+    PanAveragingMode            m_panAveragingMode;
+    PanDetectorMode             m_panDetectorMode;
 
-	QList<TReceiver>		m_rxDataList;
+    QList<TReceiver>		m_rxDataList;
 	TWideband				m_widebandOptions;
 	
 	QString					m_menu_style;
@@ -94,8 +96,11 @@ private:
 	QSlider*				m_fpsSlider;
 	QSlider*				m_avgSlider;
 	QSlider*				m_wbAvgSlider;
+	QComboBox*              m_panAverageCombo;
+    QComboBox*              m_panDetectorCombo;
+	QComboBox*              m_fftSizeCombo;
 
-	QSpinBox*				m_waterfallLoOffsetSpinBox;
+    QSpinBox*				m_waterfallLoOffsetSpinBox;
 	QSpinBox*				m_waterfallHiOffsetSpinBox;
 	QSpinBox*				m_sMeterHoldTimeSpinBox;
 
@@ -110,6 +115,9 @@ private:
 	QLabel*					m_waterfallLoOffsetLabel;
 	QLabel*					m_waterfallHiOffsetLabel;
 	QLabel*					m_sMeterHoldTimeLabel;
+	QLabel*                 m_panAvgModeLabel;
+    QLabel*                 m_panDetModeLabel;
+	QLabel*					m_fftLabel;
 
 	AeroButton*				m_PanLineBtn;
 	AeroButton*				m_PanFilledLineBtn;
@@ -144,8 +152,12 @@ private:
 	int		m_sampleRate;
 	int		m_waterfallTime;
 	int		m_sMeterHoldTime;
+	int     m_panAvMode;
+    int     m_panDetMode;
+    int     m_fftSize;
 
-	void	setupConnections();
+
+    void	setupConnections();
 	void	createFPSGroupBox();
 	void	createPanSpectrumOptions();
 	void	createWidebandPanOptions();
@@ -186,7 +198,11 @@ private slots:
 	void	sampleRateChanged(QObject *sender, int value);
 	void	callSignTextChanged(const QString &text);
 	void	callSignChanged();
-	
+	void    panAverageModeChanged(int value);
+    void    panDetectorModeChanged(int value);
+	void    fftSizeChanged(int value);
+
+
 signals:
 	void	averagingModeChanged(bool value);
 	//void	showEvent(QObject *sender);

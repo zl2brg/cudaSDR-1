@@ -35,6 +35,7 @@
 #include "cusdr_settings.h"
 #include "QtDSP/qtdsp_dspEngine.h"
 #include "Util/cusdr_highResTimer.h"
+#include "QtWDSP/qtwdsp_dspEngine.h"
 
 #ifdef LOG_RECEIVER
 #   define RECEIVER_DEBUG qDebug().nospace() << "Receiver::\t"
@@ -85,20 +86,21 @@ public:
 	qreal	getdBmPanScaleMin()		{ return m_dBmPanScaleMin; }
 	qreal	getdBmPanScaleMax()		{ return m_dBmPanScaleMax; }
 	bool	getConnectedStatus()	{ return m_connected; }
+	void 	setAudioBufferSize();
 
     float	in[BUFFER_SIZE * 2];
     float	out[BUFFER_SIZE * 2];
 	float	temp[BUFFER_SIZE * 4];
 	float	spectrum[BUFFER_SIZE * 4];
-	float	postSpectrum[BUFFER_SIZE * 4];
 
 	QVector<float>	newSpectrum;
 
-	QDSPEngine	*qtdsp;
+	QWDSPEngine *qtwdsp;
 	HResTimer	*highResTimer;
 
 	CPX			inBuf;
     CPX			outBuf;
+    CPX			audioOutputBuf;
 
 	QHQueue<CPX>	inQueue;
 
@@ -144,16 +146,18 @@ private slots:
 	void	setSampleRate(QObject *sender, int value);
 	void 	setFramesPerSecond(QObject *sender, int rx, int value);
 
-	bool	initQtDSPInterface();
-	void	deleteQtDSP();
+	bool	initQtWDSPInterface();
 
+    void	deleteQtWDSP();
+
+    
 	//void	setAGCMaximumGain_dBm(QObject* sender, int rx, int value);
 	void	setAGCMaximumGain_dB(QObject* sender, int rx, qreal value);
 	void	setAGCFixedGain_dB(QObject* sender, int rx, qreal value);
 	void	setAGCThreshold_dB(QObject* sender, int rx, qreal value);
 	void 	setAGCHangLevel_dB(QObject* sender, int rx, qreal value);
 	void 	setAGCHangThreshold(QObject* sender, int rx, int value);
-	void	setAGCVariableGain_dB(QObject* sender, int rx, qreal value);
+	void	setAGCSlope_dB(QObject *sender, int rx, qreal value);
 	void	setAGCAttackTime(QObject* sender, int rx, qreal value);
 	void 	setAGCDecayTime(QObject* sender, int rx, qreal value);
 	void 	setAGCHangTime(QObject* sender, int rx, qreal value);
@@ -185,7 +189,7 @@ private:
 	QMutex				m_mutex;
 
 	volatile bool	m_stopped;
-	
+
 	int		m_receiver;
 	int		m_samplerate;
 	int		m_audioMode; // 1 = audio on, 0 = audio off
@@ -200,7 +204,7 @@ private:
 	long	m_vfoFrequency;
 
 	float	m_audioVolume;
-	float	m_sMeterValue;
+	double	m_sMeterValue;
 
 	qreal	m_agcGain;
 	qreal	m_agcFixedGain_dB;
@@ -208,7 +212,7 @@ private:
 	qreal	m_agcThreshold_dBm;
 	qreal	m_agcHangThreshold;
 	qreal	m_agcHangLevel;
-	qreal	m_agcVariableGain;
+	qreal	m_agcSlope;
 	qreal	m_agcAttackTime;
 	qreal	m_agcDecayTime;
 	qreal	m_agcHangTime;
@@ -217,6 +221,8 @@ private:
 	qreal	m_filterHi;
 	qreal	m_dBmPanScaleMin;
 	qreal	m_dBmPanScaleMax;
+	int 	m_audiobuffersize;
+	int     m_refreshrate;
 
 	bool	m_connected;
 	bool	m_hangEnabled;
@@ -228,7 +234,8 @@ signals:
 	void	spectrumBufferChanged(int rx, const qVectorFloat& buffer);
 	void	sMeterValueChanged(int rx, float value);
 	void	outputBufferSignal(int rx, const CPX &buffer);
-	//void	audioReady(int rx);
+	void	audioBufferSignal(int rx, const CPX &buffer, int);
+
 };
 
 #endif  // CUSDR_RECEIVER_H

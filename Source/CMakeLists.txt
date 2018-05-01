@@ -6,8 +6,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 11)
 set (QT_USE_QTOPENGL TRUE)
-add_definitions(-O2 -D_FILE_OFFSET_BITS=64 -fPIC) 
+add_definitions(-O3 -D_FILE_OFFSET_BITS=64 -fPIC)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra")
+set (CMAKE_BUILD_TYPE Debug)
 
 find_package(PkgConfig)
 find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
@@ -17,7 +19,6 @@ find_package(Qt5Network 5.0 REQUIRED)
 #find_package(QT5OpenGL)
 find_package(OpenGL REQUIRED)
 
-
 SET(CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 
 SET(AUDIOENGINE_DIR ${CMAKE_SOURCE_DIR}/AudioEngine)
@@ -26,7 +27,7 @@ SET(DATAENGINE_DIR ${CMAKE_SOURCE_DIR}/DataEngine)
 SET(GL_DIR ${CMAKE_SOURCE_DIR}/GL)
 SET(QTDSP_DIR ${CMAKE_SOURCE_DIR}/QtDSP)
 SET(UTIL_DIR ${CMAKE_SOURCE_DIR}/Utility_source)
-
+SET(QTWDSP_DIR ${CMAKE_SOURCE_DIR}/QtWDSP)
 
 set (SOURCES
         ${CMAKE_SOURCE_DIR}/Util/cusdr_buttons.cpp 
@@ -93,7 +94,8 @@ set (SOURCES
 	${CMAKE_SOURCE_DIR}/cusdr_transmitOptionsWidget.cpp 
 	${CMAKE_SOURCE_DIR}/cusdr_transmitPAWidget.cpp 
 	${CMAKE_SOURCE_DIR}/main.cpp 
-        ${CMAKE_SOURCE_DIR}/Util/cusdr_cpuUsage_unix.cpp
+    ${CMAKE_SOURCE_DIR}/Util/cusdr_cpuUsage_unix.cpp
+    ${CMAKE_SOURCE_DIR}/QtWDSP/qtwdsp_dspEngine.cpp
 )
 
 
@@ -172,7 +174,10 @@ set (HEADERS
 	${CMAKE_SOURCE_DIR}/cusdr_transmitTabWidget.h 
 	${CMAKE_SOURCE_DIR}/cusdr_transmitOptionsWidget.h 
 	${CMAKE_SOURCE_DIR}/cusdr_transmitPAWidget.h 
-        ${CMAKE_SOURCE_DIR}/Util/cusdr_cpuUsage_unix.h
+    ${CMAKE_SOURCE_DIR}/Util/cusdr_cpuUsage_unix.h
+    ${CMAKE_SOURCE_DIR}/QtWDSP/qtwdsp_dspEngine.h
+    
+
 )
    
 add_definitions( ${QT_DEFINITIONS} )
@@ -193,7 +198,7 @@ include_directories( ${DATAENGINE_DIR})
 
 ADD_EXECUTABLE(cudasdr ${SOURCES} ${HEADERS} res/cusdr.qrc )
 qt5_use_modules(cudasdr Core Gui Widgets OpenGL)
-target_link_libraries(cudasdr Qt5::Widgets Qt5::Network Qt5::Multimedia GL   fftw3f pulse-simple pulse asound )
+target_link_libraries(cudasdr Qt5::Widgets Qt5::Network Qt5::Multimedia GL fftw3 pulse-simple pulse asound wdsp)
 set_target_properties(cudasdr PROPERTIES LINKER_LANGUAGE CXX)
 
 #qt5_use_modules(Core Network)

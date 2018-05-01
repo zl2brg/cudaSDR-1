@@ -25,6 +25,7 @@
  */
 
 #define LOG_GRAPHICS
+//#define GRAPHICS_DEBUG
 
 // use: GRAPHICS_DEBUG
 
@@ -171,10 +172,6 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 	m_agcFixedGain = m_rxDataList.at(m_receiver).agcFixedGain_dB;
 
 	m_dspModeString = set->getDSPModeString(m_rxDataList.at(m_receiver).dspModeList.at(m_receiver));
-//	m_agcThresholdOld = m_rxDataList.at(m_receiver).acgThreshold;
-//	m_agcThresholdNew = m_agcThresholdOld;
-//	m_agcHangLevelOld = m_rxDataList.at(m_receiver).agcHangLevel;
-//	m_agcHangLevelNew = m_agcHangLevelOld;
 
 	m_agcHangEnabled = m_rxDataList.at(m_receiver).hangEnabled;
 	m_showAGCLines = m_rxDataList.at(m_receiver).agcLines;
@@ -211,7 +208,7 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 	m_secWaterfallMin = -(1.0/m_fps) * m_secScaleWaterfallRect.height();
 
 	
-	m_dBmPanLogGain = 47;//49;//69 // allow user to calibrate this value
+	m_dBmPanLogGain = -20;//49;//69 // allow user to calibrate this value
 
 	m_cameraDistance = 0;
 	m_cameraAngle = QPoint(0, 0);
@@ -1783,11 +1780,6 @@ void QGLReceiverPanel::drawVFOControl() {
 	}
 
 	// FFT size
-	//if (m_receiver == 0) {
-	if (set->getFFTAutoStatus(m_receiver)) {
-	}
-	else {
-
 		str = "sample size: %1";
 		x1 = m_panRect.right() - m_fonts.smallFontMetrics->width(str) - 65;
 
@@ -1834,7 +1826,7 @@ void QGLReceiverPanel::drawVFOControl() {
 			qglColor(QColor(255, 170, 90, 200));
 			m_oglTextSmall->renderText(x1+1, y1-2, 1.0f, str.arg(s));
 		}
-	}
+
 
 	int delta = qRound((m_deltaF * m_panRect.width())/m_freqScaleZoomFactor);
 	//GRAPHICS_DEBUG << "delta = " << delta;
@@ -3124,6 +3116,7 @@ void QGLReceiverPanel::mouseMoveEvent(QMouseEvent* event) {
 					m_agcThresholdNew = m_dBmPanMin+2;
 
 				set->setAGCThreshold_dB(this, m_receiver, m_agcThresholdNew);
+		//		set->setAGCMaximumGain_dB(this, m_receiver, m_agcThresholdNew);
 			}
 			break;
 
@@ -3150,9 +3143,7 @@ void QGLReceiverPanel::mouseMoveEvent(QMouseEvent* event) {
 
 				if (m_agcHangLevelNew < m_dBmPanMin+2)
 					m_agcHangLevelNew = m_dBmPanMin+2;
-
-				set->setAGCHangLevel_dB(this, m_receiver, m_agcHangLevelNew);
-				//GRAPHICS_DEBUG << "set m_agcHangLevelNew = " << m_agcHangLevelNew;
+				set->setAGCHangThreshold(this, m_receiver, m_agcHangLevelNew);
 			}
 			break;
 
@@ -3770,12 +3761,11 @@ void QGLReceiverPanel::setSpectrumBuffer(int rx, const qVectorFloat& buffer) {
 
 
 	if (m_dataEngineState == QSDR::DataEngineUp) {
-	
 		if (m_spectrumAveraging) {
 	
 			spectrumBufferMutex.lock();
 			specBuf = buffer;
-			averager->ProcessDBAverager(specBuf, specBuf);
+		//	averager->ProcessDBAverager(specBuf, specBuf);
 			computeDisplayBins(specBuf, waterBuf);
 			spectrumBufferMutex.unlock();
 		}
@@ -3808,10 +3798,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 		deltaSampleSize = m_spectrumSize - m_sampleSize;
 	}
 
-	if (set->getFFTAutoStatus(m_receiver)) {
-	}
-	else {
-	
+
 		if (m_sampleSize < 2048) {
 
 			if (m_fftMult == 1) {
@@ -3897,12 +3884,12 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 
 				return;
 			}
-		}
+
 	}
 
 	m_panScale = (qreal)(1.0 * m_sampleSize / m_panRectWidth);
 	m_scaleMultOld = m_scaleMult;
-		
+
 	if (m_panScale < 0.125) {
 		m_scaleMult = 0.0625;
 	}
@@ -3921,7 +3908,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 
 	m_panSpectrumBinsLength = (GLint)(m_scaleMult * m_panRectWidth);
 
-	/*if (m_sampleSize != m_oldSampleSize) {
+	if (m_sampleSize != m_oldSampleSize) {
 	
 		GRAPHICS_DEBUG << "m_panSpectrumBinsLength = " << m_panSpectrumBinsLength;
 		GRAPHICS_DEBUG << "m_sampleSize =            " << m_sampleSize;
@@ -3929,7 +3916,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 		GRAPHICS_DEBUG << "";
 
 		m_oldSampleSize = m_sampleSize;
-	}*/
+	}
 
 	if (m_scaleMultOld != m_scaleMult) {
 
@@ -3961,6 +3948,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 					
 		// max value; later we try mean value also!
 		localMax = -10000.0F;
+
 		for (int j = lIdx; j < rIdx; j++) {
 
 			if (buffer.at(j) > localMax) {
@@ -3969,10 +3957,11 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 				idx = j;
 			}
 		}
+
 		// shift the beginning of the bins by half of the difference between
 		// full spectrum size and reduced spectrum size due to zooming
 		idx += deltaSampleSize/2;
-		
+
 		QColor pColor;
 		if (m_mercuryAttenuator) {
 
@@ -4568,3 +4557,4 @@ void QGLReceiverPanel::showRadioPopup(bool value) {
 //
 //	update();
 //}
+

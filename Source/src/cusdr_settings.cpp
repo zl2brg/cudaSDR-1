@@ -157,7 +157,6 @@ Settings::Settings(QObject *parent)
 	m_defaultFilterList = getDefaultFilterFrequencies();
 
 	m_transmitter.txAllowed = false;
-	//m_fft = 1;
 }
 
 Settings::~Settings() {
@@ -705,6 +704,26 @@ int Settings::loadSettings() {
 		}
 
 		cstr = m_rxStringList.at(i);
+		cstr.append("/fftSize");
+
+		value = settings->value(cstr, 1).toInt();
+		m_receiverDataList[i].fftsize =  value;
+		qDebug() << "load fft size" << value;
+
+
+        cstr = m_rxStringList.at(i);
+        cstr.append("/PanAverageMode");
+
+        value = settings->value(cstr, 1).toInt();
+        m_receiverDataList[i].panAvMode = (PanAveragingMode) value;
+
+        cstr = m_rxStringList.at(i);
+        cstr.append("/PanDetectorMode");
+
+        value = settings->value(cstr, 1).toInt();
+        m_receiverDataList[i].panDetMode = (PanDetectorMode) value;
+
+        cstr = m_rxStringList.at(i);
 		cstr.append("/freqRulerPosition");
 
 		value = settings->value(cstr, 5).toInt();
@@ -759,7 +778,7 @@ int Settings::loadSettings() {
 		value = settings->value(cstr, 0).toInt();
 		if (value < 0) value = 0;
 		if (value > 20) value = 20;
-		m_receiverDataList[i].agcVariableGain = (qreal)value;
+		m_receiverDataList[i].agcSlope = (qreal)value;
 
 		cstr = m_rxStringList.at(i);
 		cstr.append("/agcAttacktime");
@@ -918,14 +937,6 @@ int Settings::loadSettings() {
 		else
 			m_receiverDataList[i].clickVFO = false;
 
-		cstr = m_rxStringList.at(i);
-		cstr.append("/fftAuto");
-		str = settings->value(cstr, "off").toString();
-		if (str.toLower() == "on")
-			m_receiverDataList[i].fftAuto = true;
-		else
-			m_receiverDataList[i].fftAuto = false;
-		
         cstr = m_rxStringList.at(i);
         cstr.append("/lastCenterFrequency2200m");
         value = settings->value(cstr, 135700).toDouble();
@@ -1410,6 +1421,8 @@ int Settings::loadSettings() {
 	if (!color.isValid()) color = QColor(7, 96, 96);
 	m_panadapterColors.gridLineColor = color;
 
+
+
 	SETTINGS_DEBUG << "reading done.";
 
 	return 0;
@@ -1798,20 +1811,35 @@ int Settings::saveSettings() {
 		settings->setValue("wideband/panMode", "SOLID");
 
 
+
 	//******************************************************************
 	// receiver data settings
 
 	for (int i = 0; i < MAX_RECEIVERS; i++) {
+
+
 
 		QString str = m_rxStringList.at(i);
 		str.append("/dspCore");
 
 		if (m_receiverDataList[i].dspCore == QSDR::QtDSP)
 			settings->setValue(str, "qtdsp");
-		//else
-		//	settings->setValue(str, "dttsp");
 
 		str = m_rxStringList.at(i);
+		str.append("/fftSize");
+		settings->setValue(str, (int)(m_receiverDataList[i].fftsize));
+
+        str = m_rxStringList.at(i);
+        str.append("/PanAverageMode");
+        settings->setValue(str, (int)(m_receiverDataList[i].panAvMode));
+
+        str = m_rxStringList.at(i);
+        str.append("/PanDetectorMode");
+        settings->setValue(str, (int)(m_receiverDataList[i].panDetMode));
+        qDebug() << "save pan det mode" << m_receiverDataList[i].panDetMode;
+
+
+        str = m_rxStringList.at(i);
 		str.append("/freqRulerPosition");
 		settings->setValue(str, (int)(m_receiverDataList[i].freqRulerPosition * 10));
 
@@ -1837,7 +1865,7 @@ int Settings::saveSettings() {
 
 		str = m_rxStringList.at(i);
 		str.append("/agcSlope");
-		settings->setValue(str, (int)m_receiverDataList[i].agcVariableGain);
+		settings->setValue(str, (int)m_receiverDataList[i].agcSlope);
 
 		str = m_rxStringList.at(i);
 		str.append("/agcAttacktime");
@@ -1963,13 +1991,6 @@ int Settings::saveSettings() {
 		str = m_rxStringList.at(i);
 		str.append("/clickVFO");
 		if (m_receiverDataList[i].clickVFO)
-			settings->setValue(str, "on");
-		else
-			settings->setValue(str, "off");
-
-		str = m_rxStringList.at(i);
-		str.append("/fftAuto");
-		if (m_receiverDataList[i].fftAuto)
 			settings->setValue(str, "on");
 		else
 			settings->setValue(str, "off");
@@ -2686,6 +2707,18 @@ PanGraphicsMode Settings::getPanadapterMode(int rx)	{
 
 	return m_receiverDataList[rx].panMode;
 }
+
+PanAveragingMode  Settings::getPanAveragingMode(int rx)	{
+
+    return m_receiverDataList[rx].panAvMode;
+}
+
+
+PanDetectorMode Settings::getPanDetectorMode(int rx)	{
+
+    return m_receiverDataList[rx].panDetMode;
+}
+
 
 WaterfallColorMode	Settings::getWaterfallColorMode(int rx)	{
 
@@ -3759,8 +3792,8 @@ void Settings::setAGCMaximumGain_dB(QObject *sender, int rx, qreal value) {
 	if (m_receiverDataList[rx].agcMaximumGain_dB == value) return;
 	m_receiverDataList[rx].agcMaximumGain_dB = value;
 
-	//SETTINGS_DEBUG << "agcMaximumGain_dB = " << m_receiverDataList[rx].agcMaximumGain_dB << " (sender: " << sender << ")";
-	emit agcMaximumGainChanged_dB(sender, rx, value);
+    SETTINGS_DEBUG << "set agcMaximumGain_dB = " << m_receiverDataList[rx].agcMaximumGain_dB << " (sender: " << sender << ")";
+	emit agcMaximumGainChanged(sender,rx, value);
 }
 
 qreal Settings::getAGCMaximumGain_dB(int rx) {
@@ -3775,7 +3808,7 @@ void Settings::setAGCFixedGain_dB(QObject *sender, int rx, qreal value) {
 	if (m_receiverDataList[rx].agcFixedGain_dB == value) return;
 	m_receiverDataList[rx].agcFixedGain_dB = value;
 
-	//SETTINGS_DEBUG << "m_receiverDataList[rx].agcFixedGain_dB = " << m_receiverDataList[rx].agcFixedGain_dB;
+	SETTINGS_DEBUG << "m_receiverDataList[rx].agcFixedGain_dB = " << m_receiverDataList[rx].agcFixedGain_dB;
 	emit agcFixedGainChanged_dB(sender, rx, value);
 }
 
@@ -3787,11 +3820,11 @@ qreal Settings::getAGCFixedGain_dB(int rx) {
 void Settings::setAGCThreshold_dB(QObject *sender, int rx, qreal value) {
 
 	//QMutexLocker locker(&settingsMutex);
-
+    SETTINGS_DEBUG << "acgThreshold = " <<value;
 	if (m_receiverDataList[rx].acgThreshold_dB == value) return;
 	m_receiverDataList[rx].acgThreshold_dB = value;
 
-	//SETTINGS_DEBUG << "acgThreshold = " << m_receiverDataList[rx].acgThreshold;
+	SETTINGS_DEBUG << "acgThreshold = " <<m_receiverDataList[rx].acgThreshold_dB;
 	emit agcThresholdChanged_dB(sender, rx, value);
 }
 
@@ -3835,10 +3868,11 @@ void Settings::setAGCHangLevel_dB(QObject *sender, int rx, qreal value) {
 void Settings::setAGCLineLevels(QObject *sender, int rx, qreal thresh, qreal hang) {
 
 	if (m_currentReceiver != rx) return;
+    if ((m_receiverDataList[rx].agcHangLevel == hang) && (m_receiverDataList[rx].acgThreshold_dB == thresh)) return;
 
-	m_receiverDataList[rx].agcHangLevel = hang;
-	//SETTINGS_DEBUG << "agcHangLevel = " << m_receiverDataList[rx].agcHangLevel;
-
+    m_receiverDataList[rx].agcHangLevel = hang;
+    m_receiverDataList[rx].acgThreshold_dB = thresh;
+    SETTINGS_DEBUG << "SET agcHangLevel = " << m_receiverDataList[rx].agcHangLevel;
 	emit agcLineLevelsChanged(sender, rx, thresh, hang);
 }
 
@@ -3846,10 +3880,10 @@ void Settings::setAGCVariableGain_dB(QObject *sender, int rx, qreal value) {
 
 	if (m_currentReceiver != rx) return;
 
-	if (m_receiverDataList[rx].agcVariableGain == value) return;
-	m_receiverDataList[rx].agcVariableGain = value;
+	if (m_receiverDataList[rx].agcSlope == value) return;
+	m_receiverDataList[rx].agcSlope = value;
 
-	SETTINGS_DEBUG << "agcVariableGain = " << m_receiverDataList[rx].agcVariableGain;
+	SETTINGS_DEBUG << "agcSlope = " << m_receiverDataList[rx].agcSlope;
 	emit agcVariableGainChanged_dB(sender, rx, value);
 }
 
@@ -3928,43 +3962,6 @@ void Settings::setReceiverDataReady() {
 void Settings::setSampleSize(QObject* sender, int rx, int size) {
 
 	Q_UNUSED (sender)
-
-	/*if (rx == 0) {
-
-		SETTINGS_DEBUG << "set sample size to: " << size;
-		switch (size) {
-
-			case 4096:
-				m_fft = 1;
-				break;
-
-			case 8192:
-				m_fft = 2;
-				break;
-
-			case 16384:
-				m_fft = 4;
-				break;
-
-			case 32768:
-				m_fft = 8;
-				break;
-
-			case 65536:
-				m_fft = 16;
-				break;
-
-			case 131072:
-				m_fft = 32;
-				break;
-
-			case 262144:
-				m_fft = 64;
-				break;
-		}
-
-		emit sampleSizeChanged(0, size);
-	}*/
 
 	SETTINGS_DEBUG << "set sample size to: " << size << " for Rx " << rx;
 	switch (size) {
@@ -4749,10 +4746,6 @@ bool Settings::getHairCrossStatus(int rx) {
 	return m_receiverDataList[rx].hairCross;
 }
 
-bool Settings::getFFTAutoStatus(int rx) {
-
-	return m_receiverDataList[rx].fftAuto;
-}
 
 void Settings::setWaterfallTime(int rx, int value) {
 
@@ -4836,5 +4829,47 @@ void Settings::showRadioPopupWidget() {
 	else
 		m_radioPopupVisible = true;
 
-	emit showRadioPopupChanged(m_radioPopupVisible);
+
+}
+
+void Settings::setPanAveragingMode(int rx, PanAveragingMode mode) {
+
+    if (m_receiverDataList.at(rx).panAvMode == mode) return;
+
+        m_receiverDataList[rx].panAvMode = mode;
+
+        qDebug() << "Pan average mode set to " << mode;
+
+        emit panAveragingModeChanged(rx,mode);
+
+}
+
+void Settings::setPanDetectorMode(int rx , PanDetectorMode mode) {
+
+    if (m_receiverDataList.at(rx).panDetMode == mode) return;
+
+    m_receiverDataList[rx].panDetMode = mode;
+
+    qDebug() << "Pan detector mode set to " <<  m_receiverDataList[rx].panDetMode;
+
+
+    emit panDetectorModeChanged(rx,mode);
+
+};
+
+
+qreal Settings::getAGCSlope(int rx) {
+	return m_receiverDataList[rx].agcSlope;
+
+}
+
+void Settings::setfftSize(int rx, int size) {
+    if (m_receiverDataList[rx].fftsize == size) return;
+    m_receiverDataList[rx].fftsize = size;
+	qDebug() << "fftsize set to " << size;
+	emit fftSizeChanged(rx,size);
+}
+
+int Settings::getfftSize(int rx) {
+	return  m_receiverDataList[rx].fftsize;
 }
