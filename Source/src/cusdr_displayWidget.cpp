@@ -422,7 +422,7 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
 	m_fftLabel->setStyleSheet(set->getLabelStyle());
 
 	m_fftSizeCombo = new QComboBox(this);
-	m_fftSizeCombo->addItems(QStringList() << "2k" << "4k" <<  "8k" <<"16k" << "32k" <<"64k" << "128K" << "256k");
+	m_fftSizeCombo->addItems(QStringList() << "2k" << "4k" <<  "8k" <<"16k" << "32k");
 	m_fftSizeCombo->setFont(m_fonts.normalFont);
 	m_fftSizeCombo->setCurrentIndex(m_fftSize);
 	m_fftSizeCombo->setStyleSheet(set->getComboBoxStyle());
