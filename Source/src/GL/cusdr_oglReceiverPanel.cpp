@@ -3659,7 +3659,7 @@ void QGLReceiverPanel::setCtrFrequency(QObject *sender, int mode, int rx, long f
 	m_centerFrequency = freq;
 	m_freqScalePanadapterUpdate = true;
 	m_panGridUpdate = true;
-	update();
+//	update();
 }
 
 void QGLReceiverPanel::setVFOFrequency(QObject *sender, int mode, int rx, long freq) {
@@ -3763,6 +3763,7 @@ void QGLReceiverPanel::setSpectrumBuffer(int rx, const qVectorFloat& buffer) {
 
 
 	if (m_dataEngineState == QSDR::DataEngineUp) {
+
 		if (m_spectrumAveraging) {
 	
 			spectrumBufferMutex.lock();
@@ -4408,7 +4409,7 @@ void QGLReceiverPanel::setdBmScaleMax(int rx, qreal value) {
 	m_panGridUpdate = true;
 	m_peakHoldBufferResize = true;
 
-	update();
+//	update();
 }
 
 void QGLReceiverPanel::setMouseWheelFreqStep(QObject *sender, int rx, qreal step) {
@@ -4462,7 +4463,7 @@ void QGLReceiverPanel::updateADCStatus() {
 		m_adcStatus = 0;
 
 	//qDebug() << "m_adcStatus: " << m_adcStatus;
-	update();
+//	update();
 }
 
 void QGLReceiverPanel::setAGCLineLevels(QObject *sender, int rx, qreal thresh, qreal hang) {
@@ -4476,7 +4477,7 @@ void QGLReceiverPanel::setAGCLineLevels(QObject *sender, int rx, qreal thresh, q
 	m_agcHangLevelOld = hang;
 	//GRAPHICS_DEBUG << "m_agcThresholdOld = " << m_agcThresholdOld;
 	//GRAPHICS_DEBUG << "m_agcHangLevelOld = " << m_agcHangLevelOld;
-    update();
+//    update();
 }
 
 void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value) {
@@ -4488,7 +4489,7 @@ void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value
 
 	m_agcFixedGain = value;
 	//GRAPHICS_DEBUG << "m_agcFixedGain = " << m_agcFixedGain;
-    update();
+//    update();
 }
 
 void QGLReceiverPanel::setADCMode(QObject *sender, int rx, ADCMode mode) {
@@ -4500,7 +4501,7 @@ void QGLReceiverPanel::setADCMode(QObject *sender, int rx, ADCMode mode) {
 	m_adcMode = mode;
 	m_adcModeString = set->getADCModeString(m_receiver);
 	
-	update();
+//	update();
 }
 
 void QGLReceiverPanel::setAGCMode(QObject *sender, int rx, AGCMode mode, bool hangEnabled) {
