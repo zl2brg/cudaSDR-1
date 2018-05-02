@@ -68,98 +68,96 @@ OGLTextPrivate::~OGLTextPrivate() {
 
 void OGLTextPrivate::allocateTexture() {
 	
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
 
-	// the texture ends at the edges (clamp)
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
 
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    // the texture ends at the edges (clamp)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	// select modulate to mix texture with color for shading
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	
-	QImage image(TEXTURE_SIZE, TEXTURE_SIZE, QImage::Format_ARGB32);
-	image.fill(Qt::transparent);
-	image = QGLWidget::convertToGLFormat(image);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+    // select modulate to mix texture with color for shading
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+    QImage image(TEXTURE_SIZE, TEXTURE_SIZE, QImage::Format_ARGB32);
+    image.fill(Qt::transparent);
+    image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
 
     textures += texture;
 }
 
 CharData &OGLTextPrivate::createCharacter(QChar c) {
 	
-	ushort unicodeC = c.unicode();
-	if (characters.contains(unicodeC))
-		return characters[unicodeC];
-	
-	if (textures.empty())
-		allocateTexture();
-	
-	GLuint texture = textures.last();
-	
-	GLsizei width = fontMetrics.width(c);
-	GLsizei height = fontMetrics.height();
+    ushort unicodeC = c.unicode();
+        if (characters.contains(unicodeC))
+            return characters[unicodeC];
 
-    QPixmap pixmap(width, height);
-    pixmap.fill(Qt::transparent);
+        if (textures.empty())
+            allocateTexture();
 
-	/*QImage image(width, height, QImage::Format_ARGB32_Premultiplied);
-	if (!image.isNull()) {
+        GLuint texture = textures.last();
 
-		image.fill(Qt::transparent);
+        GLsizei width = fontMetrics.width(c);
+        GLsizei height = fontMetrics.height();
 
-		QPainter p(&image);
-		if (&font) p.setFont(this->font);
-	}*/
-	
-    QPainter painter;
-	//const QPainter::CompositionMode comp_mode = painter.compositionMode();
-	//painter.setCompositionMode(QPainter::CompositionMode_Source);
-    painter.begin(&pixmap);
-    //painter.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing);
-	painter.setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing, false);
-    painter.setFont(font);
-    painter.setPen(Qt::white);
+        QPixmap pixmap(width, height);
+        pixmap.fill(Qt::transparent);
 
-    //painter.drawText(0, fontMetrics.ascent(), c);
-	painter.drawText(pixmap.rect(), Qt::TextSingleLine | Qt::TextDontClip | Qt::AlignCenter, c);
-    painter.end();
+        /*QImage image(width, height, QImage::Format_ARGB32_Premultiplied);
+        if (!image.isNull()) {
+            image.fill(Qt::transparent);
+            QPainter p(&image);
+            if (&font) p.setFont(this->font);
+        }*/
+
+        QPainter painter;
+        //const QPainter::CompositionMode comp_mode = painter.compositionMode();
+        //painter.setCompositionMode(QPainter::CompositionMode_Source);
+        painter.begin(&pixmap);
+        //painter.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing);
+        painter.setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing, false);
+        painter.setFont(font);
+        painter.setPen(Qt::white);
+
+        //painter.drawText(0, fontMetrics.ascent(), c);
+        painter.drawText(pixmap.rect(), Qt::TextSingleLine | Qt::TextDontClip | Qt::AlignCenter, c);
+        painter.end();
 
 
-    QImage image = QGLWidget::convertToGLFormat(pixmap.toImage());
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, xOffset, yOffset, width, height, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+        QImage image = pixmap.toImage().convertToFormat(QImage::Format_RGBA8888).mirrored();
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, xOffset, yOffset, width, height, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
 
-    CharData& character = characters[unicodeC];
-    character.textureId = texture;
-    character.width = width;
-    character.height = height;
-    character.s[0] = static_cast<GLfloat>(xOffset) / TEXTURE_SIZE;
-    character.t[0] = static_cast<GLfloat>(yOffset) / TEXTURE_SIZE;
-    character.s[1] = static_cast<GLfloat>(xOffset + width) / TEXTURE_SIZE;
-    character.t[1] = static_cast<GLfloat>(yOffset + height) / TEXTURE_SIZE;
+        CharData& character = characters[unicodeC];
+        character.textureId = texture;
+        character.width = width;
+        character.height = height;
+        character.s[0] = static_cast<GLfloat>(xOffset) / TEXTURE_SIZE;
+        character.t[0] = static_cast<GLfloat>(yOffset) / TEXTURE_SIZE;
+        character.s[1] = static_cast<GLfloat>(xOffset + width) / TEXTURE_SIZE;
+        character.t[1] = static_cast<GLfloat>(yOffset + height) / TEXTURE_SIZE;
 
-    xOffset += width;
-    if (xOffset + fontMetrics.maxWidth() >= TEXTURE_SIZE) {
-		
-		xOffset = 1;
-        yOffset += height;
-	}
-    if (yOffset + fontMetrics.height() >= TEXTURE_SIZE) {
-		
-		allocateTexture();
-        yOffset = 1;
-    }
-    return character;
+        xOffset += width;
+        if (xOffset + fontMetrics.maxWidth() >= TEXTURE_SIZE) {
+
+            xOffset = 1;
+            yOffset += height;
+        }
+        if (yOffset + fontMetrics.height() >= TEXTURE_SIZE) {
+
+            allocateTexture();
+            yOffset = 1;
+        }
+        return character;
 }
 
 

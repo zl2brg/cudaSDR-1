@@ -34,7 +34,8 @@
 //#include <QTimer>
 //#include <QImage>
 //#include <QString>
-//#include <QGLFramebufferObject>
+//#include <QOpenGLFramebufferObject>
+
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D
@@ -42,7 +43,7 @@
 
 
 OGLDisplayPanel::OGLDisplayPanel(QWidget *parent)
-	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
+	: QOpenGLWidget(parent) 
 
 	, set(Settings::instance())
 	, m_serverMode(set->getCurrentServerMode())
@@ -86,14 +87,12 @@ OGLDisplayPanel::OGLDisplayPanel(QWidget *parent)
 	, m_sMeterMaxValueB(-1000.0f)
 	, m_sMeterMinValueB(1000.0f)
 {
-//	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
-
+//	QOpenGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	setAutoBufferSwap(true);
-	setAutoFillBackground(false);
+    //setAutoBufferSwap(true);
+    setAutoFillBackground(false);
 	setMouseTracking(true);
-
+    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
 	m_freqStringLeftPos = 20;
 	setupDisplayRegions(size());
 
@@ -146,7 +145,7 @@ OGLDisplayPanel::OGLDisplayPanel(QWidget *parent)
 	m_digitColor = QColor(68, 68, 68);
 	m_bkgColor1 = QColor(30, 30, 30);
 	m_bkgColor2 = QColor(50, 50, 50);
-	m_activeTextColor = QColor(166, 196, 208);
+    m_activeTextColor = QColor(166, 196, 208);
 	m_inactiveTextColor = QColor(68, 68, 68);//Qt::white;//
 	m_textBackgroundColor = QColor(66, 96, 208);
 
@@ -426,17 +425,15 @@ void OGLDisplayPanel::setupTextstrings() {
 
     m_hermesStepAttnString = QString("Hermes Step-Attn:");
     m_hermesStepAttnStringWidth = m_oglTextSmall->fontMetrics().width(m_hermesStepAttnString);
-
+    update();
 }
 
 void OGLDisplayPanel::initializeGL() {
+    initializeOpenGLFunctions();
+    if (!isValid()) return;
+  // default initialization
 
-	if (!isValid()) return;
-	
-	//*****************************************************************
-	// default initialization
-
-	//glShadeModel(GL_FLAT);
+    //glShadeModel(GL_FLAT);
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
 	//glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // 4-byte pixel alignment
@@ -470,7 +467,7 @@ void OGLDisplayPanel::resizeGL(int iWidth, int iHeight) {
 }
 
 void OGLDisplayPanel::paintGL() {
-
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0, 0, 0, 1.0);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -482,6 +479,8 @@ void OGLDisplayPanel::paintGL() {
 	paintLowerRegion();
 	paintSMeter();
 	//m_mutex.unlock();
+    update();
+
 }
 
 void OGLDisplayPanel::paintUpperRegion() {
@@ -1082,7 +1081,7 @@ void OGLDisplayPanel::paintSMeter() {
 				m_smeterFBO = 0;
 			}
 
-			m_smeterFBO = new QGLFramebufferObject(m_sMeterWidth, height);
+			m_smeterFBO = new QOpenGLFramebufferObject(m_sMeterWidth, height);
 			//DISPLAYPANEL_DEBUG << "m_smeterFBO generated.";
 		}
 
@@ -1164,6 +1163,7 @@ void OGLDisplayPanel::paintSMeter() {
 	glEnable(GL_BLEND);
 	glDisable(GL_LINE_SMOOTH);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    update();
 }
 
 void OGLDisplayPanel::renderSMeterA() {
@@ -1417,7 +1417,7 @@ void OGLDisplayPanel::renderSMeterA() {
 }
 
 void OGLDisplayPanel::renderSMeterScale() {
-
+    qDebug() << "S meter scale";
 	GLint width = m_sMeterWidth;
 	GLint height = m_smeterRect.height();
 
@@ -1437,10 +1437,10 @@ void OGLDisplayPanel::renderSMeterScale() {
 	QRect rect = QRect(0, 0, x2-x1, y2-y1);
 	
 	// draw background
-	if (m_dataEngineState == QSDR::DataEngineUp)
-		drawGLRect(rect, Qt::black, m_bkgColor2, -3.0f, false);
-	else
-		drawGLRect(rect, Qt::black);
+    if (m_dataEngineState == QSDR::DataEngineUp)
+        drawGLRect(rect, Qt::black, m_bkgColor2, -3.0f, false);
+    else
+        drawGLRect(rect, Qt::black);
 
 	glDisable(GL_MULTISAMPLE);
 	glDisable(GL_LINE_SMOOTH);
@@ -1448,9 +1448,9 @@ void OGLDisplayPanel::renderSMeterScale() {
 
 	// draw horizontal lines
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		qglColor(m_activeTextColor);
+        qglColor(m_activeTextColor);
 	else
-		qglColor(m_inactiveTextColor);
+        qglColor(m_activeTextColor);
 
 	glBegin(GL_LINES);
 		glVertex3f(0,		m_sMeterPosY, 0.0);
@@ -1461,9 +1461,9 @@ void OGLDisplayPanel::renderSMeterScale() {
 
 	// draw integer step scale
 	if (m_dataEngineState == QSDR::DataEngineUp)
-		qglColor(QColor(126, 156, 168));
+        qglColor(QColor(126, 156, 168));
 	else
-		qglColor(m_inactiveTextColor);
+        qglColor(m_activeTextColor);
 
 	int vertexArrayLength = m_sMeterWidth;
 	vertexArrayLength += vertexArrayLength%2;
@@ -1492,9 +1492,10 @@ void OGLDisplayPanel::renderSMeterScale() {
 	QString marker;
 
 	if (m_dataEngineState == QSDR::DataEngineUp)
-			qglColor(m_activeTextColor);
+      //      qglColor(m_activeTextColor);
+        glColor4f(255,255,255,255);
 		else
-			qglColor(m_inactiveTextColor);
+            qglColor(m_inactiveTextColor);
 
 	for (int i = 1, z = -120; z < 10; i++, z += 10) {
 		
@@ -1609,13 +1610,16 @@ void OGLDisplayPanel::renderSMeterScale() {
 		glVertex3f(width-1,	  m_sMeterPosY+12, 0.0);
 	glEnd();
 
-	/*if (m_dataEngineState == QSDR::DataEngineUp)
+    /*
+    if (m_dataEngineState == QSDR::DataEngineUp)
 		qglColor(m_activeTextColor);
 	else
-		qglColor(m_inactiveTextColor);*/
-		
+        qglColor(m_inactiveTextColor);
+        */
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_MULTISAMPLE);
+  //  paintGL();
+  //  update();
 }
 
 void OGLDisplayPanel::renderSMeterB() {
@@ -1789,6 +1793,7 @@ void OGLDisplayPanel::renderSMeterB() {
 
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_MULTISAMPLE);
+    update();
 }
 
 //void OGLDisplayPanel::renderSMeterB() {
@@ -2103,7 +2108,7 @@ void OGLDisplayPanel::setSMeterValue(int rx, float value) {
 			}*/
 			//qDebug() << "          tmp" << tmp;
 
-			update();
+            update();
 			m_sMeterTimer.restart();
 		}
 	}
@@ -2381,9 +2386,9 @@ void OGLDisplayPanel::mouseMoveEvent(QMouseEvent *event) {
 		}
 	//}
 
-	if (oldDigitColor != m_digitColor) update();
+    if (oldDigitColor != m_digitColor) update();
 
-	QGLWidget::mouseMoveEvent(event);
+	QOpenGLWidget::mouseMoveEvent(event);
 }
 
 void OGLDisplayPanel::wheelEvent(QWheelEvent * event) {
@@ -2461,7 +2466,7 @@ void OGLDisplayPanel::wheelEvent(QWheelEvent * event) {
 			
 	//}
 	event->accept();
-	QGLWidget::wheelEvent(event);
+	QOpenGLWidget::wheelEvent(event);
 }
 
 void OGLDisplayPanel::keyPressEvent(QKeyEvent* event) {
@@ -2492,7 +2497,7 @@ void OGLDisplayPanel::setSMeterHoldTime(int value) {
 void OGLDisplayPanel::setSyncStatus(int value) {
 
 	m_syncStatus = value;
-	update();
+    update();
 
 	//QTimer::singleShot(50, this, SLOT(updateSyncStatus()));
 }
@@ -2504,13 +2509,13 @@ void OGLDisplayPanel::updateSyncStatus() {
 	else
 		m_syncStatus = 0;
 
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setADCStatus(int value) {
 
 	m_adcStatus = value;
-	update();
+    update();
 
 	QTimer::singleShot(500, this, SLOT(updateADCStatus()));
 }
@@ -2522,13 +2527,13 @@ void OGLDisplayPanel::updateADCStatus() {
 	else
 		m_adcStatus = 0;
 
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setPacketLossStatus(int value) {
 
 	m_packetLossStatus = value;
-	update();
+    update();
 
 	QTimer::singleShot(100, this, SLOT(updatePacketLossStatus()));
 }
@@ -2540,19 +2545,19 @@ void OGLDisplayPanel::updatePacketLossStatus() {
 	else
 		m_packetLossStatus = 0;
 
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setSendIQStatus(int value) {
 
 	m_sendIQStatus = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setRecvAudioStatus(int value) {
 
 	m_recvAudioStatus = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setReceivers(QObject *sender, int value) {
@@ -2560,7 +2565,7 @@ void OGLDisplayPanel::setReceivers(QObject *sender, int value) {
 	Q_UNUSED (sender)
 
 	m_receivers = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setSampleRate(QObject *sender, int value) {
@@ -2568,7 +2573,7 @@ void OGLDisplayPanel::setSampleRate(QObject *sender, int value) {
 	Q_UNUSED (sender)
 
 	m_sample_rate = value / 1000;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setMercuryAttenuator(QObject *sender, HamBand band, int value) {
@@ -2577,7 +2582,7 @@ void OGLDisplayPanel::setMercuryAttenuator(QObject *sender, HamBand band, int va
 	Q_UNUSED (band)
 
 	m_mercuryAttenuator = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setDither(QObject *sender, int value) {
@@ -2585,7 +2590,7 @@ void OGLDisplayPanel::setDither(QObject *sender, int value) {
 	Q_UNUSED (sender)
 
 	m_dither = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setRandom(QObject *sender, int value) {
@@ -2593,7 +2598,7 @@ void OGLDisplayPanel::setRandom(QObject *sender, int value) {
 	Q_UNUSED (sender)
 
 	m_random = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setCurrentReceiver(QObject *sender, int value) {
@@ -2601,7 +2606,7 @@ void OGLDisplayPanel::setCurrentReceiver(QObject *sender, int value) {
 	Q_UNUSED(sender)
 
 	m_currentReceiver = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setFrequency(QObject *sender, int mode, int rx, long freq) {
@@ -2627,7 +2632,7 @@ void OGLDisplayPanel::setFrequency(QObject *sender, int mode, int rx, long freq)
 	else*/
 		m_frequencyList[rx] = f;
 
-	update();
+    update();
 }
 
 void OGLDisplayPanel::set10mhzSource(QObject *sender, int value) {
@@ -2645,7 +2650,7 @@ void OGLDisplayPanel::set10mhzSource(QObject *sender, int value) {
 			m_src10mhz = "Mercury";
 			break;
 	}
-	update();
+    update();
 }
 
 void OGLDisplayPanel::set122_88mhzSource(QObject *sender, int value) {
@@ -2660,37 +2665,37 @@ void OGLDisplayPanel::set122_88mhzSource(QObject *sender, int value) {
 			m_src122_88mhz = "Mercury";
 			break;
 	}
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setMercuryPresence(bool value) {
 
 	m_mercury = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setPenelopePresence(bool value) {
 
 	m_penelope = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setPennylanePresence(bool value) {
 
 	m_pennylane = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setAlexPresence(bool value) {
 
 	m_alex = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setExcaliburPresence(bool value) {
 
 	m_excalibur = value;
-	update();
+    update();
 }
 
 void OGLDisplayPanel::setMercuryVersion(int value) {
@@ -2772,7 +2777,7 @@ void OGLDisplayPanel::setMouseWheelFreqStep(QObject *sender, int rx, qreal value
 	if (rx == m_currentReceiver)
 		m_mouseWheelFreqStep = value;
 
-	update();
+    update();
 }
 
 void OGLDisplayPanel::systemStateChanged(
@@ -2822,6 +2827,13 @@ void OGLDisplayPanel::systemStateChanged(
 	m_smeterUpdate = true;
 	m_smeterRenew = true;
 
-	update();
-	//paintGL();
+   // paintGL();
+    update();
+
+}
+
+
+void OGLDisplayPanel::qglColor(QColor color)
+{
+    glColor4f(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }

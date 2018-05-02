@@ -35,6 +35,7 @@
 //#include <QImage>
 //#include <QString>
 //#include <QGLFramebufferObject>
+#include <qgl.h>
 
 
 #ifndef GL_MULTISAMPLE
@@ -42,7 +43,7 @@
 #endif
 
 QGLDistancePanel::QGLDistancePanel(QWidget *parent)
-	: QGLWidget(QGLFormat(QGL::SampleBuffers|QGL::AlphaChannel), parent)
+	: QOpenGLWidget( parent)
 
 	, set(Settings::instance())
 	, m_serverMode(set->getCurrentServerMode())
@@ -78,8 +79,8 @@ QGLDistancePanel::QGLDistancePanel(QWidget *parent)
 	, m_chirpBufferLength(set->getChirpBufferLength())
 {
 //	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
-
-	setAutoBufferSwap(true);
+//	QOpenGLFunctions_X_Y_PROFILE::initializeOpenGLFunctions();
+	//setAutoBufferSwap(true);
 	setAutoFillBackground(false);
 	
 	setMouseTracking(true);
@@ -168,7 +169,7 @@ QGLDistancePanel::QGLDistancePanel(QWidget *parent)
 
 	memset(m_tmpBuf, 0, SAMPLE_BUFFER_SIZE * sizeof(float));
 
-	updateGL();
+	update();
 }
 
 QGLDistancePanel::~QGLDistancePanel() {
@@ -327,7 +328,7 @@ void QGLDistancePanel::initializeGL() {
 
 	if (!isValid()) return;
 	
-	/*QOpenGLInfo glInfo;
+	/*QGLInfo glInfo;
 	glInfo.getInfo();
 	glInfo.printSelf();*/
 
@@ -374,7 +375,11 @@ void QGLDistancePanel::paintGL() {
 
 		default:
 			break;
+		
 	}
+
+    update();
+  
 }
  
 //****************************************************
@@ -397,6 +402,7 @@ void QGLDistancePanel::paintReceiverDisplay() {
 		drawCrossHair();
 
 	m_oldFreq = m_frequency;
+	   update();
  }
 
 void QGLDistancePanel::paintChirpWSPRDisplay() {
@@ -648,6 +654,7 @@ void QGLDistancePanel::drawPanadapter() {
 
 	// disable scissor box
 	glDisable(GL_SCISSOR_TEST);
+
 } 
 
 void QGLDistancePanel::drawPanVerticalScale() {
@@ -745,9 +752,9 @@ void QGLDistancePanel::drawPanadapterGrid() {
 	int height = m_panRect.height();
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	//glColor4f(0.35, 0.46, 0.51, 0.7);
-	//glColor4f(0.45, 0.56, 0.61, 1.0);
-	glColor4f(0.45f, 0.56f, 0.61f, 0.8f);
+    //glColor4f(0.35, 0.46, 0.51, 0.7);
+    //glColor4f(0.45, 0.56, 0.61, 1.0);
+    glColor4f(0.45f, 0.56f, 0.61f, 0.8f);
 	
 	glDisable(GL_MULTISAMPLE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -798,7 +805,7 @@ void QGLDistancePanel::drawPanFilter() {
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-	//glColor4f(0.65, 0.65, 0.65, 0.25);
+    //glColor4f(0.65, 0.65, 0.65, 0.25);
 	QColor color = QColor(150, 150, 150, 100);
 
 	GLint x1 = m_panRect.left() + qRound((qreal)(m_panRect.width()/2.0f) + freqLo * m_panRect.width() / m_freqScaleZoomFactor);
@@ -854,7 +861,7 @@ void QGLDistancePanel::drawCrossHair() {
 	glDisable(GL_LINE_SMOOTH);
 	glLineWidth(1.0f);
 
-	qglColor(QColor(255, 255, 255, 80));
+    glColor4f(255, 255, 255, 80);
 
 	// set a scissor box
 	glScissor(rect.left(), rect.top(), rect.width() - 1, rect.height());
@@ -873,7 +880,7 @@ void QGLDistancePanel::drawCrossHair() {
 	glEnd();
 
 	// cross hair
-	qglColor(QColor(255, 255, 255, 180));
+    glColor4f(255,255,255,180);
 	glBegin(GL_LINES);
 		glVertex3f(x     , y - 20, 5.0f);
 		glVertex3f(x     , y + 20, 5.0f);
@@ -885,7 +892,7 @@ void QGLDistancePanel::drawCrossHair() {
 	//if (m_mouseRegion == panadapterRegion) {
 		
 	QString str;
-	qglColor(QColor(255, 255, 255, 255));
+    glColor4f(255, 255, 255, 255);
 
 	int dx = m_panRect.width()/2 - x;
 	qreal unit = (qreal)((m_sampleRate * m_freqScaleZoomFactor) / m_panRect.width());
@@ -1753,7 +1760,7 @@ void QGLDistancePanel::enterEvent(QEvent *event) {
 	m_mouseRegion = elsewhere;
 	update();
 
-	QGLWidget::enterEvent(event);
+	QOpenGLWidget::enterEvent(event);
 }
 
 void QGLDistancePanel::leaveEvent(QEvent *event) {
@@ -1762,7 +1769,7 @@ void QGLDistancePanel::leaveEvent(QEvent *event) {
 	m_mouseRegion = elsewhere;
 	update();
 
-	QGLWidget::leaveEvent(event);
+	QOpenGLWidget::leaveEvent(event);
 }
 
 void QGLDistancePanel::wheelEvent(QWheelEvent* event) {

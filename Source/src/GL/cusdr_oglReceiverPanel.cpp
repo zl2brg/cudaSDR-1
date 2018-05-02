@@ -37,7 +37,7 @@
 //#include <QTimer>
 //#include <QImage>
 //#include <QString>
-//#include <QGLFramebufferObject>
+//#include <QOpenGLFrameBufferObject>
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D
@@ -49,7 +49,7 @@
 #define	btn_widths		34
 
 QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
-	: QGLWidget(QGLFormat(QGL::SampleBuffers|QGL::AlphaChannel), parent)
+	: QOpenGLWidget(parent)
 
 	, set(Settings::instance())
 	, m_serverMode(set->getCurrentServerMode())
@@ -104,10 +104,10 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 //	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-	setAutoBufferSwap(true);
+    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
+	//setAutoBufferSwap(true);
 	setAutoFillBackground(false);
-	
+
 	setMouseTracking(true);
 	setFocusPolicy(Qt::StrongFocus);
 
@@ -273,8 +273,8 @@ QGLReceiverPanel::~QGLReceiverPanel() {
 
 	disconnect(set, 0, this, 0);
 	
-	makeCurrent();
-	glFinish();
+//	makeCurrent();
+//	glFinish();
 
 	if (m_frequencyScaleFBO) {
 
@@ -585,9 +585,8 @@ void QGLReceiverPanel::setupConnections() {
 void QGLReceiverPanel::initializeGL() {
 
 	if (!isValid()) return;
-	
-
-	/*QOpenGLInfo glInfo;
+     initializeOpenGLFunctions();
+	/*QGLInfo glInfo;
 	glInfo.getInfo();
 	glInfo.printSelf();*/
 
@@ -1077,7 +1076,7 @@ void QGLReceiverPanel::drawPanVerticalScale() {
 				delete m_dBmScaleFBO;
 				m_dBmScaleFBO = 0;
 			}
-			m_dBmScaleFBO = new QGLFramebufferObject(width, height);
+			m_dBmScaleFBO = new QOpenGLFramebufferObject(width, height);
 			//if (m_dBmScaleFBO)
 			//	GRAPHICS_DEBUG << "m_dBmScaleFBO generated.";
 			
@@ -1120,7 +1119,7 @@ void QGLReceiverPanel::drawPanHorizontalScale() {
 				m_frequencyScaleFBO = 0;
 			}
 
-			m_frequencyScaleFBO = new QGLFramebufferObject(width, height);
+			m_frequencyScaleFBO = new QOpenGLFramebufferObject(width, height);
 			//if (m_frequencyScaleFBO)
 			//	GRAPHICS_DEBUG << "m_frequencyScaleFBO generated.";
 		}
@@ -1177,7 +1176,7 @@ void QGLReceiverPanel::drawPanadapterGrid() {
 				m_panadapterGridFBO = 0;
 			}
 
-			m_panadapterGridFBO = new QGLFramebufferObject(width, height);
+			m_panadapterGridFBO = new QOpenGLFramebufferObject(width, height);
 			//if (m_panadapterGridFBO)
 			//	GRAPHICS_DEBUG << "m_panadapterGridFBO generated.";
 		}
@@ -1405,7 +1404,7 @@ void QGLReceiverPanel::drawWaterfall() {
 	//int height = this->size().height();
 
 
-	glColor4f(1.0, 1.0, 1.0, 1.0);
+    glColor4f(1.0, 1.0, 1.0, 1.0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
@@ -1433,21 +1432,21 @@ void QGLReceiverPanel::drawWaterfall() {
 				m_textureFBO = 0;
 			}
 
-			if (QGLFramebufferObject::hasOpenGLFramebufferBlit()) {
+			if (QOpenGLFramebufferObject::hasOpenGLFramebufferBlit()) {
 			
-				//QGLFramebufferObjectFormat format;
+				//QOpenGLFramebufferObjectFormat format;
 				//format.setSamples(2);
-				//format.setAttachment(QGLFramebufferObject::CombinedDepthStencil);
+				//format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
 
-				m_waterfallLineFBO = new QGLFramebufferObject(width, 1);
+				m_waterfallLineFBO = new QOpenGLFramebufferObject(width, 1);
 				//if (m_waterfallLineFBO)
 				//GRAPHICS_DEBUG << "m_waterfallLineFBO generated.";
 
-				m_waterfallFBO = new QGLFramebufferObject(width, height);
+				m_waterfallFBO = new QOpenGLFramebufferObject(width, height);
 				//if (m_waterfallFBO)
 				//GRAPHICS_DEBUG << "m_waterfallFBO generated.";
 
-				m_textureFBO = new QGLFramebufferObject(width, height);
+                m_textureFBO = new QOpenGLFramebufferObject(width, height);
 				//if (m_textureFBO)
 				//GRAPHICS_DEBUG << "m_textureFBO generated.";
 				
@@ -1458,7 +1457,7 @@ void QGLReceiverPanel::drawWaterfall() {
 			}
 
 			m_waterfallUpdate = false;
-			drawGLRect(m_waterfallRect, Qt::black);
+            drawGLRect(m_waterfallRect, Qt::black);
 
 			m_waterfallLineCnt = 0;
 						
@@ -1540,10 +1539,13 @@ void QGLReceiverPanel::drawWaterfall() {
 				QRect rect(0, top + m_waterfallLineCnt, width, height - m_waterfallLineCnt);
 				drawGLRect(rect, QColor(0, 0, 0, 255), 3.0f);
 			}
+            m_waterfallFBO->release();
 
 			// copy the next waterfall image to the waterfall FBO
-			QRect copyRect(0, 0, width, height);
-			QGLFramebufferObject::blitFramebuffer(m_waterfallFBO, copyRect, m_textureFBO, copyRect);
+        QRect copyRect(0, 0, width, height);
+        QOpenGLFramebufferObject::blitFramebuffer(m_waterfallFBO, copyRect, m_textureFBO, copyRect);
+
+
 		}
 		else {
 
@@ -1576,7 +1578,7 @@ void QGLReceiverPanel::drawWaterfallVerticalScale() {
 				delete m_secScaleWaterfallFBO;
 				m_secScaleWaterfallFBO = 0;
 			}
-			m_secScaleWaterfallFBO = new QGLFramebufferObject(width, height);
+			m_secScaleWaterfallFBO = new QOpenGLFramebufferObject(width, height);
 			//if (m_secScaleWaterfallFBO)
 			//	GRAPHICS_DEBUG << "m_secScaleWaterfallFBO generated.";
 		}
@@ -1729,7 +1731,7 @@ void QGLReceiverPanel::drawCrossHair() {
 
 
 	glDisable(GL_SCISSOR_TEST);
-	glEnable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE);
 }
 
 void QGLReceiverPanel::drawVFOControl() {
@@ -2072,30 +2074,30 @@ void QGLReceiverPanel::drawReceiverInfo() {
 		QString fstr = str.arg(f1/1000).arg(f1 - 1000 * (int)(f1/1000), 3, 10, QLatin1Char('0'));
 		//int fLength = m_fonts.bigFont1Metrics->width(fstr) + 55;
 
-		qglColor(QColor(0, 0, 0, alpha));
+        glColor4f(0, 0, 0, alpha);
 		m_oglTextBig1->renderText(x+2, 14, 4.0f, fstr);
 		
-		qglColor(QColor(255, 255, 255, alpha));
+        glColor4f(255, 255, 255, alpha);
 		m_oglTextBig1->renderText(x, 12, 5.0f, fstr);
 
 		str = "%1";
 		if (f1 / 1000 < 10) {
 
-			qglColor(QColor(0, 0, 0, alpha));
+            glColor4f(0, 0, 0, alpha);
 			m_oglTextBig2->renderText(x + 36, 14, 4.0f, str.arg(f2, 3, 10, QLatin1Char('0')));
 			m_oglTextBig1->renderText(x + 60, 14, 4.0f, "MHz");
 
-			qglColor(QColor(255, 255, 255, alpha));
+            glColor4f(255, 255, 255, alpha);
 			m_oglTextBig2->renderText(x + 34, 12, 5.0f, str.arg(f2, 3, 10, QLatin1Char('0')));
 			m_oglTextBig1->renderText(x + 58, 12, 5.0f, "MHz");
 		}
 		else {
 
-			qglColor(QColor(0, 0, 0, alpha));
+            glColor4f(0, 0, 0, alpha);
 			m_oglTextBig2->renderText(x + 39, 13, 4.0f, str.arg(f2, 3, 10, QLatin1Char('0')));
 			m_oglTextBig1->renderText(x + 65, 13, 4.0f, "MHz");
 
-			qglColor(QColor(255, 255, 255, alpha));
+            glColor4f(255, 255, 255, alpha);
 			m_oglTextBig2->renderText(x + 41, 11, 5.0f, str.arg(f2, 3, 10, QLatin1Char('0')));
 			m_oglTextBig1->renderText(x + 63, 11, 5.0f, "MHz");
 		}
@@ -2863,7 +2865,7 @@ void QGLReceiverPanel::enterEvent(QEvent *event) {
 	setCursor(Qt::BlankCursor);
 	update();
 
-	QGLWidget::enterEvent(event);
+	QOpenGLWidget::enterEvent(event);
 }
 
 void QGLReceiverPanel::leaveEvent(QEvent *event) {
@@ -2873,7 +2875,7 @@ void QGLReceiverPanel::leaveEvent(QEvent *event) {
 
 	update();
 
-	QGLWidget::leaveEvent(event);
+	QOpenGLWidget::leaveEvent(event);
 }
 
 void QGLReceiverPanel::wheelEvent(QWheelEvent* event) {
@@ -4474,6 +4476,7 @@ void QGLReceiverPanel::setAGCLineLevels(QObject *sender, int rx, qreal thresh, q
 	m_agcHangLevelOld = hang;
 	//GRAPHICS_DEBUG << "m_agcThresholdOld = " << m_agcThresholdOld;
 	//GRAPHICS_DEBUG << "m_agcHangLevelOld = " << m_agcHangLevelOld;
+    update();
 }
 
 void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value) {
@@ -4485,6 +4488,7 @@ void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value
 
 	m_agcFixedGain = value;
 	//GRAPHICS_DEBUG << "m_agcFixedGain = " << m_agcFixedGain;
+    update();
 }
 
 void QGLReceiverPanel::setADCMode(QObject *sender, int rx, ADCMode mode) {
@@ -4557,4 +4561,9 @@ void QGLReceiverPanel::showRadioPopup(bool value) {
 //
 //	update();
 //}
+
+void QGLReceiverPanel::qglColor(QColor color)
+{
+		glColor4f(color.redF(), color.greenF(), color.blueF(), color.alphaF());
+}
 

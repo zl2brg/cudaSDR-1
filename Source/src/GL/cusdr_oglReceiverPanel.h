@@ -37,7 +37,8 @@
 #include "cusdr_radioPopupWidget.h"
 
 #include <QWheelEvent>
-#include <QtOpenGL/QGLWidget>
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
 
 
 #ifdef LOG_GRAPHICS
@@ -47,7 +48,7 @@
 #endif
 
 
-class QGLReceiverPanel : public QGLWidget {
+class QGLReceiverPanel : public QOpenGLWidget, protected QOpenGLFunctions {
 
     Q_OBJECT
 
@@ -78,6 +79,7 @@ protected:
 	void mouseMoveEvent(QMouseEvent *event);
 	void wheelEvent(QWheelEvent * event );
 	void keyPressEvent(QKeyEvent* event);
+	void qglColor(QColor color);
 
 private:
 	Settings*					set;
@@ -120,13 +122,13 @@ private:
 
 	QQueue<QVector<float> >			specAv_queue;
 
-	QGLFramebufferObject*		m_frequencyScaleFBO;
-	QGLFramebufferObject*		m_dBmScaleFBO;
-	QGLFramebufferObject*		m_panadapterGridFBO;
-	QGLFramebufferObject*		m_textureFBO;
-	QGLFramebufferObject*		m_waterfallLineFBO;
-	QGLFramebufferObject*		m_waterfallFBO;
-	QGLFramebufferObject*		m_secScaleWaterfallFBO;
+	QOpenGLFramebufferObject*	m_frequencyScaleFBO;
+	QOpenGLFramebufferObject*	m_dBmScaleFBO;
+	QOpenGLFramebufferObject*	m_panadapterGridFBO;
+    QOpenGLFramebufferObject*	m_textureFBO;
+	QOpenGLFramebufferObject*	m_waterfallLineFBO;
+	QOpenGLFramebufferObject*	m_waterfallFBO;
+	QOpenGLFramebufferObject*	m_secScaleWaterfallFBO;
 
 	QRect						m_panRect;
 	QRect						m_dBmScalePanRect;

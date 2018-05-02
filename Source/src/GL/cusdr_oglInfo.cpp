@@ -31,7 +31,7 @@
 #include "cusdr_oglUtils.h"
 #include "cusdr_oglInfo.h"
 
-QOpenGLInfo::QOpenGLInfo(QObject *parent)
+QGLInfo::QGLInfo(QObject *parent)
 	: QObject(parent)
 	, set(Settings::instance())
 {
@@ -49,10 +49,10 @@ QOpenGLInfo::QOpenGLInfo(QObject *parent)
 	m_glInfo.maxTextureStacks = 0;
 }
 
-QOpenGLInfo::~QOpenGLInfo() {
+QGLInfo::~QGLInfo() {
 }
 
-bool QOpenGLInfo::getInfo() {
+bool QGLInfo::getInfo() {
 
     QString str;
 
@@ -124,7 +124,7 @@ bool QOpenGLInfo::getInfo() {
     return true;
 }
 
-bool QOpenGLInfo::isExtensionSupported(const QString &extension) {
+bool QGLInfo::isExtensionSupported(const QString &extension) {
 
     for (int i = 0; i < m_glInfo.extensions.size(); ++i) {
 
@@ -134,7 +134,7 @@ bool QOpenGLInfo::isExtensionSupported(const QString &extension) {
     return false;
 }
 
-void QOpenGLInfo::printSelf() {
+void QGLInfo::printSelf() {
 
     //std::stringstream ss;
 

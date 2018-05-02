@@ -61,13 +61,13 @@ typedef struct _glinfo {
 } t_glinfo;
 
 
-class QOpenGLInfo : public QObject {
+class QGLInfo : public QObject {
 
 	Q_OBJECT
 
 public:
-	QOpenGLInfo(QObject *parent = 0);
-	~QOpenGLInfo();
+	QGLInfo(QObject *parent = 0);
+	~QGLInfo();
 
 	bool getInfo();
     void printSelf();
