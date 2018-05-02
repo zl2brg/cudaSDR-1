@@ -387,6 +387,14 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
 
 	m_avgValue = set->getSpectrumAveragingCnt(m_currentReceiver);
 
+	m_fmSqlevel = new QSlider(Qt::Horizontal, this);
+	m_fmSqlevel->setTickPosition(QSlider::NoTicks);
+	m_fmSqlevel->setFixedSize(130, 12);
+	m_fmSqlevel->setSingleStep(1);
+	m_fmSqlevel->setValue(80);
+	m_fmSqlevel->setRange(1, 100);
+	CHECKED_CONNECT(m_fmSqlevel, SIGNAL(valueChanged(int)), this, SLOT(sqLevelChanged(int)));
+
 	m_avgSlider = new QSlider(Qt::Horizontal, this);
 	m_avgSlider->setTickPosition(QSlider::NoTicks);
 	m_avgSlider->setFixedSize(130, 12);
@@ -403,6 +411,10 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
 	m_avgLevelLabel->setFixedSize(fontMaxWidth, 12);
 	m_avgLevelLabel->setFrameStyle(QFrame::Box | QFrame::Raised);
 	m_avgLevelLabel->setStyleSheet(set->getSliderLabelStyle());
+
+	m_sqlabel = new QLabel("FM Thresh:", this);
+	m_sqlabel->setFrameStyle(QFrame::Box | QFrame::Raised);
+	m_sqlabel->setStyleSheet(set->getLabelStyle());
 
 	m_avgLabel = new QLabel("Avg Filter:", this);
 	m_avgLabel->setFrameStyle(QFrame::Box | QFrame::Raised);
@@ -481,7 +493,14 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
 	hbox5->addWidget(m_fftLabel);
 	hbox5->addWidget(m_fftSizeCombo);
 
-    QVBoxLayout *vbox = new QVBoxLayout;
+	QHBoxLayout* hbox6 = new QHBoxLayout;
+	hbox6->setSpacing(0);
+	hbox6->setMargin(0);
+	hbox6->addWidget(m_sqlabel);
+	hbox6->addWidget(m_fmSqlevel);
+
+
+	QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->setSpacing(6);
 	vbox->addSpacing(6);
 	vbox->addLayout(hbox1);
@@ -489,6 +508,8 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
     vbox->addLayout(hbox3);
     vbox->addLayout(hbox4);
 	vbox->addLayout(hbox5);
+	vbox->addLayout(hbox6);
+
 
 	m_panSpectrumOptions = new QGroupBox(tr("Panadapter Spectrum"), this);
 	m_panSpectrumOptions->setMinimumWidth(m_minimumGroupBoxWidth);
@@ -1138,4 +1159,9 @@ void DisplayOptionsWidget::panDetectorModeChanged(int mode)  {
 void DisplayOptionsWidget::fftSizeChanged(int mode)  {
 
 	set->setfftSize(m_currentReceiver, mode);
+}
+
+void DisplayOptionsWidget::sqLevelChanged(int val) {
+
+	set->setfmsqLevel(m_currentReceiver, val);
 }
