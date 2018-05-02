@@ -533,6 +533,7 @@ typedef struct _receiver {
 	PanAveragingMode    panAvMode;
 	PanDetectorMode     panDetMode;
 	int 				fftsize;
+	int					fmsqLevel;
 
 	QList<long>			lastCenterFrequencyList;
 	QList<long>			lastVfoFrequencyList;
@@ -864,6 +865,7 @@ signals:
     void panAveragingModeChanged(int rx, int mode);
     void panDetectorModeChanged(int rx, int mode);
     void fftSizeChanged(int rx, int size);
+    void fmsqLevelChanged(int rx, int level);
 
 
 	void iqPortChanged(QObject* sender, int rx, int port);
@@ -1317,6 +1319,8 @@ public slots:
 	void setAGCHangTime(QObject *sender, int rx, qreal value);
 	void setRXFilter(QObject* sender, int rx, qreal low, qreal high);
 	void setfftSize(int rx, int size);
+	void setfmsqLevel(int rx, int level);
+
 	// wideband data & options
 	void setWidebandBuffers(QObject *sender, int value);
 	void setWidebandSpectrumBuffer(const qVectorFloat &buffer);

@@ -4870,6 +4870,16 @@ void Settings::setfftSize(int rx, int size) {
 	emit fftSizeChanged(rx,size);
 }
 
+void Settings::setfmsqLevel(int rx, int level){
+
+	if (m_receiverDataList[rx].fmsqLevel == level) return;
+	m_receiverDataList[rx].fmsqLevel = level;
+	qDebug() << "fm sq level set to " << level;
+	emit fmsqLevelChanged(rx,level);
+
+}
+
+
 int Settings::getfftSize(int rx) {
 	return  m_receiverDataList[rx].fftsize;
 }
