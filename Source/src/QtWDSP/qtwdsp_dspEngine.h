@@ -106,6 +106,8 @@ public slots:
     void    setPanAdaptorDetectorMode( int rx, int value);
     void    setPanAdaptorAveragingCnt(QObject*, int rx , int value);
     void 	setfftSize(int rx, int value);
+	void 	setfmsqLevel(int rx, int value);
+
 
 private:
 	Settings*	set;

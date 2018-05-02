@@ -96,7 +96,7 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
     SetDisplayNumAverage(rx, 0, m_display_average);
     SetDisplayDetectorMode(rx,0,m_PanDetMode);
     SetDisplayAverageMode(rx,0,m_PanAvMode);
-
+	SetRXAFMSQRun(rx,1);
     SetChannelState(m_rx,1,0);
 
 
@@ -174,6 +174,13 @@ void QWDSPEngine::setupConnections() {
 			SIGNAL(fftSizeChanged( int , int)),
 			this,
 			SLOT(setfftSize(int, int)));
+
+	CHECKED_CONNECT(
+			set,
+			SIGNAL(fmsqLevelChanged( int , int)),
+			this,
+			SLOT(setfmsqLevel(int, int)));
+
 
 
 //	CHECKED_CONNECT(
@@ -593,4 +600,12 @@ void QWDSPEngine::setfftSize(int rx, int value) {
 
 }
 
+
+void QWDSPEngine::setfmsqLevel(int rx, int value) {
+	if (rx != m_rx) return;
+	double threshold = pow(10.0,-2.0 * value/100.0);
+	WDSP_ENGINE_DEBUG <<  "fmSqLevel set" <<  value;
+	SetRXAFMSQThreshold(m_rx, threshold);
+
+}
 
