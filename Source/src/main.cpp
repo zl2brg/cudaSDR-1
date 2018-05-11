@@ -321,90 +321,9 @@ int main(int argc, char *argv[]) {
 	//*************************************************************************
 	// FFTW wisdom
 
-	QString directory = QDir::currentPath();	
-	QDir currentDir = QDir(directory);
 
-	int err;
-	FILE* wisdomFile;
 	load_WDSPWisdom();
-	qDebug() << "Init::\tcurrent path: " << qPrintable(currentDir.absolutePath());
 
-	if (currentDir.exists("fftw_wisdom")) {
-	
-		qDebug() << "Init::\tfftw_wisdom exists.";
-
-		err = fopen_s(&wisdomFile, "fftw_wisdom", "r");
-		if (err == 0) {
-
-			qDebug() << "Init::\tfound fftw_wisdom - this will be quick!";
-			splash->showMessage(
-				"\n      " +
-				Settings::instance()->getTitleStr() + " " +
-				Settings::instance()->getVersionStr() +
-				QObject::tr(":   found fftw_wisdom - loading .."),
-				Qt::AlignTop | Qt::AlignLeft, Qt::yellow);
-
-			fftw_import_wisdom_from_file(wisdomFile);
-			fclose(wisdomFile);
-		}
-		else {
-
-			qDebug() << "Init::\tfound fftwf_wisdom but could not open.";
-			return -1;
-		}
-
-	}
-	else {
-	
-		qDebug() << "Init::\tfftw_wisdom does not exist - planning FFT...";
-	
-		QString msg = "First time FFT planning. Please be patient, this may take up to 10 min!";
-		mainWindow.showWarningDialog(msg);
-
-		int size = 64;
-		QString str = "planning FFT size %1 ...";
-
-		fftw_complex* cpxbuf;
-		fftw_plan plan_fwd;
-		fftw_plan plan_rev;
-
-		while (size <= MAX_FFTSIZE) {
-		//while (size <= 2048) {
-
-			qDebug() << qPrintable(str.arg(size));
-			splash->showMessage(
-				"\n      " +
-				Settings::instance()->getTitleStr() + " " +
-				Settings::instance()->getVersionStr() +
-				QObject::tr(":   ") + str.arg(size),
-				Qt::AlignTop | Qt::AlignLeft, Qt::yellow);
-
-			cpxbuf = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * size);
-			
-			plan_fwd = fftw_plan_dft_1d(size , cpxbuf, cpxbuf, FFTW_FORWARD, FFTW_PATIENT);
-			fftw_execute(plan_fwd);
-			fftw_destroy_plan(plan_fwd);
-
-			plan_rev = fftw_plan_dft_1d(size, cpxbuf, cpxbuf, FFTW_BACKWARD, FFTW_PATIENT);
-			fftw_execute(plan_rev);
-			fftw_destroy_plan(plan_rev);
-
-			size *= 2;
-		}
-			
-		err = fopen_s(&wisdomFile, "fftw_wisdom", "w");
-		if (err == 0) {
-				
-			qDebug() << "Init::\texporting fftw_wisdom for quick measurement.";
-			fftw_export_wisdom_to_file(wisdomFile);
-			qDebug() << "Init::\texported fftw_wisdom.";
-			fclose(wisdomFile);
-		}
-		else {
-
-			qDebug() << "Init::\tcould not write fftw_wisdom.";
-		}
-	}
 
     //app.processEvents();
 
