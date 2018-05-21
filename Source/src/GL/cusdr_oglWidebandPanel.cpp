@@ -76,6 +76,7 @@ QGLWidebandPanel::QGLWidebandPanel(QWidget *parent)
 
 	//setAutoBufferSwap(true);
 	setAutoFillBackground(false);
+    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
 	
 	setMouseTracking(true);
 	//setFocusPolicy(Qt::StrongFocus);
@@ -160,9 +161,6 @@ QGLWidebandPanel::QGLWidebandPanel(QWidget *parent)
 QGLWidebandPanel::~QGLWidebandPanel() {
 
 	disconnect(set, 0, this, 0);
-	
-	makeCurrent();
-	glFinish();
 
 	while (!specAv_queue.isEmpty())
 		specAv_queue.dequeue();
@@ -289,6 +287,8 @@ void QGLWidebandPanel::setupConnections() {
 void QGLWidebandPanel::initializeGL() {
 
 	if (!isValid()) return;
+
+    initializeOpenGLFunctions();
 
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -422,18 +422,18 @@ void QGLWidebandPanel::drawSpectrum() {
 	// draw background
 	if (m_dataEngineState == QSDR::DataEngineUp) {
 
-//		glBegin(GL_TRIANGLE_STRIP);
-//			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x1, y1, -4.0); // top left corner
-//			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x2, y1, -4.0); // top right corner
-//			glColor3f(0.8f * m_bkgRed, 0.8f * m_bkgGreen, 0.8f * m_bkgBlue); glVertex3f(x1, y2, -4.0); // bottom left corner
-//			glColor3f(       m_bkgRed,        m_bkgGreen,        m_bkgBlue); glVertex3f(x2, y2, -4.0); // bottom right corner
-//		glEnd();
 		glBegin(GL_TRIANGLE_STRIP);
-			glColor3f(0.8f * m_bkgRed, 0.8f * m_bkgGreen, 0.8f * m_bkgBlue); glVertex3f(x1, y1, -4.0); // top left corner
-			glColor3f(0.6f * m_bkgRed, 0.6f * m_bkgGreen, 0.6f * m_bkgBlue); glVertex3f(x2, y1, -4.0); // top right corner
-			glColor3f(0.4f * m_bkgRed, 0.4f * m_bkgGreen, 0.4f * m_bkgBlue); glVertex3f(x1, y2, -4.0); // bottom left corner
-			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x2, y2, -4.0); // bottom right corner
+			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x1, y1, -4.0); // top left corner
+			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x2, y1, -4.0); // top right corner
+			glColor3f(0.8f * m_bkgRed, 0.8f * m_bkgGreen, 0.8f * m_bkgBlue); glVertex3f(x1, y2, -4.0); // bottom left corner
+			glColor3f(       m_bkgRed,        m_bkgGreen,        m_bkgBlue); glVertex3f(x2, y2, -4.0); // bottom right corner
 		glEnd();
+//		glBegin(GL_TRIANGLE_STRIP);
+//			glColor3f(0.8f * m_bkgRed, 0.8f * m_bkgGreen, 0.8f * m_bkgBlue); glVertex3f(x1, y1, -4.0); // top left corner
+//			glColor3f(0.6f * m_bkgRed, 0.6f * m_bkgGreen, 0.6f * m_bkgBlue); glVertex3f(x2, y1, -4.0); // top right corner
+//			glColor3f(0.4f * m_bkgRed, 0.4f * m_bkgGreen, 0.4f * m_bkgBlue); glVertex3f(x1, y2, -4.0); // bottom left corner
+//			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x2, y2, -4.0); // bottom right corner
+//		glEnd();
 	}
 	else {
 

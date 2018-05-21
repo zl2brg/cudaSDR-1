@@ -226,23 +226,23 @@ void RadioWidget::setupConnections() {
 
 void RadioWidget::createBandBtnGroup() {
 
-    band2200mBtn = new AeroButton("2200m", this);
-    band2200mBtn->setRoundness(0);
-    //band2200mBtn->setGlass(false);
-    band2200mBtn->setFixedSize(btn_widths, btn_height);
-    band2200mBtn->setStyleSheet(set->getMiniButtonStyle());
-    //band2200mBtn->setTextColor(QColor(200, 200, 200));
-    bandBtnList.append(band2200mBtn);
-    CHECKED_CONNECT(band2200mBtn, SIGNAL(clicked()), this, SLOT(bandChangedByBtn()));
+	band2200mBtn = new AeroButton("2200m", this);
+	band2200mBtn->setRoundness(0);
+	//band2200mBtn->setGlass(false);
+	band2200mBtn->setFixedSize(btn_widths, btn_height);
+	band2200mBtn->setStyleSheet(set->getMiniButtonStyle());
+	//band2200mBtn->setTextColor(QColor(200, 200, 200));
+	bandBtnList.append(band2200mBtn);
+	CHECKED_CONNECT(band2200mBtn, SIGNAL(clicked()), this, SLOT(bandChangedByBtn()));
 
-    band630mBtn = new AeroButton("630 m", this);
-    band630mBtn->setRoundness(0);
-    //band630Btn->setGlass(false);
-    band630mBtn->setFixedSize(btn_widths, btn_height);
-    band630mBtn->setStyleSheet(set->getMiniButtonStyle());
-    //band630Btn->setTextColor(QColor(200, 200, 200));
-    bandBtnList.append(band630mBtn);
-    CHECKED_CONNECT(band630mBtn, SIGNAL(clicked()), this, SLOT(bandChangedByBtn()));
+	band630mBtn = new AeroButton("630 m", this);
+	band630mBtn->setRoundness(0);
+	//band630Btn->setGlass(false);
+	band630mBtn->setFixedSize(btn_widths, btn_height);
+	band630mBtn->setStyleSheet(set->getMiniButtonStyle());
+	//band630Btn->setTextColor(QColor(200, 200, 200));
+	bandBtnList.append(band630mBtn);
+	CHECKED_CONNECT(band630mBtn, SIGNAL(clicked()), this, SLOT(bandChangedByBtn()));
 
 	band160mBtn = new AeroButton("160 m", this);
 	band160mBtn->setRoundness(0);
@@ -425,33 +425,33 @@ void RadioWidget::createBandBtnGroup() {
 	layout->setVerticalSpacing(1);
 	layout->setHorizontalSpacing(1);
 	layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(band2200mBtn, 0, 0);
-    layout->addWidget(band630mBtn, 0, 1);
-    layout->addWidget(band160mBtn, 0, 2);
-    layout->addWidget(band80mBtn, 0, 3);
-    layout->addWidget(band60mBtn, 0, 4);
-    layout->addWidget(band40mBtn, 0, 5);
-    layout->addWidget(band30mBtn, 1, 0);
-    layout->addWidget(band20mBtn, 1, 1);
-    layout->addWidget(band17mBtn, 1, 2);
-    layout->addWidget(band15mBtn, 1, 3);
-    layout->addWidget(band12mBtn, 1, 4);
-    layout->addWidget(band10mBtn, 1, 5);
-    layout->addWidget(band6mBtn,  2, 0);
-    layout->addWidget(band2mBtn,  2, 1);
-    layout->addWidget(band125cmBtn,  2, 2);
-    layout->addWidget(band70cmBtn,  2, 3);
-    layout->addWidget(band33cmBtn,  2, 4);
-    layout->addWidget(band23cmBtn,  2, 5);
-    layout->addWidget(band13cmBtn,  3, 0);
-    layout->addWidget(band10cmBtn,  3, 1);
-    layout->addWidget(band5cmBtn,  3, 2);
-    layout->addWidget(bandGenBtn, 3, 3);
+	layout->addWidget(band2200mBtn, 0, 0);
+	layout->addWidget(band630mBtn, 0, 1);
+	layout->addWidget(band160mBtn, 0, 2);
+	layout->addWidget(band80mBtn, 0, 3);
+	layout->addWidget(band60mBtn, 0, 4);
+	layout->addWidget(band40mBtn, 0, 5);
+	layout->addWidget(band30mBtn, 1, 0);
+	layout->addWidget(band20mBtn, 1, 1);
+	layout->addWidget(band17mBtn, 1, 2);
+	layout->addWidget(band15mBtn, 1, 3);
+	layout->addWidget(band12mBtn, 1, 4);
+	layout->addWidget(band10mBtn, 1, 5);
+	layout->addWidget(band6mBtn,  2, 0);
+	layout->addWidget(band2mBtn,  2, 1);
+	layout->addWidget(band125cmBtn,  2, 2);
+	layout->addWidget(band70cmBtn,  2, 3);
+	layout->addWidget(band33cmBtn,  2, 4);
+	layout->addWidget(band23cmBtn,  2, 5);
+	layout->addWidget(band13cmBtn,  3, 0);
+	layout->addWidget(band10cmBtn,  3, 1);
+	layout->addWidget(band5cmBtn,  3, 2);
+	layout->addWidget(bandGenBtn, 3, 3);
 	//layout->addWidget(bandxxBtn, 2, 3);
 
 	QHBoxLayout *hbox1 = new QHBoxLayout();
 	hbox1->setSpacing(4);
-    hbox1->addStretch(10);
+	hbox1->addStretch(10);
 	hbox1->addLayout(layout);
 
 	QVBoxLayout *vbox = new QVBoxLayout;
@@ -1153,9 +1153,9 @@ QGroupBox *RadioWidget::mercuryBtnGroup() {
 
 QLabel *RadioWidget::createLabel(const QString &text) {
 
-    QLabel *label = new QLabel(text, this);
-    label->setFrameStyle(QFrame::Box | QFrame::Raised);
-    return label;
+	QLabel *label = new QLabel(text, this);
+	label->setFrameStyle(QFrame::Box | QFrame::Raised);
+	return label;
 }
 
  
@@ -1202,71 +1202,71 @@ void RadioWidget::bandChangedByBtn() {
 
 	QString str = button->text();
 
-    if (str == "2200m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m2200));
-    else
-    if (str == "630 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m630));
-    else
-    if (str == "160 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m160));
+	if (str == "2200m")
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m2200));
+	else
+	if (str == "630 m")
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m630));
+	else
+	if (str == "160 m")
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m160));
 	else
 	if (str == "80 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m80));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m80));
 	else
 	if (str == "60 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m60));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m60));
 	else
 	if (str == "40 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m40));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m40));
 	else
 	if (str == "30 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m30));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m30));
 	else
 	if (str == "20 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m20));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m20));
 	else
 	if (str == "17 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m17));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m17));
 	else
 	if (str == "15 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m15));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m15));
 	else
 	if (str == "12 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m12));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m12));
 	else
 	if (str == "10 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m10));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m10));
 	else
 	if (str == "6 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m6));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m6));
 	else
 	if (str == "2 m")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m2));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(m2));
 	else
 	if (str == "125 cm")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm125));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm125));
 	else
 	if (str == "70 cm")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm70));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm70));
 	else
 	if (str == "33 cm")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm33));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm33));
 	else
 	if (str == "23 cm")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm23));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm23));
 	else
 	if (str == "13 cm")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm13));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm13));
 	else
 	if (str == "10 cm")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm10));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm10));
 	else
 	if (str == "5 cm")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm5));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(cm5));
 	else
 	if (str == "Gen")
-        set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(gen));
+		set->setVFOFrequency(this, 2, m_currentRx, m_lastVfoFrequencyList.at(gen));
 
 }
 

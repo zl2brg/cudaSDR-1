@@ -107,6 +107,15 @@ public slots:
     void    setPanAdaptorAveragingCnt(QObject*, int rx , int value);
     void 	setfftSize(int rx, int value);
 	void 	setfmsqLevel(int rx, int value);
+	void 	setFilterMode(int rx);
+	void 	setNoiseBlankerMode(int rx, int nb);
+	void 	setNoiseFilterMode(int rx, int nr);
+	void    setNrAGC(int rx , int value);
+    void    setNr2GainMethod(int rx , int value);
+    void    setNr2NpeMethod(int rx , int value);
+    void    setNr2Ae(int rx , bool value);
+
+
 
 
 private:
@@ -144,15 +153,20 @@ private:
    	qreal   m_agcAttackTime;
    	qreal   m_agcDecayTime;
    	DSPMode	m_dspmode;
-	qreal	m_NcoFreq;
-	qreal	m_NcoInc;
-	qreal	m_NcoTime;
-	qreal	m_CWoffset;
-	qreal	m_OscCos;
-	qreal	m_OscSin;
-	//qreal	m_calOffset;
+   	int 	m_nb;
+   	int 	m_nb2;
+	int 	m_nr;
+	int 	m_nr2;
+	int 	m_anf;
+	int 	m_snb;
+	int     m_nr_agc;
+	int     m_nr2_ae;
+    int     m_nr2_npe_method;
+    int     m_nr2_gain_method;
 
-	void	ProcessFrequencyShift(CPX &in, CPX &out, int size);
+
+
+    void	ProcessFrequencyShift(CPX &in, CPX &out, int size);
 	void	setupConnections();
 
 

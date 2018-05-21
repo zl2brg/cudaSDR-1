@@ -693,7 +693,7 @@ void Receiver::setFilterFrequencies(QObject *sender, int rx, double low, double 
 
 		if (qtwdsp) {
 
-			qtwdsp->setFilter((float)low, (float)high);
+			qtwdsp->setFilter(low, high);
 		}
 	}
 }

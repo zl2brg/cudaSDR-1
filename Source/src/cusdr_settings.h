@@ -578,6 +578,16 @@ typedef struct _receiver {
 	int		waterfallOffsetHi;
 	int		averagingCnt;
 	int		fftFactor;
+	int		nr;
+    int     nr_agc;
+    int		nbMode;
+    int     nr2_gain_method;
+    int     nr2_npe_method;
+    bool     nr2_ae;
+	bool	anf;
+	bool	snb;
+
+
 
 } TReceiver;
 
@@ -943,8 +953,19 @@ signals:
 	void dBmScaleMinChanged(int rx, qreal value);
 	void dBmScaleMaxChanged(int rx, qreal value);
     void agcMaximumGainChanged(QObject *sender,int, qreal value);
+    void noiseBlankerChanged(int rx, int mode);
+	void noiseFilterChanged(int rx, int mode);
+    void nr2GainMethodChanged(int rx, int value);
+    void nr2NpeMethodChanged(int rx, int value);
+    void nrAgcChanged(int rx, int value);
+    void nr2AeChanged(int rx, bool value);
+    void snbChanged(int rx, bool value);
+    void anfChanged(int rx, bool value);
 
-	void showRadioPopupChanged(bool value);
+
+
+
+    void showRadioPopupChanged(bool value);
 
 	void receiverDataReady();
 
@@ -1116,6 +1137,16 @@ public:
 	int		getAGCHangLeveldB(int rx);
     qreal   getAGCSlope(int rx);
     int 	getfftSize(int rx);
+    int     getNrAGC(int rx);
+    int     getNr2GainMethod(int rx);
+    int     getNr2NpeMethod(int rx);
+    bool    getNr2ae(int rx);
+    bool    getSnb(int rx);
+    bool    getAnf(int rx);
+    int     getnbMode(int rx);
+    int     getnrMode(int rx);
+
+
 
 
     int		getLowerChirpFreq()				{ return m_lowerChirpFreq; }
@@ -1392,6 +1423,16 @@ public slots:
 	void setWaterfallOffesetHi(int rx, int value);
 	void setPanAveragingMode(int rx,PanAveragingMode mode);
     void setPanDetectorMode(int rx,PanDetectorMode mode);
+    void setNoiseBlankerMode(int rx, int nb);
+	void setNoiseFilterMode(int rx, int nr);
+	void setNR2GainMethod(int rx, int value);
+    void setNR2NpeMethod(int rx, int value);
+    void setNRAgc(int rx, int value);
+    void setNR2Ae(int rx, bool value);
+    void setAnf(int rx, bool value);
+    void setSnb(int rx, bool value);
+
+
 
 
     void setSMeterHoldTime(int value);

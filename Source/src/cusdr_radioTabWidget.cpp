@@ -49,16 +49,20 @@ RadioTabWidget::RadioTabWidget(QWidget *parent)
 	, m_minimumGroupBoxWidth(set->getMinimumGroupBoxWidth())
 {
 	setStyleSheet(set->getTabWidgetStyle());
-	setContentsMargins(4, 4, 4, 0);
+    setContentsMargins(4, 4, 4, 0);
 	setMouseTracking(true);
 	
 	m_radioWidget = new RadioWidget(this);
-	m_agcWidget = new AGCOptionsWidget(this);
-	m_transmitTabWidget = new TransmitTabWidget(this);
+    m_agcWidget = new AGCOptionsWidget(this);
+    m_transmitTabWidget = new TransmitTabWidget(this);
+    m_noiseFilterWidget = new NoiseFilterWidget(this);
 
-	this->addTab(m_radioWidget, "  General ");
-	this->addTab(m_agcWidget, " AGC ");
-	this->addTab(m_transmitTabWidget, " Tx Ctrl ");
+
+    this->addTab(m_radioWidget, "  General ");
+    this->addTab(m_agcWidget, " AGC ");
+    this->addTab(m_noiseFilterWidget, " Noise Filter ");
+
+//	this->addTab(m_transmitTabWidget, " Tx Ctrl ");
 
 	if (!set->getPenelopePresence() && !set->getPennyLanePresence() && (set->getHWInterface() != QSDR::Hermes)) {
 
@@ -66,6 +70,7 @@ RadioTabWidget::RadioTabWidget(QWidget *parent)
 	}
 
 	setupConnections();
+    QTabWidget::setCurrentIndex(2);
 }
 
 RadioTabWidget::~RadioTabWidget() {

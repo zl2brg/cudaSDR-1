@@ -703,7 +703,50 @@ int Settings::loadSettings() {
 			//SETTINGS_DEBUG << "DSP core for rx " << i << " is QtDSP.";
 		}
 
+
+
 		cstr = m_rxStringList.at(i);
+		cstr.append("/nr");
+		value = settings->value(cstr, 1).toInt();
+		m_receiverDataList[i].nr =  value;
+
+		cstr = m_rxStringList.at(i);
+		cstr.append("/nbMode");
+		value = settings->value(cstr, 1).toInt();
+		m_receiverDataList[i].nbMode =  value;
+
+
+		cstr = m_rxStringList.at(i);
+		cstr.append("/anf");
+		value = settings->value(cstr, 1).toBool();
+		m_receiverDataList[i].anf =  value;
+
+		cstr = m_rxStringList.at(i);
+		cstr.append("/snb");
+		value = settings->value(cstr, 1).toBool();
+		m_receiverDataList[i].snb =  value;
+
+        cstr = m_rxStringList.at(i);
+        cstr.append("/nr2_gain_method");
+        value = settings->value(cstr, 1).toInt();
+        m_receiverDataList[i].nr2_gain_method =  value;
+
+        cstr = m_rxStringList.at(i);
+        cstr.append("/nr2_npe_method");
+        value = settings->value(cstr, 1).toInt();
+        m_receiverDataList[i].nr2_npe_method =  value;
+
+        cstr = m_rxStringList.at(i);
+        cstr.append("/nr_agc");
+        value = settings->value(cstr, 1).toInt();
+        m_receiverDataList[i].nr_agc =  value;
+
+        cstr = m_rxStringList.at(i);
+        cstr.append("/nr2_ae");
+        value = settings->value(cstr, 1).toBool();
+        m_receiverDataList[i].nr2_ae =  value;
+
+        cstr = m_rxStringList.at(i);
 		cstr.append("/fftSize");
 
 		value = settings->value(cstr, 1).toInt();
@@ -1824,6 +1867,39 @@ int Settings::saveSettings() {
 
 		if (m_receiverDataList[i].dspCore == QSDR::QtDSP)
 			settings->setValue(str, "qtdsp");
+
+        str = m_rxStringList.at(i);
+        str.append("/nr_agc");
+        settings->setValue(str, (int)(m_receiverDataList[i].nr_agc));
+
+        str = m_rxStringList.at(i);
+        str.append("/nr2_gain_method");
+        settings->setValue(str, (int)(m_receiverDataList[i].nr2_gain_method));
+
+        str = m_rxStringList.at(i);
+        str.append("/nr2_npe_method");
+        settings->setValue(str, (int)(m_receiverDataList[i].nr2_npe_method));
+
+        str = m_rxStringList.at(i);
+        str.append("/nr2_ae");
+        settings->setValue(str, (bool)(m_receiverDataList[i].nr2_ae));
+
+        str = m_rxStringList.at(i);
+        str.append("/nr");
+        settings->setValue(str, (int)(m_receiverDataList[i].nr));
+
+        str = m_rxStringList.at(i);
+        str.append("/nbMode");
+        settings->setValue(str, (int)(m_receiverDataList[i].nbMode));
+
+		str = m_rxStringList.at(i);
+		str.append("/anf");
+		settings->setValue(str, (bool)(m_receiverDataList[i].anf));
+
+		str = m_rxStringList.at(i);
+		str.append("/snb");
+		settings->setValue(str, (bool)(m_receiverDataList[i].snb));
+
 
 		str = m_rxStringList.at(i);
 		str.append("/fftSize");
@@ -4882,4 +4958,92 @@ void Settings::setfmsqLevel(int rx, int level){
 
 int Settings::getfftSize(int rx) {
 	return  m_receiverDataList[rx].fftsize;
+}
+
+int Settings::getNrAGC(int rx) {
+    return  m_receiverDataList[rx].nr_agc;
+}
+
+
+int Settings::getNr2GainMethod(int rx) {
+    return  m_receiverDataList[rx].nr2_gain_method;
+}
+
+int Settings::getNr2NpeMethod(int rx) {
+    return  m_receiverDataList[rx].nr2_npe_method;
+}
+
+bool Settings::getSnb(int rx) {
+    return  m_receiverDataList[rx].snb;
+}
+
+bool Settings::getAnf(int rx) {
+    return  m_receiverDataList[rx].anf;
+}
+
+bool Settings::getNr2ae(int rx) {
+	return  m_receiverDataList[rx].nr2_ae;
+}
+
+
+int Settings::getnbMode(int rx) {
+    return  m_receiverDataList[rx].nbMode;
+}
+
+int Settings::getnrMode(int rx) {
+    return  m_receiverDataList[rx].nr;
+}
+
+
+
+void Settings::setNoiseBlankerMode(int rx, int nb) {
+	if (m_receiverDataList[rx].nbMode == nb) return;
+	m_receiverDataList[rx].nbMode  = nb;
+	emit (noiseBlankerChanged(rx, nb));
+}
+
+
+void Settings::setNoiseFilterMode(int rx, int nr) {
+	if (m_receiverDataList[rx].nr == nr) return;
+	m_receiverDataList[rx].nr  = nr;
+	emit (noiseFilterChanged(rx, nr));
+}
+
+void Settings::setNR2Ae(int rx, bool value) {
+    if (m_receiverDataList[rx].nr2_ae == value) return;
+    m_receiverDataList[rx].nr2_ae = value;
+    emit(nr2AeChanged(rx, value));
+}
+
+void Settings::setNR2GainMethod(int rx, int value) {
+    if (m_receiverDataList[rx].nr2_gain_method == value) return;
+    m_receiverDataList[rx].nr2_gain_method = value;
+    emit(nr2GainMethodChanged(rx, value));
+}
+
+void Settings::setNR2NpeMethod(int rx, int value) {
+    if (m_receiverDataList[rx].nr2_npe_method == value) return;
+    m_receiverDataList[rx].nr2_npe_method = value;
+    emit(nr2NpeMethodChanged(rx, value));
+}
+
+void Settings::setNRAgc(int rx, int value) {
+	if (m_receiverDataList[rx].nr_agc == value) return;
+	m_receiverDataList[rx].nr_agc = value;
+	emit(nrAgcChanged(rx, value));
+}
+
+
+
+void Settings::setSnb(int rx, bool value) {
+	if (m_receiverDataList[rx].snb == value) return;
+	m_receiverDataList[rx].snb = value;
+	emit(snbChanged(rx, value));
+}
+
+
+void Settings::setAnf(int rx, bool value) {
+	if (m_receiverDataList[rx].anf == value) return;
+	m_receiverDataList[rx].anf = value;
+	emit(anfChanged(rx, value));
 }

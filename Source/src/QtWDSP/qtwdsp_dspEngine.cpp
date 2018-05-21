@@ -63,8 +63,13 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
 	m_agcHangThreshold = set->getAGCHangThreshold(m_rx);
 	spectrumBuffer.resize(BUFFER_SIZE*4);
 	m_fftSize = getfftVal(set->getfftSize(m_rx));
+	m_nr_agc = set->getNrAGC(m_rx);
+    m_nr2_ae = set->getNr2ae(m_rx);
+    m_nr2_gain_method = set->getNr2GainMethod(m_rx);
+    m_nr2_npe_method = set->getNr2NpeMethod(m_rx);
 
-	setNCOFrequency(m_rx, m_rxData.vfoFrequency - m_rxData.ctrFrequency);
+
+    setNCOFrequency(m_rx, m_rxData.vfoFrequency - m_rxData.ctrFrequency);
 	WDSP_ENGINE_DEBUG << "init DSPEngine with size: " << m_size;
 	SleeperThread::msleep(100);
 
@@ -80,7 +85,10 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
                 0, // receive
                 0, // run
                 0.010, 0.025, 0.0, 0.010, 0);
-
+	SetRXAEMNRgainMethod(m_rx,m_nr2_gain_method);
+	SetRXAEMNRPosition(m_rx,m_nr_agc);
+	SetRXAEMNRnpeMethod(m_rx,m_nr2_npe_method);
+	SetRXAEMNRaeRun(m_rx, m_nr2_ae);
     SetRXAFMDeviation(m_rx, (double)8000.0);
 	SetRXAMode(m_rx, FMN);
 	RXASetNC(m_rx,4096);
@@ -98,10 +106,6 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
     SetDisplayAverageMode(rx,0,m_PanAvMode);
 	SetRXAFMSQRun(rx,1);
     SetChannelState(m_rx,1,0);
-
-
-
-
 }
 
 
@@ -180,6 +184,42 @@ void QWDSPEngine::setupConnections() {
 			SIGNAL(fmsqLevelChanged( int , int)),
 			this,
 			SLOT(setfmsqLevel(int, int)));
+
+	CHECKED_CONNECT(
+			set,
+			SIGNAL(noiseBlankerChanged( int , int)),
+			this,
+			SLOT(setNoiseBlankerMode(int, int )));
+
+	CHECKED_CONNECT(
+			set,
+			SIGNAL(noiseFilterChanged( int , int)),
+			this,
+			SLOT(setNoiseFilterMode(int, int )));
+
+    CHECKED_CONNECT(
+            set,
+            SIGNAL(nr2AeChanged(int, bool)),
+            this,
+            SLOT(setNr2Ae(int, bool )));
+
+    CHECKED_CONNECT(
+            set,
+            SIGNAL(nr2NpeMethodChanged(int, int)),
+            this,
+            SLOT(setNr2NpeMethod(int, int )));
+
+    CHECKED_CONNECT(
+            set,
+            SIGNAL(nr2GainMethodChanged(int, int)),
+            this,
+            SLOT(setNr2GainMethod(int, int )));
+
+    CHECKED_CONNECT(
+            set,
+            SIGNAL(nrAgcChanged(int, int)),
+            this,
+            SLOT(setNrAGC(int, int )));
 
 
 
@@ -609,3 +649,47 @@ void QWDSPEngine::setfmsqLevel(int rx, int value) {
 
 }
 
+void QWDSPEngine::setFilterMode(int rx) {
+
+ 	SetEXTANBRun(rx, m_nb);
+ 	SetEXTNOBRun(rx, m_nb2);
+  	SetRXAANRRun(rx, m_nr);
+  	SetRXAEMNRRun(rx, m_nr2);
+  	SetRXAANFRun(rx, m_anf);
+  	SetRXASNBARun(rx, m_snb);
+
+
+}
+
+void QWDSPEngine::setNoiseBlankerMode(int rx, int nb) {
+    if (rx != m_rx) return;
+	m_nb = nb;
+	setFilterMode(rx);
+}
+
+
+void QWDSPEngine::setNoiseFilterMode(int rx, int nr) {
+    if (rx != m_rx) return;
+	m_nr2= nr;
+	setFilterMode(rx);
+}
+
+void QWDSPEngine::setNr2Ae(int rx, bool value) {
+    if (rx != m_rx) return;
+    SetRXAEMNRaeRun(m_rx, value);
+}
+
+void QWDSPEngine::setNr2GainMethod(int rx, int value) {
+    if (rx != m_rx) return;
+    SetRXAEMNRgainMethod(m_rx,value);
+}
+
+void QWDSPEngine::setNr2NpeMethod(int rx, int value) {
+    if (rx != m_rx) return;
+    SetRXAEMNRnpeMethod(m_rx,value);
+}
+
+void QWDSPEngine::setNrAGC(int rx, int value) {
+    if (rx != m_rx) return;
+    SetRXAEMNRPosition(m_rx,value);
+}

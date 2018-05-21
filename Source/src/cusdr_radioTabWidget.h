@@ -38,7 +38,7 @@
 #include "cusdr_radioWidget.h"
 #include "cusdr_agcWidget.h"
 #include "cusdr_transmitTabWidget.h"
-
+#include "noisefilterwidget.h"
 
 class RadioTabWidget : public QTabWidget {
 
@@ -75,6 +75,7 @@ private:
 	RadioWidget			*m_radioWidget;
 	AGCOptionsWidget	*m_agcWidget;
 	TransmitTabWidget	*m_transmitTabWidget;
+	NoiseFilterWidget	*m_noiseFilterWidget;
 
 	int		m_minimumWidgetWidth;
 	int		m_minimumGroupBoxWidth;

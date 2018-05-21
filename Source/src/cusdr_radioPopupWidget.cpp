@@ -933,10 +933,24 @@ void RadioPopupWidget::createAgcBtnGroup() {
 	hbox2->addWidget(showAGCLines);
 	hbox2->addStretch();
 
+
+
+	QHBoxLayout* hbox3 = new QHBoxLayout();
+	hbox3->setContentsMargins(0, 0, 0, 0);
+	hbox3->setSpacing(0);
+	QCheckBox* anf = new QCheckBox();
+	anf->setText("ANF");
+	hbox3->addWidget(anf);
+	hbox2->addStretch();
+
+
 	agcVBox = new QVBoxLayout;
 	agcVBox->setSpacing(1);
 	agcVBox->addLayout(hbox1);
 	agcVBox->addLayout(hbox2);
+	agcVBox->addLayout(hbox3);
+
+
 }
 
 void RadioPopupWidget::createFilterBtnWidgetA() {

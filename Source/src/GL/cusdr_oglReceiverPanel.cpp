@@ -273,9 +273,6 @@ QGLReceiverPanel::~QGLReceiverPanel() {
 
 	disconnect(set, 0, this, 0);
 	
-//	makeCurrent();
-//	glFinish();
-
 	if (m_frequencyScaleFBO) {
 
 		delete m_frequencyScaleFBO;

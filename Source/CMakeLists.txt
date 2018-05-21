@@ -28,6 +28,7 @@ SET(GL_DIR ${CMAKE_SOURCE_DIR}/GL)
 SET(QTDSP_DIR ${CMAKE_SOURCE_DIR}/QtDSP)
 SET(UTIL_DIR ${CMAKE_SOURCE_DIR}/Utility_source)
 SET(QTWDSP_DIR ${CMAKE_SOURCE_DIR}/QtWDSP)
+SET(UI_DIR ${CMAKE_SOURCE_DIR}/UI)
 
 set (SOURCES
         ${CMAKE_SOURCE_DIR}/Util/cusdr_buttons.cpp 
@@ -96,13 +97,15 @@ set (SOURCES
 	${CMAKE_SOURCE_DIR}/main.cpp 
     ${CMAKE_SOURCE_DIR}/Util/cusdr_cpuUsage_unix.cpp
     ${CMAKE_SOURCE_DIR}/QtWDSP/qtwdsp_dspEngine.cpp
-)
+#	${CMAKE_SOURCE_DIR}cusdr_NoiseFilterWidget.cpp
+	${CMAKE_SOURCE_DIR}/UI/noisefilterwidget.cpp
+	)
 
 
 
     
 set (HEADERS 
-        ${CMAKE_SOURCE_DIR}/Util/cusdr_buttons.h 
+    ${CMAKE_SOURCE_DIR}/Util/cusdr_buttons.h
 	${CMAKE_SOURCE_DIR}/Util/cusdr_colorTriangle.h 
 	${CMAKE_SOURCE_DIR}/Util/cusdr_highResTimer.h 
 	${CMAKE_SOURCE_DIR}/Util/cusdr_image.h 
@@ -176,10 +179,17 @@ set (HEADERS
 	${CMAKE_SOURCE_DIR}/cusdr_transmitPAWidget.h 
     ${CMAKE_SOURCE_DIR}/Util/cusdr_cpuUsage_unix.h
     ${CMAKE_SOURCE_DIR}/QtWDSP/qtwdsp_dspEngine.h
-    
-
+	#${CMAKE_SOURCE_DIR}cusdr_NoiseFilterWidget.h
+	${CMAKE_SOURCE_DIR}/UI/noisefilterwidget.h
 )
-   
+
+
+
+set(UI_SOURCES
+		${CMAKE_SOURCE_DIR}/UI/noisefilterwidget.ui
+		)
+
+
 add_definitions( ${QT_DEFINITIONS} )
 include_directories( ${CMAKE_BINARY_DIR} )
 include_directories( ${Qt5Widgets_INCLUDE_DIRS})
@@ -191,12 +201,14 @@ include_directories( ${Qt5Gui_INCLUDE_DIRS})
 #include_directories( ${QT5OpenGL_INCLUDE_DIRS})
 include_directories( ${OpenGL_INCLUDE_DIR})
 include_directories( ${DATAENGINE_DIR})
+include_directories( ${UI_DIR})
+#include_directories( ${AUTOGEN_BUILD_DIR})
 
+#qt5_wrap_ui(UI_GENERATED_HEADERS ${UI_SOURCES})
 
-#message (STATUS " " ${SOURCES})
-#message (STATUS " " ${all_HDRS})
+ADD_EXECUTABLE(cudasdr ${SOURCES} ${HEADERS} res/cusdr.qrc ${UI_SOURCES} )
+#ADD_EXECUTABLE(cudasdr ${SOURCES} ${HEADERS} res/cusdr.qrc )
 
-ADD_EXECUTABLE(cudasdr ${SOURCES} ${HEADERS} res/cusdr.qrc )
 qt5_use_modules(cudasdr Core Gui Widgets OpenGL)
 target_link_libraries(cudasdr Qt5::Widgets Qt5::Network Qt5::Multimedia GL fftw3 pulse-simple pulse asound wdsp)
 set_target_properties(cudasdr PROPERTIES LINKER_LANGUAGE CXX)
