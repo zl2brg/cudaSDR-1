@@ -16,8 +16,6 @@ NoiseFilterWidget::NoiseFilterWidget(QWidget *parent) :
     setContentsMargins(4, 0, 4, 0);
 
     ui->setupUi(this);
-    return;
-    /*
     ui->snbCheckBox->setStyleSheet(set->getLabelStyle());
     ui->anfCheckBox->setStyleSheet(set->getLabelStyle());
     ui->anfCheckBox->setFont(QFont("Arial", 8));
@@ -63,8 +61,8 @@ NoiseFilterWidget::NoiseFilterWidget(QWidget *parent) :
     ui->preAGCRadioButton->setStyleSheet(set->getLabelStyle());
 
 
-    ui->frame->setFrameStyle(1);
-    */
+//    ui->frame->setFrameStyle(1);
+
 }
 
 NoiseFilterWidget::~NoiseFilterWidget()
