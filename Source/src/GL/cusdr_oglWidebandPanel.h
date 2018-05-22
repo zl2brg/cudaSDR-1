@@ -42,6 +42,9 @@
 //#include <QtOpenGL/QOpenGLWidget>
 //#include <QGLFramebufferObject>
 
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+
 #ifdef LOG_WBGRAPHICS
 #   define WBGRAPHICS_DEBUG qDebug().nospace() << "WB-Graphics::\t"
 #else
@@ -49,7 +52,7 @@
 #endif
 
 
-class QGLWidebandPanel : public QOpenGLWidget {
+class QGLWidebandPanel : public QOpenGLWidget, protected QOpenGLFunctions{
 
     Q_OBJECT
 

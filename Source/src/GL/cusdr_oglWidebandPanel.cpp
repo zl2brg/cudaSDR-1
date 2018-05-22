@@ -288,7 +288,7 @@ void QGLWidebandPanel::initializeGL() {
 
 	if (!isValid()) return;
 
-    initializeOpenGLFunctions();
+	initializeOpenGLFunctions();
 
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
