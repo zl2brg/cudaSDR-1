@@ -48,18 +48,20 @@ NoiseFilterWidget::NoiseFilterWidget(QWidget *parent) :
     ui->nr2GainComboBox->setFont(QFont("Arial", 8));
     ui->nr2GainComboBox->setStyleSheet(set->getComboBoxStyle());
 
-    ui->mmseRadioButton->setFont(QFont("Arial", 8));
-    ui->mmseRadioButton->setStyleSheet(set->getLabelStyle());
+    ui->mmseCheckBox->setFont(QFont("Arial", 8));
+    ui->mmseCheckBox->setStyleSheet(set->getLabelStyle());
 
-    ui->omsRadioButton->setFont(QFont("Arial", 8));
-    ui->omsRadioButton->setStyleSheet(set->getWidgetStyle());
+    ui->omsCheckBox->setFont(QFont("Arial", 8));
+    ui->omsCheckBox->setStyleSheet(set->getLabelStyle());
 
-    ui->postAGCRadioButton->setFont(QFont("Arial", 8));
-    ui->postAGCRadioButton->setStyleSheet(set->getLabelStyle());
+    ui->postAGCCheckBox->setFont(QFont("Arial", 8));
+    ui->postAGCCheckBox->setStyleSheet(set->getLabelStyle());
 
-    ui->preAGCRadioButton->setFont(QFont("Arial", 8));
-    ui->preAGCRadioButton->setStyleSheet(set->getLabelStyle());
+    ui->preAGCCheckBox->setFont(QFont("Arial", 8));
+    ui->preAGCCheckBox->setStyleSheet(set->getLabelStyle());
 
+    ui->nr2aeCheckBox->setFont(QFont("Arial", 8));
+    ui->nr2aeCheckBox->setStyleSheet(set->getLabelStyle());
 
 //    ui->frame->setFrameStyle(1);
 
