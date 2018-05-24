@@ -179,22 +179,28 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="preAGCRadioButton">
+       <widget class="QCheckBox" name="preAGCCheckBox">
         <property name="layoutDirection">
          <enum>Qt::RightToLeft</enum>
         </property>
         <property name="text">
          <string>PreAGC</string>
         </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="postAGCRadioButton">
+       <widget class="QCheckBox" name="postAGCCheckBox">
         <property name="layoutDirection">
          <enum>Qt::RightToLeft</enum>
         </property>
         <property name="text">
          <string>PostAGC</string>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -218,22 +224,31 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="mmseRadioButton">
+       <widget class="QCheckBox" name="mmseCheckBox">
         <property name="layoutDirection">
          <enum>Qt::RightToLeft</enum>
         </property>
         <property name="text">
          <string>MMSE</string>
         </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="omsRadioButton">
+       <widget class="QCheckBox" name="omsCheckBox">
         <property name="layoutDirection">
          <enum>Qt::RightToLeft</enum>
         </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
         <property name="text">
          <string>OMS</string>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
