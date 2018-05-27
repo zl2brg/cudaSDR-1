@@ -16,7 +16,7 @@ class NoiseFilterWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit NoiseFilterWidget(QWidget *parent = 0);
+    NoiseFilterWidget(QWidget *parent = 0);
     ~NoiseFilterWidget();
 
 private:
@@ -27,11 +27,11 @@ private:
     QSDR::_DataEngineState		m_dataEngineState;
 
     QList<TReceiver>	m_rxDataList;
-
+    void        getSettings();
     CFonts		*fonts;
     TFonts		m_fonts;
 
-
+    int     m_rx;
     int		m_minimumWidgetWidth;
     int		m_minimumGroupBoxWidth;
     int		m_btnSpacing;
@@ -52,6 +52,22 @@ private slots:
             QSDR::_DataEngineState state);
 
     void	setCurrentReceiver(QObject *sender, int rx);
+    void    nfModeChanged(int value);
+    void    nbModeChanged(int value);
+    void    nr2GainChanged(int value);
+    void    agcProcChanged(int value);
+    void    snbChanged(bool value);
+    void    anfChanged(bool value);
+    void    nr2aeChanged(bool value);
+    void    omsChanged(bool value);
+    void    mmseChanged(bool value);
+    void    preAgcChanged(bool value);
+    void    postAgcChanged(bool nalue);
+    void    npeModeChanged(int value);
+
+
+
+
 
 
 public slots:

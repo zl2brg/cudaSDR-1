@@ -79,7 +79,7 @@ Settings::Settings(QObject *parent)
 		m_titleString = "cudaSDR Debug BETA ";
 	#endif
 
-	m_versionString = "v0.3.2.13+";
+	m_versionString = "v0.3.2.14 - ZL2BRG";
 	
 	qDebug() << qPrintable(m_titleString);
 
@@ -2526,6 +2526,10 @@ QString Settings::getFrameStyle() {
 QString Settings::getTabWidgetStyle() {
 
 	return tabWidgetStyle;
+}
+
+QString Settings::getRadioButtonStyle() {
+	return radioButtonStyle;
 }
 
 //QString Settings::getNewSliderStyle() {

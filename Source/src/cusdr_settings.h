@@ -1037,6 +1037,7 @@ public:
 	QString getSplitterStyle();
 	QString getFrameStyle();
 	QString getTabWidgetStyle();
+	QString getRadioButtonStyle();
 	//QString getNewSliderStyle();
 
 

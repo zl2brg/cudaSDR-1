@@ -202,12 +202,10 @@ include_directories( ${Qt5Gui_INCLUDE_DIRS})
 include_directories( ${OpenGL_INCLUDE_DIR})
 include_directories( ${DATAENGINE_DIR})
 include_directories( ${UI_DIR})
-#include_directories( ${AUTOGEN_BUILD_DIR})
+include_directories( ${AUTOGEN_BUILD_DIR})
 
-#qt5_wrap_ui(UI_GENERATED_HEADERS ${UI_SOURCES})
 
 ADD_EXECUTABLE(cudasdr ${SOURCES} ${HEADERS} res/cusdr.qrc ${UI_SOURCES} )
-#ADD_EXECUTABLE(cudasdr ${SOURCES} ${HEADERS} res/cusdr.qrc )
 
 qt5_use_modules(cudasdr Core Gui Widgets OpenGL)
 target_link_libraries(cudasdr Qt5::Widgets Qt5::Network Qt5::Multimedia GL fftw3 pulse-simple pulse asound wdsp)

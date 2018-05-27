@@ -163,6 +163,8 @@ private:
 	int     m_nr2_ae;
     int     m_nr2_npe_method;
     int     m_nr2_gain_method;
+    int     m_nbMode;
+    int     m_nrMode;
 
 
 

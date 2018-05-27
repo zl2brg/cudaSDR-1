@@ -67,8 +67,8 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
     m_nr2_ae = set->getNr2ae(m_rx);
     m_nr2_gain_method = set->getNr2GainMethod(m_rx);
     m_nr2_npe_method = set->getNr2NpeMethod(m_rx);
-
-
+    m_nbMode = set->getnbMode(m_rx);
+	m_nrMode = set->getnrMode(m_rx);
     setNCOFrequency(m_rx, m_rxData.vfoFrequency - m_rxData.ctrFrequency);
 	WDSP_ENGINE_DEBUG << "init DSPEngine with size: " << m_size;
 	SleeperThread::msleep(100);
@@ -85,10 +85,15 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
                 0, // receive
                 0, // run
                 0.010, 0.025, 0.0, 0.010, 0);
-	SetRXAEMNRgainMethod(m_rx,m_nr2_gain_method);
-	SetRXAEMNRPosition(m_rx,m_nr_agc);
-	SetRXAEMNRnpeMethod(m_rx,m_nr2_npe_method);
-	SetRXAEMNRaeRun(m_rx, m_nr2_ae);
+
+	create_anbEXT(m_rx,1,size,m_samplerate,0.0001,0.0001,0.0001,0.05,20);
+	create_nobEXT(m_rx,1,0,size,m_samplerate,0.0001,0.0001,0.0001,0.05,20);
+	fprintf(stderr,"RXASetNC %d\n",m_fftSize);
+	RXASetNC(m_rx, m_fftSize);
+
+	setFilterMode(m_rx);
+//	fprintf(stderr,"RXASetMP %d\n",rx->low_latency);
+//	RXASetMP(rx->id, rx->low_latency);
     SetRXAFMDeviation(m_rx, (double)8000.0);
 	SetRXAMode(m_rx, FMN);
 	RXASetNC(m_rx,4096);
@@ -650,27 +655,66 @@ void QWDSPEngine::setfmsqLevel(int rx, int value) {
 }
 
 void QWDSPEngine::setFilterMode(int rx) {
+    if (rx != m_rx) return;
+	switch (m_nbMode) {
+		case 0:
+			m_nb = m_nb2 = 0;
+			break;
+		case 1:
+			m_nb = 1;
+			m_nb2 = 0;
+			break;
+		case 2:
+			m_nb = 0;
+			m_nb2 = 1;
+			break;
 
- 	SetEXTANBRun(rx, m_nb);
+		default:
+			WDSP_ENGINE_DEBUG << "invalid nb mode" << m_nbMode;
+			break;
+	}
+
+	switch (m_nrMode) {
+
+		case 0:
+			m_nr = m_nr2 = 0;
+			break;
+		case 1:
+			m_nr = 1;
+			m_nr2 = 0;
+			break;
+		case 2:
+			m_nr = 0;
+			m_nr2 = 1;
+			break;
+
+		default:
+			WDSP_ENGINE_DEBUG <<  "invalid nr mode" <<  m_nrMode;
+			break;
+	}
+
+	SetEXTANBRun(rx, m_nb);
  	SetEXTNOBRun(rx, m_nb2);
   	SetRXAANRRun(rx, m_nr);
   	SetRXAEMNRRun(rx, m_nr2);
   	SetRXAANFRun(rx, m_anf);
   	SetRXASNBARun(rx, m_snb);
-
-
+    WDSP_ENGINE_DEBUG <<  "nb mode" <<  m_nb;
+    WDSP_ENGINE_DEBUG <<  "nf mode" <<  m_nr;
+    WDSP_ENGINE_DEBUG <<  "anf mode" <<  m_anf;
+    WDSP_ENGINE_DEBUG <<  "snb mode" <<  m_anf;
 }
 
 void QWDSPEngine::setNoiseBlankerMode(int rx, int nb) {
-    if (rx != m_rx) return;
-	m_nb = nb;
+	if (rx != m_rx) return;
+	m_nbMode = nb;
+	WDSP_ENGINE_DEBUG << "nb mode" << nb;
 	setFilterMode(rx);
 }
 
 
 void QWDSPEngine::setNoiseFilterMode(int rx, int nr) {
-    if (rx != m_rx) return;
-	m_nr2= nr;
+	m_nrMode = nr;
 	setFilterMode(rx);
 }
 
