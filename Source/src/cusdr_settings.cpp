@@ -2528,14 +2528,16 @@ QString Settings::getTabWidgetStyle() {
 	return tabWidgetStyle;
 }
 
-QString Settings::getRadioButtonStyle() {
-	return radioButtonStyle;
-}
-
 //QString Settings::getNewSliderStyle() {
 //
 //	return m_newSliderStyle;
 //}
+
+QString Settings::getCheckBoxStyle()  {
+
+	return checkboxStyle;
+}
+
 
 
 //*******************************************************

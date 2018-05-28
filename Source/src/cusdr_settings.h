@@ -1040,6 +1040,8 @@ public:
 	QString getRadioButtonStyle();
 	//QString getNewSliderStyle();
 
+    QString getCheckBoxStyle();
+
 
 	QString getServerAddr();
 	QString getHPSDRDeviceLocalAddr();

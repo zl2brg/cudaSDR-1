@@ -27,8 +27,8 @@ NoiseFilterWidget::NoiseFilterWidget(QWidget *parent)
 {
     setContentsMargins(4, 0, 4, 0);
     ui->setupUi(this);
-    ui->snbCheckBox->setStyleSheet(set->getLabelStyle());
-    ui->anfCheckBox->setStyleSheet(set->getLabelStyle());
+    ui->snbCheckBox->setStyleSheet(set->getCheckBoxStyle());
+    ui->anfCheckBox->setStyleSheet(set->getCheckBoxStyle());
     ui->anfCheckBox->setFont(QFont("Arial", 8));
 
     ui->label->setFrameStyle(QFrame::Box | QFrame::Raised);
@@ -60,19 +60,19 @@ NoiseFilterWidget::NoiseFilterWidget(QWidget *parent)
     ui->nr2GainComboBox->setStyleSheet(set->getComboBoxStyle());
 
     ui->mmseCheckBox->setFont(QFont("Arial", 8));
-    ui->mmseCheckBox->setStyleSheet(set->getLabelStyle());
+    ui->mmseCheckBox->setStyleSheet(set->getCheckBoxStyle());
 
     ui->omsCheckBox->setFont(QFont("Arial", 8));
-    ui->omsCheckBox->setStyleSheet(set->getLabelStyle());
+    ui->omsCheckBox->setStyleSheet(set->getCheckBoxStyle());
 
     ui->postAGCCheckBox->setFont(QFont("Arial", 8));
-    ui->postAGCCheckBox->setStyleSheet(set->getLabelStyle());
+    ui->postAGCCheckBox->setStyleSheet(set->getCheckBoxStyle());
 
     ui->preAGCCheckBox->setFont(QFont("Arial", 8));
-    ui->preAGCCheckBox->setStyleSheet(set->getLabelStyle());
+    ui->preAGCCheckBox->setStyleSheet(set->getCheckBoxStyle());
 
     ui->nr2aeCheckBox->setFont(QFont("Arial", 8));
-    ui->nr2aeCheckBox->setStyleSheet(set->getLabelStyle());
+    ui->nr2aeCheckBox->setStyleSheet(set->getCheckBoxStyle());
     setupConnections();
     getSettings();
 //    ui->frame->setFrameStyle(1);
