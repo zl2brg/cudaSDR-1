@@ -1195,6 +1195,9 @@ public:
 
 	QMutex 		debugMutex;
 
+	void getConfigPath();
+    QString         cfg_dir;
+
 public slots:
 	void	setMainPower(QObject *sender, bool power);
 	void	setDefaultSkin(QObject *sender, bool value);

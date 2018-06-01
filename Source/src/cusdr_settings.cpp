@@ -27,6 +27,7 @@
 
 #define LOG_SETTINGS
 
+#include <QStandardPaths>
 #include "cusdr_settings.h"
 #include "Util/cusdr_styles.h"
 
@@ -72,7 +73,7 @@ Settings::Settings(QObject *parent)
 
 	settingsFilename = "settings.ini";
 	settings = new QSettings(QCoreApplication::applicationDirPath() +  "/" + settingsFilename, QSettings::IniFormat);
-
+    getConfigPath();
 	m_titleString = "cudaSDR BETA";
 
 	#ifdef DEBUG
@@ -751,8 +752,6 @@ int Settings::loadSettings() {
 
 		value = settings->value(cstr, 1).toInt();
 		m_receiverDataList[i].fftsize =  value;
-		qDebug() << "load fft size" << value;
-
 
         cstr = m_rxStringList.at(i);
         cstr.append("/PanAverageMode");
@@ -1912,8 +1911,6 @@ int Settings::saveSettings() {
         str = m_rxStringList.at(i);
         str.append("/PanDetectorMode");
         settings->setValue(str, (int)(m_receiverDataList[i].panDetMode));
-        qDebug() << "save pan det mode" << m_receiverDataList[i].panDetMode;
-
 
         str = m_rxStringList.at(i);
 		str.append("/freqRulerPosition");
@@ -2624,55 +2621,55 @@ QString	Settings::getErrorString(QSDR::_Error err) {
 	QString str;
 	switch (err) {
 
-		case 0:
+	    case QSDR::_Error ::NoError:
 			str = "No error";
 			break;
 
-		case 1:
+		case QSDR::_Error ::NotImplemented:
 			str = "Not implemented";
 			break;
 
-		case 2:
+		case QSDR::_Error ::HwIOError:
 			str = "Hardware IO error";
 			break;
 
-		case 3:
+		case QSDR::_Error ::ServerModeError:
 			str = "Server mode error";
 			break;
 
-		case 4:
+		case QSDR::_Error ::OpenError:
 			str = "open device error";
 			break;
 
-		case 5:
+		case QSDR::_Error ::DataReceiverThreadError:
 			str = "dataReceiverThread error";
 			break;
 
-		case 6:
+		case QSDR::_Error ::DataProcessThreadError:
 			str = "dataProcessThread error";
 			break;
 
-		case 7:
+		case QSDR::_Error ::WideBandDataProcessThreadError:
 			str = "widebandDataProcessThread error";
 			break;
 
-		case 8:
+		case QSDR::_Error ::AudioThreadError:
 			str = "audioThread error";
 			break;
 
-		case 9:
+		case QSDR::_Error ::ChirpDataProcessThreadError:
 			str = "ChirpDataProcessThread error";
 			break;
 
-		case 10:
+		case QSDR::_Error ::UnderrunError:
 			str = "underrun error";
 			break;
 
-		case 11:
+		case QSDR::_Error ::FirmwareError:
 			str = "firmware error";
 			break;
 
-		case 12:
+		case QSDR::_Error ::FatalError:
 			str = "fatal error";
 			break;
 	}
@@ -2684,11 +2681,11 @@ QString	Settings::getHDataEngineStateString(QSDR::_DataEngineState mode) {
 	QString str;
 	switch (mode) {
 
-		case 0:
+	    case QSDR::_DataEngineState::DataEngineDown:
 			str = "down";
 			break;
 
-		case 1:
+	    case QSDR::_DataEngineState::DataEngineUp:
 			str = "up";
 			break;
 	}
@@ -2728,15 +2725,15 @@ QString	Settings::getHWInterfaceModeString(QSDR::_HWInterfaceMode mode) {
 	QString str;
 	switch (mode) {
 
-		case 0:
+		case QSDR::_HWInterfaceMode::NoInterfaceMode:
 			str = "no interface";
 			break;
 
-		case 1:
+		case QSDR::_HWInterfaceMode::Metis:
 			str = "Metis";
 			break;
 
-		case 2:
+		case QSDR::_HWInterfaceMode::Hermes:
 			str = "Hermes";
 			break;
 	}
@@ -4934,9 +4931,7 @@ void Settings::setPanDetectorMode(int rx , PanDetectorMode mode) {
 
     qDebug() << "Pan detector mode set to " <<  m_receiverDataList[rx].panDetMode;
 
-
     emit panDetectorModeChanged(rx,mode);
-
 };
 
 
@@ -5053,3 +5048,18 @@ void Settings::setAnf(int rx, bool value) {
 	m_receiverDataList[rx].anf = value;
 	emit(anfChanged(rx, value));
 }
+
+
+void Settings::getConfigPath() {
+	cfg_dir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation).append("/.cudaSDR");
+	qDebug() <<"cfg dir " << cfg_dir;
+
+	QDir dir(cfg_dir);
+	if (!dir.exists()) {
+	    dir.mkpath(".'");
+        qDebug() <<"cfg dir does not exist - creating" << cfg_dir;
+
+    }
+	qDebug() << cfg_dir;
+}
+

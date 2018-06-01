@@ -28,6 +28,7 @@
 #include "cusdr_settings.h"
 
 
+
 #if defined(Q_OS_WIN32)
 	#include "Util/cusdr_cpuUsage.h"
 #elif defined(Q_OS_LINUX)
@@ -92,22 +93,19 @@ void cuSDRMessageHandler(QtMsgType type, const QMessageLogContext &context, cons
     ts << txt << endl << flush;
 }
 
+
 void load_WDSPWisdom() {
-	QString directory = QDir::currentPath();
-	QDir currentDir = QDir(directory);
-	QString wisdompath = currentDir.absoluteFilePath("wdsp_wisdom");
 
-	qDebug() <<"wisdom path name" << currentDir.absoluteFilePath("wdsp_wisdom");
-
-	qDebug() << "Init::\tcurrent path: " << qPrintable(currentDir.absolutePath());
-
-	if (currentDir.exists("wdsp_wisdom")) {
+	if (QDir(Settings::instance()->cfg_dir.append("/wdspwisdom")).exists()) {
 
 		qDebug() << "Init::\twdsp_wisdom exists, initialisation should be quick";
 	} else {
 		qDebug() << "Init::\twdsp_wisdom does not exist - -- needs to be generated";
 	}
-	WDSPwisdom( wisdompath.toLocal8Bit().data());
+
+    qDebug() << "Init::\twdsp_wisdom " << Settings::instance()->cfg_dir.toLocal8Bit().data();
+
+	WDSPwisdom(Settings::instance()->cfg_dir.toLocal8Bit().data());
 }
 
 
@@ -122,6 +120,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     Settings::instance(&app);
+
 
     app.setApplicationName(Settings::instance()->getTitleStr());
     app.setApplicationVersion(Settings::instance()->getVersionStr());
@@ -319,26 +318,12 @@ int main(int argc, char *argv[]) {
     SleeperThread::msleep(300);
 	
 	//*************************************************************************
-	// FFTW wisdom
-
 
 	load_WDSPWisdom();
-
-
-    //app.processEvents();
 
     mainWindow.show();
     app.processEvents();
 
-	/*splash_fade_timer.restart();
-	while (splash_transparency > 0)
-	{
-		splash_transparency = 1 - (float)splash_fade_timer.elapsed() / 300;
-		if (splash_transparency < 0) splash_transparency = 0;
-		if (splash_transparency > 1) splash_transparency = 1;
-		splash->setWindowOpacity(splash_transparency);
-		splash->repaint();
-	}*/
     splash->hide();
 
 	delete splash;
