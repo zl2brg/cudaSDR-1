@@ -56,8 +56,7 @@ set (SOURCES
 	${CMAKE_SOURCE_DIR}/DataEngine/soundout.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.cpp 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_demodulation.cpp 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_dspEngine.cpp 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_dualModeAverager.cpp 
+	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_dualModeAverager.cpp
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_fft.cpp 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_filter.cpp 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_powerSpectrum.cpp 
@@ -136,8 +135,7 @@ set (HEADERS
 	${CMAKE_SOURCE_DIR}/DataEngine/datatypes.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/fftw3.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_demodulation.h 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_dspEngine.h 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_dualModeAverager.h 
+	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_dualModeAverager.h
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_fft.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_filter.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_powerSpectrum.h 
