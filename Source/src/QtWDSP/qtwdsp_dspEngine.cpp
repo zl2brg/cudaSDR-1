@@ -346,15 +346,18 @@ void QWDSPEngine::setAGCMode(AGCMode agc) {
 
 }
 
-void QWDSPEngine::setAGCAttackTime(int value) {
+void QWDSPEngine::setAGCAttackTime(int rx, int value) {
+    if (m_rx != rx) return;
 	m_agcAttackTime = value;
 }
 
-void QWDSPEngine::setAGCDecayTime(int value) {
+void QWDSPEngine::setAGCDecayTime(int rx, int value) {
+    if (m_rx != rx) return;
 	m_agcDecayTime = value;
 }
 
-void QWDSPEngine::setAGCSlope(int value) {
+void QWDSPEngine::setAGCSlope(int rx, int value) {
+    if (m_rx != rx) return;
 	m_agcSlope = value;
 }
 
@@ -366,12 +369,10 @@ void QWDSPEngine::setAGCMaximumGain(qreal value) {
 	emit setAGCLineValues(m_rx);
 }
 
-void QWDSPEngine::setAGCHangThreshold(int value) {
-
-	m_agcHangThreshold = value;
+void QWDSPEngine::setAGCHangThreshold(int rx, double value) {
+    if (m_rx != rx) return;
+	m_agcHangLevel = value;
    	WDSP_ENGINE_DEBUG << "Set AGC Hang Threshold " << value;
-
-
 }
 
 void QWDSPEngine::setAGCLineValues(int rx) {

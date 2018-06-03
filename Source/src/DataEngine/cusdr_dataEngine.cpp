@@ -427,7 +427,7 @@ bool DataEngine::startDataEngineWithoutConnection() {
 					return false;
 				}
 		
-				m_chirpDspEngine = new QDSPEngine(this, 0, 2*BUFFER_SIZE);
+				m_chirpDspEngine = new QWDSPEngine(this, 0, 2*BUFFER_SIZE);
 
 				cpxIn.resize(2*BUFFER_SIZE);
 				cpxOut.resize(2*BUFFER_SIZE);
@@ -1199,9 +1199,9 @@ bool DataEngine::initReceivers(int rcvrs) {
 
 			CHECKED_CONNECT(
 				rx,
-				SIGNAL(sMeterValueChanged(int, float)),
+				SIGNAL(sMeterValueChanged(int, double)),
 				set,
-				SLOT(setSMeterValue(int, float)));
+				SLOT(setSMeterValue(int, double)));
 
 			/*CHECKED_CONNECT(
 				rx,
@@ -2041,7 +2041,7 @@ void DataEngine::processFileBuffer(const QList<qreal> buffer) {
 
 	if (m_rxSamples == 2*BUFFER_SIZE) {
 
-		m_chirpDspEngine->fft->DoFFTWForward(cpxIn, cpxOut, 2*BUFFER_SIZE);
+	//	m_chirpDspEngine->fft->DoFFTWForward(cpxIn, cpxOut, 2*BUFFER_SIZE);
 
 		// reorder the spectrum buffer
 		for (int i = 0; i < BUFFER_SIZE; i++) {

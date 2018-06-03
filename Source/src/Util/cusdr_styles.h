@@ -436,4 +436,15 @@ QString	tabWidgetStyle = QString::fromUtf8(
 		"}"
 	);
 
+QString	checkboxStyle = QString::fromUtf8(
+        "color: rgba(166, 196, 208, 255);"
+"QCheckBox {"
+"spacing: 5px;"
+"}"
+"QCheckBox::indicator {"
+"width: 13px;"
+"height: 13px;"
+"}"
+);
+
 #endif // CUSDR_STYLES_H

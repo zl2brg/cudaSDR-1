@@ -1,6 +1,6 @@
 
 /**
-* @file  qtdsp_dspEngine.h
+* @file  qtwdsp_dspEngine.h
 * @brief header file for QtDSP
 * @author Hermann von Hasseln, DL3HVH
 * @version 0.1
@@ -30,7 +30,7 @@
 #ifndef _QTWDSP_DSP_ENGINE_H
 #define _QTWDSP_DSP_ENGINE_H
 
-#define AGCOFFSET -18.0//-63.0
+#define AGCOFFSET (-18.0)//-63.0
 
 //#include <QObject>
 //#include <QThread>
@@ -56,8 +56,8 @@ extern "C" {
 #   define WDSP_ENGINE_DEBUG nullDebug()
 #endif
 
-#define min(x,y) (x<y?x:y)
-#define max(x,y) (x<y?y:x)
+#define min(X,Y) ((X) < (Y) ?  (X) : (Y))
+#define max(X,Y) ((X) < (Y) ?  (Y) : (X))
 
 
 class QWDSPEngine : public QObject {
@@ -65,11 +65,11 @@ class QWDSPEngine : public QObject {
 	Q_OBJECT
 
 public:
-	QWDSPEngine(QObject* parent = 0, int rx = 0, int size = 0);
-	~QWDSPEngine();
+	explicit QWDSPEngine(QObject* parent = nullptr, int rx = 0, int size = 0);
+    ~QWDSPEngine() override;
 
 
-	void	processDSP(CPX &in, CPX &out,  int size);
+	void processDSP(CPX &in, CPX &out);
 
 	double	getSMeterInstValue();
     void    init_analyzer(int refreshrate);
@@ -91,16 +91,16 @@ public slots:
 	void setAGCMode(AGCMode mode);
     void setFilter(double  low,double high);
 	void	setAGCMaximumGain(qreal);
-	void	setAGCHangThreshold(qreal);
+	void setAGCHangThreshold(int rx, double);
 	//void	setAGCHangLeveldBLine(qreal value);
 	//void	setAGCThresholdLine(QObject *sender, int rx, qreal value);
-	void	setAGCLineValues(QObject *sender, int rx);
+    void setAGCLineValues(int rx);
 	void 	setAGCThreshold( double threshold);
 	void	setAGCHangTime(int hang);
 	void 	setAGCHangLevel(double level);
-	void    setAGCAttackTime(qreal value);
-    void    setAGCDecayTime(qreal value);
-    void    setAGCSlope(qreal value);
+	void setAGCAttackTime(int rx, int value);
+    void setAGCDecayTime(int rx, int value);
+    void setAGCSlope(int rx, int value);
     void 	setFramesPerSecond(QObject* sender, int rx, int value);
 	void    setPanAdaptorAveragingMode( int rx, int value);
     void    setPanAdaptorDetectorMode( int rx, int value);
@@ -114,6 +114,8 @@ public slots:
     void    setNr2GainMethod(int rx , int value);
     void    setNr2NpeMethod(int rx , int value);
     void    setNr2Ae(int rx , bool value);
+    void    setanf(int rx, bool value);
+    void    setsnb(int rx, bool value);
 
 
 
@@ -126,7 +128,6 @@ private:
 	QList<PowerSpectrum* >	powerSpectraList;
 	CPX		tmp1CPX;
 	CPX		tmp2CPX;
-	cpx		osc1cpx;
 
 
 	QMutex	m_mutex;
@@ -148,10 +149,11 @@ private:
    	float	m_volume;
    	int     m_agcSlope;
    	qreal   m_agcThreshold;
-   	qreal   m_agcHangThreshold;
-   	qreal   m_agcMaximumGain;
-   	qreal   m_agcAttackTime;
-   	qreal   m_agcDecayTime;
+   	int     m_agcHangThreshold;
+   	double  m_agcHangLevel;
+   	double   m_agcMaximumGain;
+   	int     m_agcAttackTime;
+   	int     m_agcDecayTime;
    	DSPMode	m_dspmode;
    	int 	m_nb;
    	int 	m_nb2;
@@ -168,7 +170,7 @@ private:
 
 
 
-    void	ProcessFrequencyShift(CPX &in, CPX &out, int size);
+    void ProcessFrequencyShift(CPX &in, CPX &out);
 	void	setupConnections();
 
 

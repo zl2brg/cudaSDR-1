@@ -50,7 +50,7 @@ Receiver::Receiver(int rx)
 	setAudioBufferSize();
 	newSpectrum.resize(BUFFER_SIZE*4);
 
-	qtwdsp = 0;
+	qtwdsp = nullptr;
 
 	setupConnections();
 
@@ -67,7 +67,7 @@ Receiver::~Receiver() {
 	if (qtwdsp) {
 
 		delete qtwdsp;
-		qtwdsp = 0;
+		qtwdsp = nullptr;
 	}
 
 	m_stopped = false;
@@ -268,7 +268,7 @@ bool Receiver::initQtWDSPInterface() {
     else {
 
         RECEIVER_DEBUG << "could not start QWtDSP for receiver: " << m_receiver;
-        qtwdsp = 0;
+        qtwdsp = nullptr;
         return false;
     }
 
@@ -298,7 +298,7 @@ void Receiver::deleteQtWDSP() {
 	if (qtwdsp) {
 
 		delete qtwdsp;
-		qtwdsp = 0;
+		qtwdsp = nullptr;
 	}
 }
 
@@ -323,20 +323,16 @@ void Receiver::stop() {
 void Receiver::dspProcessing() {
 
 	//RECEIVER_DEBUG << "dspProcessing: " << this->thread();
-	qtwdsp->processDSP(inBuf, audioOutputBuf, BUFFER_SIZE);
+    qtwdsp->processDSP(inBuf, audioOutputBuf);
 	// spectrum
 
 	if (highResTimer->getElapsedTimeInMicroSec() >= getDisplayDelay()) {
-		if (1)
-		{
-			memcpy(
+		memcpy(
 					newSpectrum.data(),
 					qtwdsp->spectrumBuffer.data(),
 					4096 * sizeof(float)
 			);
 			emit spectrumBufferChanged(m_receiver, newSpectrum);
-
-		}
 		highResTimer->start();
 	}
 
@@ -588,7 +584,7 @@ void Receiver::setAGCHangThreshold(QObject *sender, int rx, int value) {
 	if (qtwdsp) {
 
 		RECEIVER_DEBUG << "m_agcHangThreshold =" << m_agcHangThreshold/100.0;
-		qtwdsp->setAGCHangThreshold(m_agcHangThreshold/100.0);
+		qtwdsp->setAGCHangThreshold(m_receiver, m_agcHangThreshold / 100.0);
 	}
 }
 
@@ -620,7 +616,7 @@ void Receiver::setAGCSlope_dB(QObject *sender, int rx, qreal value) {
 	if (qtwdsp) {
 
 		RECEIVER_DEBUG << "m_agcSlope = " << m_agcSlope;
-		qtwdsp->setAGCSlope(m_agcSlope);
+		qtwdsp->setAGCSlope(m_receiver, m_agcSlope);
 	}
 }
 
@@ -632,7 +628,7 @@ void Receiver::setAGCAttackTime(QObject *sender, int rx, qreal value) {
 	if (m_agcAttackTime == value) return;
 
 	m_agcAttackTime = value;
-	qtwdsp->setAGCAttackTime(value);
+	qtwdsp->setAGCAttackTime(m_receiver, value);
 	RECEIVER_DEBUG << "m_agcAttackTime = " << m_agcAttackTime;
 }
 
@@ -641,10 +637,9 @@ void Receiver::setAGCDecayTime(QObject *sender, int rx, qreal value) {
 
         Q_UNUSED(sender)
 
-	if (m_receiver != rx) return;
 	if (m_agcDecayTime == value) return;
 	m_agcDecayTime = value;
-	qtwdsp->setAGCDecayTime(value);
+	qtwdsp->setAGCDecayTime(m_receiver, value);
 	RECEIVER_DEBUG << "m_agcDecayTime = " << m_agcDecayTime;
 }
 

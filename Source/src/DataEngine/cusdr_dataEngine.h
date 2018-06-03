@@ -91,8 +91,8 @@ class DataEngine : public QObject {
 	Q_OBJECT
 
 public:
-	DataEngine(QObject* parent = 0);
-	~DataEngine();
+	explicit DataEngine(QObject* parent = nullptr);
+	~DataEngine() override;
 
 	Settings*			set;
 	THPSDRParameter		io;
@@ -194,7 +194,7 @@ private:
 private:
 	DataProcessor*			m_dataProcessor;
 	WideBandDataProcessor*	m_wbDataProcessor;
-	QDSPEngine*				m_chirpDspEngine;
+	QWDSPEngine*				m_chirpDspEngine;
 	AudioReceiver*			m_audioReceiver;
 	AudioEngine*			m_audioEngine;
 	AudioOutProcessor*		m_audioOutProcessor;
@@ -349,12 +349,12 @@ class DataProcessor : public QObject {
     Q_OBJECT
 
 public:
-	DataProcessor(
-		DataEngine* de = 0, 
+	explicit DataProcessor(
+		DataEngine* de = nullptr,
 		QSDR::_ServerMode serverMode = QSDR::NoServerMode,
 		QSDR::_HWInterfaceMode hwMode = QSDR::NoInterfaceMode);
 
-	~DataProcessor();
+	~DataProcessor() override;
 
 public slots:
 	void	stop();
@@ -447,8 +447,8 @@ class AudioOutProcessor : public QObject {
     Q_OBJECT
 
 public:
-	AudioOutProcessor(DataEngine* de = 0, QSDR::_ServerMode serverMode = QSDR::NoServerMode);
-	~AudioOutProcessor();
+	AudioOutProcessor(DataEngine* de = nullptr, QSDR::_ServerMode serverMode = QSDR::NoServerMode);
+	~AudioOutProcessor() override;
 
 public slots:
 	void	stop();
@@ -492,8 +492,8 @@ class WideBandDataProcessor : public QObject {
     Q_OBJECT
 
 public:
-	WideBandDataProcessor(THPSDRParameter *ioData = 0, QSDR::_ServerMode serverMode = QSDR::NoServerMode, int size = 0);
-	~WideBandDataProcessor();
+	explicit WideBandDataProcessor(THPSDRParameter *ioData = 0, QSDR::_ServerMode serverMode = QSDR::NoServerMode, int size = 0);
+	~WideBandDataProcessor() override;
 
 public slots:
 	void	stop();

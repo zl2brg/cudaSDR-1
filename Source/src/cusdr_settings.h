@@ -548,7 +548,7 @@ typedef struct _receiver {
 	qreal	filterHi;
 	qreal	acgGain;
 	qreal	acgThreshold_dB;
-	qreal	agcHangThreshold;
+	int		agcHangThreshold;
 	qreal	agcHangLevel;
 	int 	agcMaximumGain_dB;
 	qreal	agcAttackTime;
@@ -748,7 +748,7 @@ signals:
 	void cpuLoadChanged(short load);
 	void txAllowedChanged(QObject* sender, bool value);
 	void multiRxViewChanged(int view);
-	void sMeterValueChanged(int rx, float value);
+	void sMeterValueChanged(int rx, double value);
 	void spectrumBufferChanged(int rx, const qVectorFloat& buffer);
 	void postSpectrumBufferChanged(int rx, const float* buffer);
 
@@ -1115,7 +1115,7 @@ public:
 	AGCMode getAGCMode(int rx);
 	QString getADCModeString(int rx);
 	QString getAGCModeString(int rx);
-	int		getAGCGain(int rx);
+	qreal getAGCGain(int rx);
 	int getAGCMaximumGain_dB(int rx);
 	qreal	getAGCFixedGain_dB(int rx);
 	int		getAGCHangThreshold(int rx);
@@ -1211,7 +1211,7 @@ public slots:
 
 	void setTxAllowed(QObject* sender, bool value);
 	void setMultiRxView(int view);
-	void setSMeterValue(int rx, float value);
+	void setSMeterValue(int rx, double value);
 	void setSpectrumBuffer(int rx, const qVectorFloat &buffer);
 	void setPostSpectrumBuffer(int rx, const float*);
 	void setSampleSize(QObject* sender, int rx, int size);

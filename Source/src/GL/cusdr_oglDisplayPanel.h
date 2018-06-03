@@ -333,7 +333,7 @@ private slots:
 
 	void	setMouseWheelFreqStep(QObject *sender, int rx, qreal value);
 
-	void	setSMeterValue(int rx, float value);
+	void	setSMeterValue(int rx, double value);
 	void	setSMeterHoldTime(int value);
 	void	updateSyncStatus();
 	void	updateADCStatus();

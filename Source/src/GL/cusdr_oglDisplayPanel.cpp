@@ -31,7 +31,7 @@
 //#include <QtGui>
 //#include <QDebug>
 //#include <QFileInfo>
-//#include <QTimer>
+//#include <QTimer>SetRXAAGCHangLevel
 //#include <QImage>
 //#include <QString>
 //#include <QOpenGLFramebufferObject>
@@ -342,9 +342,9 @@ void OGLDisplayPanel::setupConnections() {
 
 	CHECKED_CONNECT(
 		set,
-		SIGNAL(sMeterValueChanged(int, float)),
+		SIGNAL(sMeterValueChanged(int, double)),
 		this,
-		SLOT(setSMeterValue(int, float)));
+		SLOT(setSMeterValue(int, double)));
 
 	CHECKED_CONNECT(
 		set, 
@@ -1967,7 +1967,7 @@ void OGLDisplayPanel::renderSMeterB() {
 //}
 
 //***********************************************
-void OGLDisplayPanel::setSMeterValue(int rx, float value) {
+void OGLDisplayPanel::setSMeterValue(int rx, double value) {
 
 	Q_UNUSED(rx)
 

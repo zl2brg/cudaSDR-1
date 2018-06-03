@@ -33,7 +33,6 @@
 //#include <QtNetwork>
 
 #include "cusdr_settings.h"
-#include "QtDSP/qtdsp_dspEngine.h"
 #include "Util/cusdr_highResTimer.h"
 #include "QtWDSP/qtwdsp_dspEngine.h"
 
@@ -49,8 +48,8 @@ class Receiver : public QObject {
 	Q_OBJECT
 
 public:
-	Receiver(int rx = 0);
-	~Receiver();
+	explicit Receiver(int rx = 0);
+	~Receiver() override;
 
 	void	setupConnections();
 	bool	initDSPInterface();
@@ -212,10 +211,10 @@ private:
 	qreal	m_agcThreshold_dBm;
 	qreal	m_agcHangThreshold;
 	qreal	m_agcHangLevel;
-	qreal	m_agcSlope;
-	qreal	m_agcAttackTime;
-	qreal	m_agcDecayTime;
-	qreal	m_agcHangTime;
+	int		m_agcSlope;
+	int		m_agcAttackTime;
+	int		m_agcDecayTime;
+	int		m_agcHangTime;
 	//qreal	m_calOffset;
 	qreal	m_filterLo;
 	qreal	m_filterHi;
@@ -232,7 +231,7 @@ private:
 signals:
 	void	messageEvent(QString msg);
 	void	spectrumBufferChanged(int rx, const qVectorFloat& buffer);
-	void	sMeterValueChanged(int rx, float value);
+	void	sMeterValueChanged(int rx, double value);
 	void	outputBufferSignal(int rx, const CPX &buffer);
 	void	audioBufferSignal(int rx, const CPX &buffer, int);
 
