@@ -31,7 +31,7 @@
 #include "cusdr_settings.h"
 #include "Util/cusdr_styles.h"
 
-Settings *Settings::m_instance = NULL;		/*!< set m_instance to NULL. */
+Settings *Settings::m_instance = nullptr;		/*!< set m_instance to NULL. */
 
 /*!
 	\class Settings
@@ -3875,7 +3875,7 @@ void Settings::setAGCMaximumGain_dB(QObject *sender, int rx, qreal value) {
 	emit agcMaximumGainChanged(sender,rx, value);
 }
 
-qreal Settings::getAGCMaximumGain_dB(int rx) {
+int Settings::getAGCMaximumGain_dB(int rx) {
 
 	return m_receiverDataList[rx].agcMaximumGain_dB;
 }
@@ -4935,7 +4935,7 @@ void Settings::setPanDetectorMode(int rx , PanDetectorMode mode) {
 };
 
 
-qreal Settings::getAGCSlope(int rx) {
+int Settings::getAGCSlope(int rx) {
 	return m_receiverDataList[rx].agcSlope;
 
 }

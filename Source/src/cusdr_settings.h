@@ -80,21 +80,6 @@
 #define MAXDISTDBM 150
 #define MAX_FFTSIZE	262144
 
-// **************************************
-// fftw definitions
-
-static void my_fftw_write_char(char c, void *f) { fputc(c, (FILE *) f); }
-//static void my_fftw_write_char(char c, void *f) { fputc(c, (QFILE *) f); }
-#define fftw_export_wisdom_to_file(f) fftw_export_wisdom(my_fftw_write_char, (void*) (f))
-#define fftwf_export_wisdom_to_file(f) fftwf_export_wisdom(my_fftw_write_char, (void*) (f))
-#define fftwl_export_wisdom_to_file(f) fftwl_export_wisdom(my_fftw_write_char, (void*) (f))
-
-static int my_fftw_read_char(void *f) { return fgetc((FILE *) f); }
-#define fftw_import_wisdom_from_file(f) fftw_import_wisdom(my_fftw_read_char, (void*) (f))
-#define fftwf_import_wisdom_from_file(f) fftwf_import_wisdom(my_fftw_read_char, (void*) (f))
-#define fftwl_import_wisdom_from_file(f) fftwl_import_wisdom(my_fftw_read_char, (void*) (f))
-
-
 
 // **************************************
 // receiver settings
@@ -565,12 +550,12 @@ typedef struct _receiver {
 	qreal	acgThreshold_dB;
 	qreal	agcHangThreshold;
 	qreal	agcHangLevel;
-	qreal	agcMaximumGain_dB;
+	int 	agcMaximumGain_dB;
 	qreal	agcAttackTime;
 	qreal	agcDecayTime;
 	qreal	agcHangTime;
 	qreal	agcFixedGain_dB;
-	qreal	agcSlope;
+	int 	agcSlope;
 
 	int		sampleRate;
 	int		framesPerSecond;
@@ -709,7 +694,7 @@ class Settings : public QObject {
 	Q_OBJECT
 
 public:
-	static Settings *instance(QObject *parent = 0) {
+	static Settings *instance(QObject *parent = nullptr) {
 
 		if (Settings::m_instance)
 			return Settings::m_instance;
@@ -723,18 +708,18 @@ public:
 	
 		if (Settings::m_instance) {
 		
-			disconnect(Settings::m_instance, 0, 0, 0);
+			disconnect(Settings::m_instance, nullptr, nullptr, nullptr);
 			delete Settings::m_instance;
-			Settings::m_instance = 0;
+			Settings::m_instance = nullptr;
 		}
 	}
 
-	virtual ~Settings();
+	virtual ~Settings() override;
 
 	QMutex 			settingsMutex;
 
 private:
-	Settings(QObject *parent = 0);
+	explicit Settings(QObject *parent = nullptr);
 
 	static Settings		*m_instance;
 
@@ -1037,9 +1022,6 @@ public:
 	QString getSplitterStyle();
 	QString getFrameStyle();
 	QString getTabWidgetStyle();
-	QString getRadioButtonStyle();
-	//QString getNewSliderStyle();
-
     QString getCheckBoxStyle();
 
 
@@ -1134,11 +1116,11 @@ public:
 	QString getADCModeString(int rx);
 	QString getAGCModeString(int rx);
 	int		getAGCGain(int rx);
-	qreal	getAGCMaximumGain_dB(int rx);
+	int getAGCMaximumGain_dB(int rx);
 	qreal	getAGCFixedGain_dB(int rx);
 	int		getAGCHangThreshold(int rx);
 	int		getAGCHangLeveldB(int rx);
-    qreal   getAGCSlope(int rx);
+    int getAGCSlope(int rx);
     int 	getfftSize(int rx);
     int     getNrAGC(int rx);
     int     getNr2GainMethod(int rx);
@@ -1670,7 +1652,7 @@ public:
     NullDebug& operator << (const T) { return *this; }
 };
 
-inline NullDebug nullDebug() { return NullDebug(); }
+inline NullDebug nullDebug() { return {NullDebug()}; }
 
 
 #ifdef LOG_SETTINGS
