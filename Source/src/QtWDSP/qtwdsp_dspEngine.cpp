@@ -341,7 +341,7 @@ void QWDSPEngine::setAGCMode(AGCMode agc) {
 				SetRXAAGCHangThreshold(m_rx,m_agcHangThreshold);
 				break;
 		}
-	emit setAGCLineValues(this,m_rx);
+	emit setAGCLineValues(m_rx);
 	WDSP_ENGINE_DEBUG << "Set AGC Mode " << agc;
 
 }
@@ -363,7 +363,7 @@ void QWDSPEngine::setAGCMaximumGain(qreal value) {
 	SetRXAAGCTop(m_rx, (double)value);
 	m_agcMaximumGain = value;
     WDSP_ENGINE_DEBUG << "Set AGCMaximum gain " << value;
-	emit setAGCLineValues(this,m_rx);
+	emit setAGCLineValues(m_rx);
 }
 
 void QWDSPEngine::setAGCHangThreshold(int value) {
@@ -374,8 +374,7 @@ void QWDSPEngine::setAGCHangThreshold(int value) {
 
 }
 
-void QWDSPEngine::setAGCLineValues(QObject *sender, int rx) {
-	Q_UNUSED(sender);
+void QWDSPEngine::setAGCLineValues(int rx) {
     if (m_rx != rx) return;
     double hang;
     double thresh;
@@ -410,7 +409,7 @@ void QWDSPEngine::setAGCHangLevel(double level) {
 void QWDSPEngine::setAGCThreshold(double threshold) {
 
 	SetRXAAGCThresh(m_rx,threshold,2048,this->m_samplerate);
-	emit setAGCLineValues(this,m_rx);
+	emit setAGCLineValues(m_rx);
 	WDSP_ENGINE_DEBUG << "Set AGC threshold " << threshold;
 }
 
@@ -469,7 +468,7 @@ void QWDSPEngine:: setFilter(double low,double high) {
 		SetRXAFMDeviation(m_rx, (double)4000.0);
 		}
 	RXASetPassband(m_rx,low,high);
-	emit setAGCLineValues(this,m_rx);
+	emit setAGCLineValues(m_rx);
     WDSP_ENGINE_DEBUG << "Set Filter:Low  " <<  low << "High " << high;
 }
 
