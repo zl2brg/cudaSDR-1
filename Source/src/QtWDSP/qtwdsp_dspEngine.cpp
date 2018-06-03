@@ -69,6 +69,9 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
     m_nr2_npe_method = set->getNr2NpeMethod(m_rx);
     m_nbMode = set->getnbMode(m_rx);
 	m_nrMode = set->getnrMode(m_rx);
+	m_anf = set->getAnf(m_rx);
+    m_snb= set->getSnb(m_rx);
+
     setNCOFrequency(m_rx, m_rxData.vfoFrequency - m_rxData.ctrFrequency);
 	WDSP_ENGINE_DEBUG << "init DSPEngine with size: " << m_size;
 	SleeperThread::msleep(100);
@@ -99,7 +102,7 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
 	RXASetNC(m_rx,4096);
     SetRXAPanelRun(m_rx, 1);
     SetRXAPanelSelect(m_rx,3);
-	XCreateAnalyzer(m_rx, &result,262144, 1, 1, "");
+	XCreateAnalyzer(m_rx, &result,262144, 1, 1, (char *) "");
     if(result != 0) {
         WDSP_ENGINE_DEBUG <<  "XCreateAnalyzer id=%d failed: %d\n" <<  result;
     }
@@ -226,7 +229,17 @@ void QWDSPEngine::setupConnections() {
             this,
             SLOT(setNrAGC(int, int )));
 
+	CHECKED_CONNECT(
+			set,
+			SIGNAL(anfChanged(int, bool)),
+			this,
+			SLOT(setanf(int, bool )));
 
+	CHECKED_CONNECT(
+			set,
+			SIGNAL(snbChanged(int, bool)),
+			this,
+			SLOT(setsnb(int, bool )));
 
 //	CHECKED_CONNECT(
 //		wpagc,
@@ -245,7 +258,7 @@ void QWDSPEngine::setupConnections() {
 
 
 
-void QWDSPEngine::processDSP(CPX &in, CPX &out, int size) {
+void QWDSPEngine::processDSP(CPX &in, CPX &out) {
 
 int error;
 	m_mutex.lock();
@@ -300,13 +313,13 @@ void QWDSPEngine::setAGCMode(AGCMode agc) {
 				SetRXAAGCAttack(m_rx,2);
 				SetRXAAGCHang(m_rx,2000);
 				SetRXAAGCDecay(m_rx,2000);
-				SetRXAAGCHangThreshold(m_rx,(int) m_agcHangThreshold);
+				SetRXAAGCHangThreshold(m_rx, m_agcHangThreshold);
 				break;
 			case agcSLOW:
 				SetRXAAGCAttack(m_rx,2);
 				SetRXAAGCHang(m_rx,1000);
 				SetRXAAGCDecay(m_rx,500);
-				SetRXAAGCHangThreshold(m_rx,(int)m_agcHangThreshold);
+				SetRXAAGCHangThreshold(m_rx,m_agcHangThreshold);
 				break;
 			case agcMED:
 				SetRXAAGCAttack(m_rx,2);
@@ -333,15 +346,15 @@ void QWDSPEngine::setAGCMode(AGCMode agc) {
 
 }
 
-void QWDSPEngine::setAGCAttackTime(qreal value) {
+void QWDSPEngine::setAGCAttackTime(int value) {
 	m_agcAttackTime = value;
 }
 
-void QWDSPEngine::setAGCDecayTime(qreal value) {
+void QWDSPEngine::setAGCDecayTime(int value) {
 	m_agcDecayTime = value;
 }
 
-void QWDSPEngine::setAGCSlope(qreal value) {
+void QWDSPEngine::setAGCSlope(int value) {
 	m_agcSlope = value;
 }
 
@@ -353,7 +366,7 @@ void QWDSPEngine::setAGCMaximumGain(qreal value) {
 	emit setAGCLineValues(this,m_rx);
 }
 
-void QWDSPEngine::setAGCHangThreshold(qreal value) {
+void QWDSPEngine::setAGCHangThreshold(int value) {
 
 	m_agcHangThreshold = value;
    	WDSP_ENGINE_DEBUG << "Set AGC Hang Threshold " << value;
@@ -362,6 +375,7 @@ void QWDSPEngine::setAGCHangThreshold(qreal value) {
 }
 
 void QWDSPEngine::setAGCLineValues(QObject *sender, int rx) {
+	Q_UNUSED(sender);
     if (m_rx != rx) return;
     double hang;
     double thresh;
@@ -369,9 +383,9 @@ void QWDSPEngine::setAGCLineValues(QObject *sender, int rx) {
     GetRXAAGCHangLevel(m_rx, &hang);
     GetRXAAGCThresh(m_rx, &thresh, 2048, (double)m_samplerate);
 
-    if ((hang != m_agcHangThreshold) || (thresh != m_agcHangThreshold))
+    if ((hang != m_agcHangLevel) || (thresh != m_agcHangThreshold))
 	{
-		m_agcHangThreshold = hang;
+		m_agcHangLevel = hang;
 		m_agcThreshold = thresh;
 		emit set->agcLineLevelsChanged(this,m_rx,thresh,hang);
 		WDSP_ENGINE_DEBUG << "Set AGC line value" << hang;
@@ -440,8 +454,8 @@ void QWDSPEngine::setSampleRate(QObject *sender, int value) {
 	SetInputSamplerate(m_rx,m_samplerate);
 
 	init_analyzer(m_refreshrate);
-//    SetEXTANBSamplerate (m_rx, m_samplerate);
-//   SetEXTNOBSamplerate (m_rx, m_samplerate);
+    SetEXTANBSamplerate (m_rx, m_samplerate);
+    SetEXTNOBSamplerate (m_rx, m_samplerate);
 	SetChannelState(m_rx,1,0);
 	WDSP_ENGINE_DEBUG << "sample rate set to " << m_samplerate ;
 
@@ -488,15 +502,12 @@ void QWDSPEngine::setSampleSize(int rx, int size) {
 	}
 }
 
-void QWDSPEngine::ProcessFrequencyShift(CPX &in, CPX &out, int size) {
+void QWDSPEngine::ProcessFrequencyShift(CPX &in, CPX &out) {
 
 
 }
 
 void QWDSPEngine::init_analyzer(int refreshrate) {
-
-	int result;
-
 	int flp[] = {0};
 	double keep_time = 0.1;
 	int n_pixout = 1;
@@ -505,14 +516,12 @@ void QWDSPEngine::init_analyzer(int refreshrate) {
 	int fft_size = m_fftSize;
 	int window_type = 6;
 	double kaiser_pi = 14.0;
-	int overlap = 2048;
+	int overlap;
 	int clip = 0;
 	int span_clip_l = 0;
 	int span_clip_h = 0;
 	int pixels = 4096;
 	int stitches = 1;
-	int avm = 0;
-	double tau = 0.001 * 120.0;
 	int calibration_data_set = 0;
 	double span_min_freq = 0.0;
 	double span_max_freq = 0.0;
@@ -625,6 +634,7 @@ int QWDSPEngine::getfftVal(int size) {
 			fftSize = 655356;
 			break;
 		default:
+			fftSize = 2048;
 			WDSP_ENGINE_DEBUG <<  "invalid fft size set" <<  size;
 			break;
 	}
@@ -693,6 +703,10 @@ void QWDSPEngine::setFilterMode(int rx) {
 			break;
 	}
 
+	SetRXAEMNRPosition(m_rx,m_nr_agc);
+	SetRXAEMNRaeRun(m_rx, m_nr2_ae);
+	SetRXAEMNRnpeMethod(m_rx,m_nr2_npe_method);
+	SetRXAEMNRgainMethod(m_rx,m_nr2_gain_method);
 	SetEXTANBRun(rx, m_nb);
  	SetEXTNOBRun(rx, m_nb2);
   	SetRXAANRRun(rx, m_nr);
@@ -700,7 +714,9 @@ void QWDSPEngine::setFilterMode(int rx) {
   	SetRXAANFRun(rx, m_anf);
   	SetRXASNBARun(rx, m_snb);
     WDSP_ENGINE_DEBUG <<  "nb mode" <<  m_nb;
+    WDSP_ENGINE_DEBUG <<  "nb2mode" <<  m_nb2;
     WDSP_ENGINE_DEBUG <<  "nf mode" <<  m_nr;
+    WDSP_ENGINE_DEBUG <<  "nr2 mode" <<  m_nr2;
     WDSP_ENGINE_DEBUG <<  "anf mode" <<  m_anf;
     WDSP_ENGINE_DEBUG <<  "snb mode" <<  m_anf;
 }
@@ -720,20 +736,38 @@ void QWDSPEngine::setNoiseFilterMode(int rx, int nr) {
 
 void QWDSPEngine::setNr2Ae(int rx, bool value) {
     if (rx != m_rx) return;
-    SetRXAEMNRaeRun(m_rx, value);
+    m_nr2_ae = value;
+    SetRXAEMNRaeRun(m_rx, m_nr2_ae);
 }
 
 void QWDSPEngine::setNr2GainMethod(int rx, int value) {
     if (rx != m_rx) return;
-    SetRXAEMNRgainMethod(m_rx,value);
+    m_nr2_gain_method = value;
+    SetRXAEMNRgainMethod(m_rx,m_nr2_gain_method);
 }
 
 void QWDSPEngine::setNr2NpeMethod(int rx, int value) {
     if (rx != m_rx) return;
-    SetRXAEMNRnpeMethod(m_rx,value);
+    m_nr2_npe_method = value;
+    SetRXAEMNRnpeMethod(m_rx,m_nr2_npe_method);
 }
 
 void QWDSPEngine::setNrAGC(int rx, int value) {
     if (rx != m_rx) return;
-    SetRXAEMNRPosition(m_rx,value);
+    m_nr_agc = value;
+    SetRXAEMNRPosition(m_rx,m_nr_agc);
+}
+
+
+void QWDSPEngine::setanf(int rx, bool value) {
+	if (rx != m_rx) return;
+	m_anf = value;
+	WDSP_ENGINE_DEBUG <<  "anf mode" <<  value;
+	SetRXAANFRun(rx, m_anf);
+}
+
+void QWDSPEngine::setsnb(int rx, bool value) {
+	m_snb = value;
+	WDSP_ENGINE_DEBUG <<  "	snb mode" <<  value;
+	SetRXASNBARun(rx, m_snb);
 }
