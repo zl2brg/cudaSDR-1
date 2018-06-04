@@ -47,7 +47,6 @@ extern "C" {
 #include "../cusdr_settings.h"
 #include "QtDSP/qtdsp_qComplex.h"
 #include "QtDSP/qtdsp_powerSpectrum.h"
-#include "QtDSP/qtdsp_signalMeter.h"
 
 
 #ifdef LOG_WDSP_ENGINE

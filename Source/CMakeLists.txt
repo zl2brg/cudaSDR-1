@@ -55,14 +55,11 @@ set (SOURCES
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_receiver.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/soundout.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.cpp 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_demodulation.cpp 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_dualModeAverager.cpp
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_fft.cpp 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_filter.cpp 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_powerSpectrum.cpp 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_signalMeter.cpp 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_wpagc.cpp 
-	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDisplayPanel.cpp 
+	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDisplayPanel.cpp
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDistancePanel.cpp 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglInfo.cpp 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglReceiverPanel.cpp 
@@ -134,16 +131,13 @@ set (HEADERS
 	${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.h 
 	${CMAKE_SOURCE_DIR}/DataEngine/datatypes.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/fftw3.h 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_demodulation.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_dualModeAverager.h
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_fft.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_filter.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_powerSpectrum.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_invsinc_coeff.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_qComplex.h 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_signalMeter.h 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_wpagc.h 
-	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDisplayPanel.h 
+	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDisplayPanel.h
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDistancePanel.h 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglInfo.h 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglReceiverPanel.h 
