@@ -287,14 +287,13 @@ void QGLWidebandPanel::setupConnections() {
 void QGLWidebandPanel::initializeGL() {
 
 	if (!isValid()) return;
-
 	initializeOpenGLFunctions();
 
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // 4-byte pixel alignment
-	//glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    //glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
 	glDepthFunc(GL_LESS);
     glEnable(GL_DEPTH_TEST);
@@ -350,6 +349,7 @@ void QGLWidebandPanel::paintGL() {
 
 			break;
 	}
+	update();
 }
  
 //************************************************************************

@@ -3980,11 +3980,10 @@ void Settings::setRXFilter(QObject *sender, int rx, qreal low, qreal high) {
 
     if (m_filterFrequencyLow == low && m_filterFrequencyHigh == high) return;
 
-    m_filterFrequencyLow = low;
-    m_filterFrequencyHigh = high;
-    m_receiverDataList[rx].filterLo = low;
-    m_receiverDataList[rx].filterHi = high;
+    m_receiverDataList[rx].filterLo = m_filterFrequencyLow =  low;
+    m_receiverDataList[rx].filterHi = m_filterFrequencyHigh = high;
 
+    SETTINGS_DEBUG << "filter freq changed" << low << high;
     emit filterFrequenciesChanged(sender, rx, m_filterFrequencyLow, m_filterFrequencyHigh);
 }
 

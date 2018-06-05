@@ -1694,16 +1694,10 @@ void RadioPopupWidget::filterChangedByBtn()	 {
 						m_filterHi =  1450.0f;
 						break;
 
-					case 5:
+                    case (DSPMode) FMN:
 						m_filterLo = -2000.0f;
 						m_filterHi =  2000.0f;
 						break;
-
-					/*case 6:
-						m_filterLo = -4000.0f;
-						m_filterHi =  4000.0f;
-						break;*/
-
 					default:
 						break;
 				}
@@ -1720,7 +1714,7 @@ void RadioPopupWidget::filterChangedByBtn()	 {
 						m_filterHi =  1550.0f;
 						break;
 
-					case 5:
+                    case (DSPMode) FMN:
 						m_filterLo = -2000.0f;
 						m_filterHi =  2000.0f;
 						break;
@@ -1742,20 +1736,10 @@ void RadioPopupWidget::filterChangedByBtn()	 {
 					case (DSPMode) DSB:
 					case (DSPMode) AM:
 					case (DSPMode) SAM:
-						m_filterLo = -2000.0f;
+                    case (DSPMode) FMN:
+                        m_filterLo = -2000.0f;
 						m_filterHi =  2000.0f;
 						break;
-
-					case 5:
-						m_filterLo = -2000.0f;
-						m_filterHi =  2000.0f;
-						break;
-
-					/*case 6:
-						m_filterLo = -4000.0f;
-						m_filterHi =  4000.0f;
-						break;*/
-
 					default:
 						break;
 				}
@@ -1768,20 +1752,10 @@ void RadioPopupWidget::filterChangedByBtn()	 {
 					case (DSPMode) DSB:
 					case (DSPMode) AM:
 					case (DSPMode) SAM:
-						m_filterLo = -2600.0f;
+                    case (DSPMode) FMN:
+                        m_filterLo = -2600.0f;
 						m_filterHi =  2600.0f;
 						break;
-
-					case 5:
-						m_filterLo = -2000.0f;
-						m_filterHi =  2000.0f;
-						break;
-
-					/*case 6:
-						m_filterLo = -4000.0f;
-						m_filterHi =  4000.0f;
-						break;*/
-
 					default:
 						break;
 				}
@@ -1794,20 +1768,10 @@ void RadioPopupWidget::filterChangedByBtn()	 {
 					case (DSPMode) DSB:
 					case (DSPMode) AM:
 					case (DSPMode) SAM:
-						m_filterLo = -3300.0f;
+                    case (DSPMode) FMN:
+                        m_filterLo = -3300.0f;
 						m_filterHi =  3300.0f;
 						break;
-
-					case (DSPMode) FMN:
-						m_filterLo = -2000.0f;
-						m_filterHi =  2000.0f;
-						break;
-
-					/*case 6:
-						m_filterLo = -4000.0f;
-						m_filterHi =  4000.0f;
-						break;*/
-
 					default:
 						break;
 				}
@@ -1820,20 +1784,10 @@ void RadioPopupWidget::filterChangedByBtn()	 {
 					case (DSPMode) DSB:
 					case (DSPMode) AM:
 					case (DSPMode) SAM:
+                    case (DSPMode) FMN:
 						m_filterLo = -4000.0f;
 						m_filterHi =  4000.0f;
 						break;
-
-					case (DSPMode) FMN:
-						m_filterLo = -2000.0f;
-						m_filterHi =  2000.0f;
-						break;
-
-					/*case 6:
-						m_filterLo = -4000.0f;
-						m_filterHi =  4000.0f;
-						break;*/
-
 					default:
 						break;
 				}
@@ -1846,20 +1800,10 @@ void RadioPopupWidget::filterChangedByBtn()	 {
 					case (DSPMode) DSB:
 					case (DSPMode) AM:
 					case (DSPMode) SAM:
-						m_filterLo = -5000.0f;
+                    case (DSPMode) FMN:
+                        m_filterLo = -5000.0f;
 						m_filterHi =  5000.0f;
 						break;
-
-					case (DSPMode) FMN:
-						m_filterLo = -2000.0f;
-						m_filterHi =  2000.0f;
-						break;
-
-					/*case 6:
-						m_filterLo = -4000.0f;
-						m_filterHi =  4000.0f;
-						break;*/
-
 					default:
 						break;
 				}
@@ -1872,20 +1816,10 @@ void RadioPopupWidget::filterChangedByBtn()	 {
 					case (DSPMode) DSB:
 					case (DSPMode) AM:
 					case (DSPMode) SAM:
+                    case (DSPMode) FMN:
 						m_filterLo = -6000.0f;
 						m_filterHi =  6000.0f;
 						break;
-
-					case (DSPMode) FMN:
-						m_filterLo = -2000.0f;
-						m_filterHi =  2000.0f;
-						break;
-
-					/*case 6:
-						m_filterLo = -4000.0f;
-						m_filterHi =  4000.0f;
-						break;*/
-
 					default:
 						break;
 				}
@@ -1898,20 +1832,10 @@ void RadioPopupWidget::filterChangedByBtn()	 {
 					case (DSPMode) DSB:
 					case (DSPMode) AM:
 					case (DSPMode) SAM:
-						m_filterLo = -8000.0f;
+                    case (DSPMode) FMN:
+                        m_filterLo = -8000.0f;
 						m_filterHi =  8000.0f;
 						break;
-
-					case (DSPMode) FMN:
-						m_filterLo = -2000.0f;
-						m_filterHi =  2000.0f;
-						break;
-
-					/*case 6:
-						m_filterLo = -4000.0f;
-						m_filterHi =  4000.0f;
-						break;*/
-
 					default:
 						break;
 				}
