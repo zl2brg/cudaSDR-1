@@ -1642,18 +1642,24 @@ private:
 
 
 
-//******************************************************
+///******************************************************
 // Debug output
 
 class NullDebug {
 
 public:
-    template <typename T>
-    NullDebug& operator << (const T) { return *this; }
+	template <typename T>
+	NullDebug& operator << (const T) { return *this; }
 };
 
-inline NullDebug nullDebug() { return {NullDebug()}; }
+inline NullDebug nullDebug() { return NullDebug(); }
 
+
+#ifdef LOG_SETTINGS
+#   define SETTINGS_DEBUG qDebug().nospace() << "Settings::\t"
+#else
+#   define SETTINGS_DEBUG nullDebug()
+#endif
 
 #ifdef LOG_SETTINGS
 #   define SETTINGS_DEBUG qDebug().nospace() << "Settings::\t"

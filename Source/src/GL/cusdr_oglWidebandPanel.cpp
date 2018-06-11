@@ -31,7 +31,7 @@
 #include "cusdr_oglWidebandPanel.h"
 
 //#include <QtGui>
-//#include <QDebug>
+#include <QDebug>
 //#include <QFileInfo>
 //#include <QTimer>
 //#include <QImage>
@@ -71,7 +71,10 @@ QGLWidebandPanel::QGLWidebandPanel(QWidget *parent)
 		, m_dBmScaleOffset(0.0)
 {
 //	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
-	
+
+    painter = new QPainter(this);
+
+
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	//setAutoBufferSwap(true);
@@ -305,7 +308,8 @@ void QGLWidebandPanel::initializeGL() {
 }
 
 void QGLWidebandPanel::paintGL() {
-
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+    f->glClear(GL_COLOR_BUFFER_BIT);
 	switch (m_serverMode) {
 
 		case QSDR::NoServerMode:
@@ -349,7 +353,6 @@ void QGLWidebandPanel::paintGL() {
 
 			break;
 	}
-	update();
 }
  
 //************************************************************************
@@ -406,7 +409,6 @@ void QGLWidebandPanel::drawSpectrum() {
 	yScale = height / dBmRange;
 	yScaleColor = 1.0f / dBmRange;
 	yTop = (float) y2;
-
 	if (m_dataEngineState == QSDR::DataEngineUp)
 		glClear(GL_DEPTH_BUFFER_BIT);
 	else
@@ -790,7 +792,6 @@ void QGLWidebandPanel::drawHorizontalScale() {
 
 	int width = m_freqScaleRect.width();
 	int height = m_freqScaleRect.height();
-
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glColor3f(0.65f, 0.76f, 0.81f);
 	
@@ -840,7 +841,6 @@ void QGLWidebandPanel::drawGrid() {
 
 	int width = m_panRect.width();
 	int height = m_panRect.height();
-
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     glColor4f(m_redGrid, m_greenGrid, m_blueGrid, 1.0);
 	
@@ -887,6 +887,7 @@ void QGLWidebandPanel::drawGrid() {
 }
 
 void QGLWidebandPanel::drawCrossHair() {
+
 
 	QRect rect(0, m_panRect.top(), width(), height() - m_panRect.top());
 
@@ -959,7 +960,7 @@ void QGLWidebandPanel::drawHamBand(
 		int hi,
 		const QString &band
 ) {
-	glEnable(GL_BLEND);
+    glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	GLint x1 = (GLint)(m_frequencyUnit * (lo - m_lowerFrequency));
@@ -993,6 +994,7 @@ void QGLWidebandPanel::drawHamBand(
 
 void QGLWidebandPanel::renderVerticalScale() {
 
+
 	QString str;
 	//QFontMetrics d_fm(m_smallFont);
 	int spacing = 6;
@@ -1005,7 +1007,6 @@ void QGLWidebandPanel::renderVerticalScale() {
 	qreal unit = (qreal)(m_dBmScaleRect.height() / qAbs(m_dBmPanMax - m_dBmPanMin));
 
 	m_dBmScale = getYRuler2(m_dBmScaleRect, fontHeight, unit, m_dBmPanMin, m_dBmPanMax);
-
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	QRect textRect(0, 0, fontMaxWidth, fontHeight);
@@ -1062,13 +1063,14 @@ void QGLWidebandPanel::renderVerticalScale() {
 	glColor3f(0.94f, 0.22f, 0.43f);
 	
 	str = QString("dBm");
-	m_oglTextSmall->renderText(textRect.x() + 18, textRect.y(), str);
+	//m_oglTextSmall->renderText(textRect.x() + 18, textRect.y(), str);
+	qDebug() << "TextRect" << (textRect.x() + 18) << textRect.y() << str;
+  // renderText(textRect.x() + 18, textRect.y(), str);
+
 }
 
 void QGLWidebandPanel::renderHorizontalScale() {
-
 	if (m_freqScaleRect.isEmpty()) return;
-
 	//QFontMetrics d_fm(m_smallFont);
 	int fontHeight = m_fonts.smallFontMetrics->tightBoundingRect(".0kMGHz").height();
 	int fontMaxWidth = m_fonts.smallFontMetrics->boundingRect("000.000").width();
@@ -1106,7 +1108,6 @@ void QGLWidebandPanel::renderHorizontalScale() {
 			glVertex3f(m_frequencyScale.mainPointPositions.at(i), 4.0f, 0.0f);
 		}
 		glEnd();
-		
 		for (int i = 0; i < len; i++) {
 		
 			QString str = QString::number(m_frequencyScale.mainPoints.at(i) / freqScale, 'f', 3);
@@ -1120,9 +1121,10 @@ void QGLWidebandPanel::renderHorizontalScale() {
 			QRect textRect(m_frequencyScale.mainPointPositions.at(i) + offset_X - (text_width / 2), textOffset_y, text_width, fontHeight);
 
 			if (textRect.left() < 0 || textRect.right() >= scaledTextRect.left()) continue;
-			
-			m_oglTextSmall->renderText(textRect.x(), textRect.y(), str);
-		}
+//			m_oglTextSmall->renderText(textRect.x(), textRect.y(), str);
+            renderText(m_frequencyScaleFBO, textRect.x(), textRect.y() + 5, str);
+
+        }
 	}
 
 	len = m_frequencyScale.subPointPositions.length();
@@ -1265,6 +1267,7 @@ void QGLWidebandPanel::getRegion(QPoint p) {
 }
 
 void QGLWidebandPanel::resizeGL(int iWidth, int iHeight) {
+
 
 	int width = (int)(iWidth/2) * 2;
 	int height = iHeight;
@@ -2004,8 +2007,6 @@ void QGLWidebandPanel::setPanadapterColors() {
 		m_panGridUpdate = true;
 	}
 	mutex.unlock();
-
-	update();
 }
 
 void QGLWidebandPanel::setPanGridStatus(bool value, int rx) {
@@ -2068,7 +2069,21 @@ void QGLWidebandPanel::closeEvent(QCloseEvent *event) {
 }
 
 void QGLWidebandPanel::showEvent(QShowEvent *event) {
-
 	emit showEvent(this);
 	QWidget::showEvent(event);
+}
+
+
+
+void QGLWidebandPanel::renderText(QPaintDevice *obj, float x, float y, const QString str) {
+    saveGLState();
+    painter->begin(obj);
+    painter->setPen(QColor(140, 180, 200));
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setRenderHint(QPainter::HighQualityAntialiasing);
+    painter->setFont(m_fonts.smallFont);
+    qDebug() << "render text " << x << y << str;
+    painter->drawText(int(x) , int(y), str);
+    painter->end();
+    restoreGLState();
 }

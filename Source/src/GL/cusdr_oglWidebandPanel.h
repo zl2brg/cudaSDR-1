@@ -101,6 +101,7 @@ private:
 	QGLFramebufferObject*		m_frequencyScaleFBO;
 	QGLFramebufferObject*		m_dBmScaleFBO;
 	QGLFramebufferObject*		m_gridFBO;
+	QPainter*					painter;
 
 	CFonts		*fonts;
 	TFonts		m_fonts;
@@ -248,6 +249,7 @@ private:
 	void renderVerticalScale();
 	void renderHorizontalScale();
 	void renderGrid();
+	void renderText(QPaintDevice *obj, float x, float y, const QString str);
 
 private slots:
 	void	systemStateChanged(
