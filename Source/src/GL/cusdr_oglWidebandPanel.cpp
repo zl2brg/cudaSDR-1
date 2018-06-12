@@ -1121,8 +1121,8 @@ void QGLWidebandPanel::renderHorizontalScale() {
 			QRect textRect(m_frequencyScale.mainPointPositions.at(i) + offset_X - (text_width / 2), textOffset_y, text_width, fontHeight);
 
 			if (textRect.left() < 0 || textRect.right() >= scaledTextRect.left()) continue;
-//			m_oglTextSmall->renderText(textRect.x(), textRect.y(), str);
-            renderText(m_frequencyScaleFBO, textRect.x(), textRect.y() + 5, str);
+			m_oglTextSmall->renderText(textRect.x(), textRect.y(), str);
+            renderText(m_frequencyScaleFBO, textRect.x(), (textRect.y() + fontHeight + 1), str);
 
         }
 	}
@@ -2079,8 +2079,7 @@ void QGLWidebandPanel::renderText(QPaintDevice *obj, float x, float y, const QSt
     saveGLState();
     painter->begin(obj);
     painter->setPen(QColor(140, 180, 200));
-    painter->setRenderHint(QPainter::Antialiasing);
-    painter->setRenderHint(QPainter::HighQualityAntialiasing);
+    painter->setRenderHint(QPainter::TextAntialiasing ,true);
     painter->setFont(m_fonts.smallFont);
     qDebug() << "render text " << x << y << str;
     painter->drawText(int(x) , int(y), str);
