@@ -1,3 +1,7 @@
+Forked from VK5ABN's cudaSDR repo. 
+Now uses WDSP library.
+In the process of updating to use QOpenGLWidgets.
+
 This is a copy of VK5ABN, Berndt's cuSDR source
 derived from his post: http://www.ping.net.au/20140126_cuSDR64src.tar.gz
 
