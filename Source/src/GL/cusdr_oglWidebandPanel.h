@@ -249,7 +249,7 @@ private:
 	void renderVerticalScale();
 	void renderHorizontalScale();
 	void renderGrid();
-	void renderText(QPaintDevice *obj, float x, float y, const QString str);
+	void renderText(float x, float y, QPaintDevice *fbo, QFont font, int size, QColor color, const QString str);
 
 private slots:
 	void	systemStateChanged(

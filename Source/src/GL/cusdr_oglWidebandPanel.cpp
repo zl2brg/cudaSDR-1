@@ -1098,20 +1098,20 @@ void QGLWidebandPanel::renderHorizontalScale() {
 
 	glColor3f((GLfloat)0.65f, (GLfloat)0.76f, (GLfloat)0.81f);
 	int len = m_frequencyScale.mainPointPositions.length();
-	if (len > 0) {
-
-		glLineWidth(3);
-		glBegin(GL_LINES);
+	saveGLState();
+    painter->begin(m_frequencyScaleFBO);
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setPen(QPen(QColor(140, 180, 200),3, Qt::SolidLine, Qt::FlatCap));
+    if (len > 0) {
 		for (int i = 0; i < len; i++) {
-
-			glVertex3f(m_frequencyScale.mainPointPositions.at(i), 1.0f, 0.0f);
-			glVertex3f(m_frequencyScale.mainPointPositions.at(i), 4.0f, 0.0f);
+			painter->drawLine(m_frequencyScale.mainPointPositions.at(i),1,m_frequencyScale.mainPointPositions.at(i),4);
 		}
-		glEnd();
-		for (int i = 0; i < len; i++) {
+        painter->setRenderHint(QPainter::TextAntialiasing ,true);
+        painter->setFont( m_oglTextSmall->font());
+
+        for (int i = 0; i < len; i++) {
 		
 			QString str = QString::number(m_frequencyScale.mainPoints.at(i) / freqScale, 'f', 3);
-
 			if (freqScale == 1e3)
 				while (str.endsWith('0')) str.remove(str.size() - 1, 1);
 
@@ -1121,10 +1121,11 @@ void QGLWidebandPanel::renderHorizontalScale() {
 			QRect textRect(m_frequencyScale.mainPointPositions.at(i) + offset_X - (text_width / 2), textOffset_y, text_width, fontHeight);
 
 			if (textRect.left() < 0 || textRect.right() >= scaledTextRect.left()) continue;
-			m_oglTextSmall->renderText(textRect.x(), textRect.y(), str);
-            renderText(m_frequencyScaleFBO, textRect.x(), (textRect.y() + fontHeight + 1), str);
-
+            painter->drawText(textRect.x() , textRect.y() +  m_oglTextSmall->fontMetrics().height() , str);
         }
+        painter->end();
+		restoreGLState();
+
 	}
 
 	len = m_frequencyScale.subPointPositions.length();
@@ -2075,14 +2076,14 @@ void QGLWidebandPanel::showEvent(QShowEvent *event) {
 
 
 
-void QGLWidebandPanel::renderText(QPaintDevice *obj, float x, float y, const QString str) {
+void QGLWidebandPanel::renderText(float x, float y, QPaintDevice *fbo, QFont font, int size, QColor color, const QString str) {
     saveGLState();
-    painter->begin(obj);
-    painter->setPen(QColor(140, 180, 200));
+    painter->begin(fbo);
+    painter->setPen(color);
     painter->setRenderHint(QPainter::TextAntialiasing ,true);
-    painter->setFont(m_fonts.smallFont);
+    painter->setFont(font);
     qDebug() << "render text " << x << y << str;
-    painter->drawText(int(x) , int(y), str);
+    painter->drawText(int(x) , int(y) + size, str);
     painter->end();
     restoreGLState();
 }
