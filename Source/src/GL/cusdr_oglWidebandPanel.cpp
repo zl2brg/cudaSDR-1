@@ -424,18 +424,18 @@ void QGLWidebandPanel::drawSpectrum() {
 	// draw background
 	if (m_dataEngineState == QSDR::DataEngineUp) {
 
-		glBegin(GL_TRIANGLE_STRIP);
-			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x1, y1, -4.0); // top left corner
-			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x2, y1, -4.0); // top right corner
-			glColor3f(0.8f * m_bkgRed, 0.8f * m_bkgGreen, 0.8f * m_bkgBlue); glVertex3f(x1, y2, -4.0); // bottom left corner
-			glColor3f(       m_bkgRed,        m_bkgGreen,        m_bkgBlue); glVertex3f(x2, y2, -4.0); // bottom right corner
-		glEnd();
 //		glBegin(GL_TRIANGLE_STRIP);
-//			glColor3f(0.8f * m_bkgRed, 0.8f * m_bkgGreen, 0.8f * m_bkgBlue); glVertex3f(x1, y1, -4.0); // top left corner
-//			glColor3f(0.6f * m_bkgRed, 0.6f * m_bkgGreen, 0.6f * m_bkgBlue); glVertex3f(x2, y1, -4.0); // top right corner
-//			glColor3f(0.4f * m_bkgRed, 0.4f * m_bkgGreen, 0.4f * m_bkgBlue); glVertex3f(x1, y2, -4.0); // bottom left corner
-//			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x2, y2, -4.0); // bottom right corner
+//			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x1, y1, -4.0); // top left corner
+//			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x2, y1, -4.0); // top right corner
+//			glColor3f(0.8f * m_bkgRed, 0.8f * m_bkgGreen, 0.8f * m_bkgBlue); glVertex3f(x1, y2, -4.0); // bottom left corner
+//			glColor3f(       m_bkgRed,        m_bkgGreen,        m_bkgBlue); glVertex3f(x2, y2, -4.0); // bottom right corner
 //		glEnd();
+		glBegin(GL_TRIANGLE_STRIP);
+			glColor3f(0.8f * m_bkgRed, 0.8f * m_bkgGreen, 0.8f * m_bkgBlue); glVertex3f(x1, y1, -4.0); // top left corner
+			glColor3f(0.6f * m_bkgRed, 0.6f * m_bkgGreen, 0.6f * m_bkgBlue); glVertex3f(x2, y1, -4.0); // top right corner
+			glColor3f(0.4f * m_bkgRed, 0.4f * m_bkgGreen, 0.4f * m_bkgBlue); glVertex3f(x1, y2, -4.0); // bottom left corner
+			glColor3f(0.2f * m_bkgRed, 0.2f * m_bkgGreen, 0.2f * m_bkgBlue); glVertex3f(x2, y2, -4.0); // bottom right corner
+		glEnd();
 	}
 	else {
 
@@ -744,8 +744,7 @@ void QGLWidebandPanel::drawVerticalScale() {
 	int height = m_dBmScaleRect.height();
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glColor3f(0.65f, 0.76f, 0.81f);
-	
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
@@ -781,9 +780,6 @@ void QGLWidebandPanel::drawVerticalScale() {
 	}
 
 	renderTexture(m_dBmScaleRect, m_dBmScaleFBO->texture(), 0.0f);
-
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glColor3f(0.65f, 0.76f, 0.81f);
 }
 
 void QGLWidebandPanel::drawHorizontalScale() {
@@ -888,71 +884,48 @@ void QGLWidebandPanel::drawGrid() {
 
 void QGLWidebandPanel::drawCrossHair() {
 
-
 	QRect rect(0, m_panRect.top(), width(), height() - m_panRect.top());
 
 	int x = m_mousePos.x();
 	int y = m_mousePos.y();
 
-	glDisable(GL_MULTISAMPLE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	painter->begin(this);
+	painter->setRenderHint(QPainter::Antialiasing);
+	painter->setPen(QPen(QColor(255,255,255,80),2, Qt::SolidLine, Qt::FlatCap));
+	//horizontal line
+	painter->drawLine(rect.left() - 1,y,m_dBmScaleRect.left() - 2,y);
+	//vertical line
+	painter->drawLine(x,rect.top() + 1,x, rect.bottom() - 1);
+    // cross hair
+    painter->setPen(QPen(QColor(255,255,255,180),1,Qt::SolidLine, Qt::FlatCap));
 
-	glDisable(GL_LINE_SMOOTH);
-	glLineWidth(1.0f);
+    painter->drawLine(x,y-20,x,y + 20);
+    painter->drawLine(x-20,y,x + 20, y);
 
-    glColor4f(255, 255, 255, 80);
-
-	// set a scissor box
-	glScissor(rect.left(), rect.top(), rect.width() - 1, rect.height());
-	glEnable(GL_SCISSOR_TEST);
-
-	// horizontal line
-	glBegin(GL_LINES);
-		glVertex3f(rect.left() - 1, y, 4.0f);
-		glVertex3f(m_dBmScaleRect.left() - 2, y, 4.0f);
-	glEnd();
-
-	// vertical line
-	glBegin(GL_LINES);
-		glVertex3f(x, rect.top() + 1, 4.0f);
-		glVertex3f(x, rect.bottom() - 1, 4.0f);
-	glEnd();
-
-	// cross hair
-    glColor4f(255, 255, 255, 180);
-	glBegin(GL_LINES);
-		glVertex3f(x     , y - 20, 5.0f);
-		glVertex3f(x     , y + 20, 5.0f);
-		glVertex3f(x - 20, y, 5.0f);
-		glVertex3f(x + 20, y, 5.0f);
-	glEnd();
-
-	// text only on panadapter
+    // text only on panadapter
 	if (m_mouseRegion == panRegion) {
 		
 		QString str;
-        glColor4f(255, 255, 255, 255);
 
 		qreal unit = (qreal)((MAXHPFREQUENCY * m_freqScaleZoomFactor) / m_panRect.width());
 		qreal frequency = (unit * x) + m_lowerFrequency;
 
 		str = frequencyString(frequency);
 		if (x > m_panRect.width() - 85)
-			m_oglTextSmall->renderText(x - 90, y - 18, 5.0f, str);
+		    painter->drawText(x- 90, y - 8,str);
 		else
-			m_oglTextSmall->renderText(x + 4, y - 18, 5.0f, str);
+            painter->drawText(x + 4, y - 8,str);
 
 		qreal dBm = m_dBmPanMax - ((m_dBmPanMax - m_dBmPanMin) * ((qreal)(y - m_panRect.top()) / m_panRect.height()));
 		str = QString::number(dBm, 'f', 1) + " dBm";
 		if (x > m_panRect.width() - 85)
-			m_oglTextSmall->renderText(x - 90, y + 6, 5.0f, str);
+            painter->drawText(x- 90, y + 16,str);
 		else
-			m_oglTextSmall->renderText(x + 4, y + 6, 5.0f, str);
+            painter->drawText(x + 4, y + 16,str);
 	}
+    painter->end();
+    restoreGLState();
 
-	glDisable(GL_SCISSOR_TEST);
-	glEnable(GL_MULTISAMPLE);
 }
 
 void QGLWidebandPanel::drawHamBand(
@@ -1065,7 +1038,7 @@ void QGLWidebandPanel::renderVerticalScale() {
 void QGLWidebandPanel::renderHorizontalScale() {
 	if (m_freqScaleRect.isEmpty()) return;
 	QColor freqlabelColor = QColor(239,56,109);
-    QColor freqtxtColor = QColor(140, 180, 200);
+    QColor textColor = QColor(140, 180, 200);
 
     //QFontMetrics d_fm(m_smallFont);
 	int fontHeight = m_fonts.smallFontMetrics->tightBoundingRect(".0kMGHz").height();
@@ -1095,7 +1068,7 @@ void QGLWidebandPanel::renderHorizontalScale() {
 	saveGLState();
     painter->begin(m_frequencyScaleFBO);
     painter->setRenderHint(QPainter::Antialiasing);
-    painter->setPen(QPen(freqtxtColor,3, Qt::SolidLine, Qt::FlatCap));
+    painter->setPen(QPen(textColor,3, Qt::SolidLine, Qt::FlatCap));
     int len = m_frequencyScale.mainPointPositions.length();
     if (len > 0) {
 		for (int i = 0; i < len; i++) {
@@ -1137,38 +1110,30 @@ void QGLWidebandPanel::renderHorizontalScale() {
 }
 
 void QGLWidebandPanel::renderGrid() {
-
 	glClear(GL_COLOR_BUFFER_BIT);
-	glLineStipple(1, 0x9999);
-	glEnable(GL_LINE_STIPPLE);
-	glLineWidth(1.0f);
-
     saveGLState();
     painter->begin(m_gridFBO);
     painter->setRenderHint(QPainter::Antialiasing);
-    painter->setPen(QPen(QColor(165,193,206),1, Qt::DotLine, Qt::FlatCap));
+    painter->setPen(QPen(m_gridColor,1, Qt::DotLine, Qt::FlatCap));
 
 	// vertical lines
 	int len = m_frequencyScale.mainPointPositions.length();
 	if (len > 0) {
 
-		GLint y1 = 1;
-
 		GLint y2 = m_panRect.bottom() - 1;
 
 		for (int i = 0; i < len; i++) {
 			GLint x = m_frequencyScale.mainPointPositions.at(i);
-            painter->drawLine(x,y1,x,y2);
+            painter->drawLine(x,1,x,y2);
 		}
 	}
 
 	// horizontal lines
 	len = m_dBmScale.mainPointPositions.length();
     if (len > 0) {
-
+		GLint x1 = m_panRect.left();
+		GLint x2 = m_panRect.right();
         for (int i = 0; i < len; i++) {
-            GLint x1 = m_panRect.left();
-            GLint x2 = m_panRect.right();
             GLint y =  m_dBmScale.mainPointPositions.at(i);
             painter->drawLine(x1,y,x2,y);
         }
