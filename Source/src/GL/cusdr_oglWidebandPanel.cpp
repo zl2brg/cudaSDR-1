@@ -1143,73 +1143,39 @@ void QGLWidebandPanel::renderGrid() {
 	glEnable(GL_LINE_STIPPLE);
 	glLineWidth(1.0f);
 
+    saveGLState();
+    painter->begin(m_gridFBO);
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setPen(QPen(QColor(165,193,206),1, Qt::DotLine, Qt::FlatCap));
+
 	// vertical lines
 	int len = m_frequencyScale.mainPointPositions.length();
 	if (len > 0) {
 
-		GLint x1 = m_panRect.left();
-		GLint x2 = 1;
-		if (m_dBmScaleRect.isValid()) x2 += m_dBmScaleRect.width();
-
-		//GLint y1 = rect.top() + 1;
 		GLint y1 = 1;
+
 		GLint y2 = m_panRect.bottom() - 1;
 
-		TGL2int *vertexArray = new TGL2int[len * 2];
-		int vertexArrayLen = 0;
-
-		TGL2int point1, point2;
-		point1.y = y1;
-		point2.y = y2;
 		for (int i = 0; i < len; i++) {
-
 			GLint x = m_frequencyScale.mainPointPositions.at(i);
-			if (x < x2) continue;
-			x += x1;
-			point1.x = x;
-			point2.x = x;
-			vertexArray[vertexArrayLen++] = point1;
-			vertexArray[vertexArrayLen++] = point2;
+            painter->drawLine(x,y1,x,y2);
 		}
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(2, GL_INT, 0, vertexArray);
-		glDrawArrays(GL_LINES, 0, vertexArrayLen);
-		glDisableClientState(GL_VERTEX_ARRAY);
-
-		delete[] vertexArray;
 	}
 
 	// horizontal lines
 	len = m_dBmScale.mainPointPositions.length();
-	if (len > 0) {
+    if (len > 0) {
 
-		TGL2float *vertexArray = new TGL2float[len * 2];
-		int vertexArrayLen = 0;
+        for (int i = 0; i < len; i++) {
+            GLint x1 = m_panRect.left();
+            GLint x2 = m_panRect.right();
+            GLint y =  m_dBmScale.mainPointPositions.at(i);
+            painter->drawLine(x1,y,x2,y);
+        }
+    }
 
-		TGL2float point1, point2;
-		point1.x = m_panRect.left();// + m_dBmScaleRect.width();
-		point2.x = m_panRect.right();
-		
-		for (int i = 0; i < len; i++) {
-
-			GLfloat y = m_dBmScale.mainPointPositions.at(i);
-			
-			point1.y = y;
-			point2.y = y;
-			
-			vertexArray[vertexArrayLen++] = point1;
-			vertexArray[vertexArrayLen++] = point2;
-		}
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(2, GL_FLOAT, 0, vertexArray);
-		glDrawArrays(GL_LINES, 0, vertexArrayLen);
-		glDisableClientState(GL_VERTEX_ARRAY);
-
-		delete[] vertexArray;
-	}
-	glDisable(GL_LINE_STIPPLE);
+    painter->end();
+    restoreGLState();
 }
  
 //********************************************************************
