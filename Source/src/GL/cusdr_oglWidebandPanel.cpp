@@ -941,24 +941,25 @@ void QGLWidebandPanel::drawHamBand(
 
 	GLint y1 = m_panRect.top();// + 15;
 	GLint y2 = m_panRect.bottom();
-	
 	QRect rect = QRect(x1, y1, x2-x1, y2);
+	QLinearGradient colorGradient = QLinearGradient(x1,y1,x2-x1,y2);
+	colorGradient.setSpread(QGradient::PadSpread);
+	colorGradient.setColorAt(0, QColor((int)(255 * m_bkgRed), (int)(255 * m_bkgGreen), (int)(255 * m_bkgBlue), 80));
+	colorGradient.setColorAt(1, QColor((int)(255 * m_bkgRed), (int)(255 * m_bkgGreen), (int)(255 * m_bkgBlue), 40));
+	QBrush colorGradiantBrush = QBrush(colorGradient);
+	saveGLState();
+	painter->begin(this);
+	painter->setBrush(colorGradient);
+	painter->drawRect(rect);
+    int fontWidth = m_fonts.smallFontMetrics->boundingRect(band).width();
+    painter->setPen(QPen(QColor(255,255,255,180)));
+    painter->setFont(m_oglTextNormal->font());
+    painter->drawText((x2 + x1 - fontWidth)/2 , y1 +  m_fonts.smallFontMetrics->height() , band);
+ 	painter->end();
+	restoreGLState();
 
-	if (x2 < m_dBmScaleRect.left()) {
 
-		drawGLRect(
-				rect,
-				QColor((int)(255 * m_bkgRed), (int)(255 * m_bkgGreen), (int)(255 * m_bkgBlue), 180),
-				QColor((int)(255 * m_bkgRed), (int)(255 * m_bkgGreen), (int)(255 * m_bkgBlue), 80),
-				-2.0f,
-				false);
-	}
 
-	//QFontMetrics d_fm(m_smallFont);
-	int fontWidth = m_fonts.smallFontMetrics->boundingRect(band).width();
-
-    glColor4f(255, 255, 255, 180);
-	m_oglTextSmall->renderText((x2 + x1 - fontWidth)/2.0f, y1, 5.0f, band);
 }
 
 //************************************************************************
