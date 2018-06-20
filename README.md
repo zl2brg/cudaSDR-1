@@ -5,8 +5,9 @@ Updating to Qt5.x - still in progress
 Added WDSP related functionality
 
 Todo :-
-FreeDV support
+FreeDV 
 HamLib
 Tx
+
 
 
