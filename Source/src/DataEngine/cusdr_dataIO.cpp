@@ -1,4 +1,5 @@
 /**
+/**
 * @file  cusdr_dataIO.cpp
 * @brief Data IO class
 * @author Hermann von Hasseln, DL3HVH
@@ -287,7 +288,6 @@ void DataIO::readDeviceData() {
 				}
 				else if (m_datagram[3] == (char)0x04) { // wide band data
 
-					//qDebug() << "wideband data received!";
 					m_sequenceWideBand  = (m_datagram[4] & 0xFF) << 24;
 					m_sequenceWideBand += (m_datagram[5] & 0xFF) << 16;
 					m_sequenceWideBand += (m_datagram[6] & 0xFF) << 8;
@@ -317,12 +317,10 @@ void DataIO::readDeviceData() {
 					{
 						m_wbDatagram.append(m_datagram.mid(METIS_HEADER_SIZE, BUFFER_SIZE));
 					}
-                  //  qDebug() << "count " << m_wbCount << " " << m_wbBuffers;
 					if (m_wbCount++ == m_wbBuffers)
 					{
 						// enqueue
 						m_sendEP4 = false;
-						qDebug() << "Queud data";
 						io->wb_queue.enqueue(m_wbDatagram);
 						m_wbDatagram.resize(0);
 					}
@@ -630,5 +628,5 @@ void DataIO::setSampleRate(QObject *sender, int value) {
 
 
 void DataIO::set_wbBuffers(int val) {
-    m_wbBuffers = val;
+    m_wbBuffers = val - 1;
 }

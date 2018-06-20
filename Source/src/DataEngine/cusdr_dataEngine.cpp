@@ -1984,7 +1984,7 @@ void DataEngine::setWideBandBufferCount()
 	else
 		wbBuffers = SMALLWIDEBANDSIZE / 512;
 
-	set->setWidebandBuffers(this, 16);
+	set->setWidebandBuffers(this, wbBuffers);
 
 }
 //********************************************************
@@ -3824,7 +3824,6 @@ void WideBandDataProcessor::processWideBandData() {
 }
 
 void WideBandDataProcessor::processWideBandInputBuffer(const QByteArray &buffer) {
-	qDebug() << "process wideband";
 	int size;
 	//if (m_mercuryFW > 32 || m_hermesFW > 16)
 	if (io->mercuryFW > 32 || io->hermesFW > 11)
