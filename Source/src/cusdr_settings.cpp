@@ -4374,7 +4374,7 @@ void Settings::setWidebandOptions(QObject *sender, TWideband options) {
     QMutexLocker locker(&settingsMutex);
 
     m_widebandOptions = options;
-
+    locker.unlock();
     emit widebandOptionsChanged(sender, m_widebandOptions);
 }
 
@@ -4384,7 +4384,7 @@ void Settings::setWidebandStatus(QObject *sender, bool value) {
 
     if (m_widebandOptions.wideBandDisplayStatus == value) return;
     m_widebandOptions.wideBandDisplayStatus = value;
-
+    locker.unlock();
     emit widebandStatusChanged(sender, m_widebandOptions.wideBandDisplayStatus);
 }
 
@@ -4394,16 +4394,17 @@ void Settings::setWidebandData(QObject *sender, bool value) {
 
     if (m_widebandOptions.wideBandData == value) return;
     m_widebandOptions.wideBandData = value;
-
+    locker.unlock();
     emit widebandDataChanged(sender, m_widebandOptions.wideBandData);
 }
 
 void Settings::setWidebandBuffers(QObject *sender, int value) {
 
     Q_UNUSED(sender)
-
+    SETTINGS_DEBUG << "Set WidebandBuffers)! " << value ;
     QMutexLocker locker(&settingsMutex);
     m_widebandOptions.numberOfBuffers = value;
+    locker.unlock();
 }
 
 void Settings::setWidebanddBmScaleMin(QObject *sender, qreal value) {

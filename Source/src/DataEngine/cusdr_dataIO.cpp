@@ -317,11 +317,12 @@ void DataIO::readDeviceData() {
 					{
 						m_wbDatagram.append(m_datagram.mid(METIS_HEADER_SIZE, BUFFER_SIZE));
 					}
-						
+                  //  qDebug() << "count " << m_wbCount << " " << m_wbBuffers;
 					if (m_wbCount++ == m_wbBuffers)
 					{
 						// enqueue
 						m_sendEP4 = false;
+						qDebug() << "Queud data";
 						io->wb_queue.enqueue(m_wbDatagram);
 						m_wbDatagram.resize(0);
 					}
@@ -396,25 +397,6 @@ void DataIO::sendInitFramesToNetworkDevice(int rx) {
 
 	for (int i = 528; i < 1032; i++) initDatagram[i]  = 0x00;
 
-//	for (int i = 0; i < 5; i++) {
-//
-//		if (m_dataIOSocket->writeDatagram(initDatagram.data(), initDatagram.size(), io->hpsdrDeviceIPAddress, DEVICE_PORT) < 0) {
-//
-//			io->networkIOMutex.lock();
-//			DATAIO_DEBUG << "error sending init data to device: " << qPrintable(m_dataIOSocket->errorString());
-//			io->networkIOMutex.unlock();
-//		}
-//		else {
-//
-//			if (i == 0) {
-//
-//				io->networkIOMutex.lock();
-//				DATAIO_DEBUG << "init frames sent to network device.";
-//				io->networkIOMutex.unlock();
-//			}
-//		}
-//	}
-
 	if (m_dataIOSocket->writeDatagram(initDatagram.data(), initDatagram.size(), io->hpsdrDeviceIPAddress, DEVICE_PORT) < 0) {
 
 		io->networkIOMutex.lock();
@@ -424,22 +406,7 @@ void DataIO::sendInitFramesToNetworkDevice(int rx) {
 	else {
 
 		io->networkIOMutex.lock();
-		DATAIO_DEBUG << "init frames sent to network device.";
-		io->networkIOMutex.unlock();
-	}
-
-	SleeperThread::msleep(20);
-
-	if (m_dataIOSocket->writeDatagram(initDatagram.data(), initDatagram.size(), io->hpsdrDeviceIPAddress, DEVICE_PORT) < 0) {
-
-		io->networkIOMutex.lock();
-		DATAIO_DEBUG << "error sending init data to device: " << qPrintable(m_dataIOSocket->errorString());
-		io->networkIOMutex.unlock();
-	}
-	else {
-
-		io->networkIOMutex.lock();
-		DATAIO_DEBUG << "init frames sent to network device.";
+		DATAIO_DEBUG << "init frames sent to network device. " << rx;
 		io->networkIOMutex.unlock();
 	}
 }
@@ -659,4 +626,9 @@ void DataIO::setSampleRate(QObject *sender, int value) {
 #endif
 
 	io->networkIOMutex.unlock();
+}
+
+
+void DataIO::set_wbBuffers(int val) {
+    m_wbBuffers = val;
 }

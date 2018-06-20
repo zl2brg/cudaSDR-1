@@ -533,6 +533,10 @@ bool DataEngine::getFirmwareVersions() {
 	set->setSystemMessage(str.arg(set->getNumberOfReceivers()), rcvrs * 500);
 
 	if (!initReceivers(rcvrs)) return false;
+	if (!initReceivers(rcvrs)) return false;
+
+
+
 
 	if (!m_dataIO) createDataIO();
 		
@@ -591,22 +595,11 @@ bool DataEngine::getFirmwareVersions() {
 	setSystemState(QSDR::NoError, m_hwInterface, m_serverMode, QSDR::DataEngineUp);
 	SleeperThread::msleep(300);
 
-	io.metisFW = set->getMetisVersion();
-	io.mercuryFW = set->getMercuryVersion();
-	io.penelopeFW = set->getPenelopeVersion();
-	io.pennylaneFW = set->getPennyLaneVersion();
-	io.hermesFW = set->getHermesVersion();
-
-	// if we have 4096 * 16 bit = 8 * 1024 raw consecutive ADC samples, m_wbBuffers = 8
-	// we have 16384 * 16 bit = 32 * 1024 raw consecutive ADC samples, m_wbBuffers = 32
-	int wbBuffers = 0;
-	if (io.mercuryFW > 32 || io.hermesFW > 11)
-		wbBuffers = BIGWIDEBANDSIZE / 512;
-	else
-		wbBuffers = SMALLWIDEBANDSIZE / 512;
-
-	set->setWidebandBuffers(this, wbBuffers);
-
+    io.metisFW = set->getMetisVersion();
+    io.mercuryFW = set->getMercuryVersion();
+    io.penelopeFW = set->getPenelopeVersion();
+    io.pennylaneFW = set->getPennyLaneVersion();
+    io.hermesFW = set->getHermesVersion();
 	if (set->getFirmwareVersionCheck())
 		return checkFirmwareVersions();
 	else
@@ -806,6 +799,7 @@ bool DataEngine::checkFirmwareVersions() {
 		set->showWarningDialog(msg);
 		return false;
 	}
+	setWideBandBufferCount();
 
 	return true;
 }
@@ -821,7 +815,7 @@ bool DataEngine::start() {
 	if (!m_dataIO) createDataIO();
 	
 	if (!m_dataProcessor) createDataProcessor();
-		
+
 	if (m_serverMode == QSDR::SDRMode && !m_wbDataProcessor)
 		createWideBandDataProcessor();
 
@@ -951,9 +945,12 @@ bool DataEngine::start() {
 			//setSystemState(QSDR::DataProcessThreadError, m_hwInterface, m_serverMode, QSDR::DataEngineDown);
 			return false;
 	}
+		m_dataIO->set_wbBuffers(set->getWidebandBuffers());
 	}
 
-	if (m_serverMode != QSDR::ChirpWSPR && !startWideBandDataProcessor(QThread::NormalPriority)) {
+
+
+	if (!startWideBandDataProcessor(QThread::NormalPriority)) {
 
 		DATA_ENGINE_DEBUG << "wide band data processor thread could not be started.";
 		return false;
@@ -985,27 +982,23 @@ bool DataEngine::start() {
 	//m_ADCChangedTime.start();
 	//m_smeterTime.start();
 
-	// start the "frames-per-second" timer for all receivers
-	for (int i = 0; i < rcvrs; i++)
+		// pre-conditioning
+	for (int i = 0; i < io.receivers; i++) {
+			m_dataIO->sendInitFramesToNetworkDevice(i);
+		}
 
-	// just give them a little time..
-	SleeperThread::msleep(100);
-
-	// pre-conditioning
-	for (int i = 0; i < io.receivers; i++)
-		m_dataIO->sendInitFramesToNetworkDevice(i);
-				
-	if (m_serverMode == QSDR::SDRMode && set->getWidebandData())
-		m_dataIO->networkDeviceStartStop(0x03); // 0x03 for starting the device with wide band data
+    if (m_serverMode == QSDR::SDRMode && set->getWidebandData()) {
+			m_dataIO->networkDeviceStartStop(0x03); // 0x03 for starting the device with wide band data
+			SleeperThread::msleep(100);
+	}
 	else
 		m_dataIO->networkDeviceStartStop(0x01); // 0x01 for starting the device without wide band data
-		
-	m_networkDeviceRunning = true;
+		m_networkDeviceRunning = true;
 
-	setSystemState(QSDR::NoError, m_hwInterface, m_serverMode, QSDR::DataEngineUp);
-	set->setSystemMessage("System running", 4000);
+		setSystemState(QSDR::NoError, m_hwInterface, m_serverMode, QSDR::DataEngineUp);
+		set->setSystemMessage("System running", 4000);
 
-	DATA_ENGINE_DEBUG << "Data Engine thread: " << this->thread();
+		DATA_ENGINE_DEBUG << "Data Engine thread: " << this->thread();
 
 	return true;
 }
@@ -1147,8 +1140,7 @@ bool DataEngine::initDataEngine() {
 		if (findHPSDRDevices()) {
 		
 			if (io.mercuryFW > 0 || io.hermesFW > 0) {
-				
-				stop();
+
 				DATA_ENGINE_DEBUG << "got firmware versions:";
 				DATA_ENGINE_DEBUG << "	Metis firmware:  " << io.metisFW;
 				DATA_ENGINE_DEBUG << "	Mercury firmware:  " << io.mercuryFW;
@@ -1981,7 +1973,20 @@ void DataEngine::stopChirpDataProcessor() {
 	else
 		DATA_ENGINE_DEBUG << "chirp data processor thread wasn't started.";
 }
- 
+
+void DataEngine::setWideBandBufferCount()
+{
+	// if we have 4096 * 16 bit = 8 * 1024 raw consecutive ADC samples, m_wbBuffers = 8
+	// we have 16384 * 16 bit = 32 * 1024 raw consecutive ADC samples, m_wbBuffers = 32
+	int wbBuffers = 0;
+	if (io.mercuryFW > 32 || io.hermesFW > 11)
+		wbBuffers = BIGWIDEBANDSIZE / 512;
+	else
+		wbBuffers = SMALLWIDEBANDSIZE / 512;
+
+	set->setWidebandBuffers(this, 16);
+
+}
 //********************************************************
 // create, start/stop audio receiver
 
@@ -3806,7 +3811,6 @@ void WideBandDataProcessor::stop() {
 void WideBandDataProcessor::processWideBandData() {
 
 	forever {
-
 		processWideBandInputBuffer(io->wb_queue.dequeue());
 		
 		m_mutex.lock();
@@ -3820,7 +3824,7 @@ void WideBandDataProcessor::processWideBandData() {
 }
 
 void WideBandDataProcessor::processWideBandInputBuffer(const QByteArray &buffer) {
-
+	qDebug() << "process wideband";
 	int size;
 	//if (m_mercuryFW > 32 || m_hermesFW > 16)
 	if (io->mercuryFW > 32 || io->hermesFW > 11)
@@ -3831,7 +3835,7 @@ void WideBandDataProcessor::processWideBandInputBuffer(const QByteArray &buffer)
 	qint64 length = buffer.length();
 	if (buffer.length() != size) {
 
-		WIDEBAND_PROCESSOR_DEBUG << "wrong wide band buffer length: " << length;
+		WIDEBAND_PROCESSOR_DEBUG << "wrong wide band buffer length: " << length << "size " << size <<  "ver " << io->hermesFW ;
 		return;
 	}
 
@@ -3885,3 +3889,4 @@ void WideBandDataProcessor::setWbSpectrumAveraging(QObject* sender, int rx, bool
 	m_wbSpectrumAveraging = value;
 	m_mutex.unlock();
 }
+

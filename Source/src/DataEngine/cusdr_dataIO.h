@@ -52,6 +52,7 @@ class DataIO : public QObject {
 
 public:
     DataIO(THPSDRParameter *ioData = 0);
+    void set_wbBuffers(int val);
 	~DataIO();
 
 public slots:

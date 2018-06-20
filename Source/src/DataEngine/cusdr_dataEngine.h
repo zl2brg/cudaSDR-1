@@ -190,6 +190,7 @@ private:
 	void	stopWideBandDataProcessor();
 	void	stopChirpDataProcessor();
 	void	setHPSDRConfig();
+	void    setWideBandBufferCount();
 
 private:
 	DataProcessor*			m_dataProcessor;

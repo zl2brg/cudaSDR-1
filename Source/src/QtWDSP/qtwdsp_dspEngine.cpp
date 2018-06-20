@@ -119,7 +119,10 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
 
 
 QWDSPEngine::~QWDSPEngine() {
-    CloseChannel(m_rx);
+	SetChannelState(m_rx,0,0);
+	SleeperThread::msleep(100);
+  //  CloseChannel(m_rx);
+	SleeperThread::msleep(100);
 	tmp1CPX.clear();
 	tmp2CPX.clear();
 
