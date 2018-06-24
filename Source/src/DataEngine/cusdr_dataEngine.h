@@ -504,8 +504,11 @@ public slots:
 private slots:
 	//void	initDataProcessorSocket();
 	//void	displayDataProcessorSocketError(QAbstractSocket::SocketError error);
+	void	newprocessWideBandInputBuffer(const QByteArray &buffer);
 	void	processWideBandInputBuffer(const QByteArray &buffer);
-	
+	void 	getSpectrumdata(int size);
+	void 	new_getSpectrumData();
+
 private:
 	THPSDRParameter*	io;
 	Settings*			set;
@@ -529,6 +532,7 @@ private:
 	volatile bool	m_stopped;
 
 	unsigned char	m_ibuffer[IO_BUFFER_SIZE * IO_BUFFERS];
+    void initWidebandAnalyzer();
 
 signals:
 	void	messageEvent(QString message);

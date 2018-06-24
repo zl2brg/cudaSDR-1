@@ -321,18 +321,21 @@ void Receiver::stop() {
 }
 
 void Receiver::dspProcessing() {
-
+	int spectrumDataReady;
 	//RECEIVER_DEBUG << "dspProcessing: " << this->thread();
     qtwdsp->processDSP(inBuf, audioOutputBuf);
 	// spectrum
 
 	if (highResTimer->getElapsedTimeInMicroSec() >= getDisplayDelay()) {
-		memcpy(
+		GetPixels(0,0,qtwdsp->spectrumBuffer.data(), &spectrumDataReady);
+		if (spectrumDataReady) {
+			memcpy(
 					newSpectrum.data(),
 					qtwdsp->spectrumBuffer.data(),
 					4096 * sizeof(float)
 			);
 			emit spectrumBufferChanged(m_receiver, newSpectrum);
+		}
 		highResTimer->start();
 	}
 

@@ -120,10 +120,7 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
 
 QWDSPEngine::~QWDSPEngine() {
 	SetChannelState(m_rx,0,0);
-	SleeperThread::msleep(100);
-  //  CloseChannel(m_rx);
-	SleeperThread::msleep(100);
-	tmp1CPX.clear();
+    tmp1CPX.clear();
 	tmp2CPX.clear();
 
 
@@ -266,14 +263,13 @@ void QWDSPEngine::processDSP(CPX &in, CPX &out) {
 int error;
 	m_mutex.lock();
     fexchange0(m_rx, (double *) in.data(),  (double *) out.data(), &error);
-
     if(error!=0) {
         WDSP_ENGINE_DEBUG << "WDSP channel read error " << error;
     }
     Spectrum0(1, m_rx, 0, 0,(double *) in.data());
-    GetPixels(0,0,spectrumBuffer.data(), &spectrumDataReady);
 	m_mutex.unlock();
 }
+
 
 double QWDSPEngine::getSMeterInstValue() {
 
@@ -302,9 +298,6 @@ void QWDSPEngine::setDSPMode(DSPMode mode) {
 }
 
 void QWDSPEngine::setAGCMode(AGCMode agc) {
-
-
-
 		SetRXAAGCMode(m_rx, agc);
 		//SetRXAAGCThresh(rx->id, agc_thresh_point, 4096.0, rx->sample_rate);
 		SetRXAAGCSlope(m_rx,m_agcSlope);
