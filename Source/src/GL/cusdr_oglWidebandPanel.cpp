@@ -68,7 +68,7 @@ QGLWidebandPanel::QGLWidebandPanel(QWidget *parent)
 		, m_currentReceiver(set->getCurrentReceiver())
 		, m_sampleRate(set->getSampleRate())
 		, m_freqScaleZoomFactor(1.0)
-		, m_dBmScaleOffset(0.0)
+		, m_dBmScaleOffset(-40.0)
 {
 //	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 

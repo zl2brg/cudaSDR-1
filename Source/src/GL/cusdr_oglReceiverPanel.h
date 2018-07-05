@@ -33,7 +33,6 @@
 #include "cusdr_fonts.h"
 #include "Util/cusdr_buttons.h"
 #include "cusdr_oglText.h"
-#include "QtDSP/qtdsp_dualModeAverager.h"
 #include "cusdr_radioPopupWidget.h"
 
 #include <QWheelEvent>
@@ -91,7 +90,6 @@ private:
 	CFonts*						fonts;
 	TFonts						m_fonts;
 
-	DualModeAverager*			averager;
 	RadioPopupWidget*			radioPopup;
 	ADCMode						m_adcMode;
 	AGCMode						m_agcMode;

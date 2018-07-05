@@ -4687,8 +4687,9 @@ void Settings::setSpectrumAveraging(QObject *sender, int rx, bool value) {
         m_receiverDataList[rx].spectrumAveraging = value;
     }
 
-    //SETTINGS_DEBUG << "Averaging for Rx " << rx << " : " << value;
-    emit spectrumAveragingChanged(sender, rx, value);
+    SETTINGS_DEBUG << "Averaging for Rx " << rx << " : " << value;
+   // emit spectrumAveragingChanged(sender, rx, value);
+    emit spectrumAveragingCntChanged(sender, rx, 100);
 }
 
 bool Settings::getSpectrumAveraging(int rx) {
@@ -4709,14 +4710,14 @@ int Settings::getSpectrumAveragingCnt(int rx) {
 
 void Settings::setSpectrumAveragingCnt(QObject *sender, int rx, int value) {
 
-    QMutexLocker locker(&settingsMutex);
+ //   QMutexLocker locker(&settingsMutex);
 
     //if (m_specAveragingCnt == value) return
     if (rx == -1)
         m_widebandOptions.averagingCnt = value;
     else
         m_receiverDataList[rx].averagingCnt = value;
-
+    qDebug() << "spec av" << value;
     emit spectrumAveragingCntChanged(sender, rx, value);
 }
 

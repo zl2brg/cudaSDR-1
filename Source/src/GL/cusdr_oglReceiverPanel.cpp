@@ -176,7 +176,6 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 	m_agcHangEnabled = m_rxDataList.at(m_receiver).hangEnabled;
 	m_showAGCLines = m_rxDataList.at(m_receiver).agcLines;
 
-	averager = new DualModeAverager(m_receiver, m_spectrumSize);
 	radioPopup = new RadioPopupWidget(this, m_receiver);
 
 	fonts = new CFonts(this);
@@ -314,9 +313,6 @@ QGLReceiverPanel::~QGLReceiverPanel() {
 		delete m_secScaleWaterfallFBO;
 		m_secScaleWaterfallFBO = 0;
 	}
-
-	if (averager)
-		delete averager;
 
 	while (!specAv_queue.isEmpty())
 		specAv_queue.dequeue();
@@ -3765,7 +3761,6 @@ void QGLReceiverPanel::setSpectrumBuffer(int rx, const qVectorFloat& buffer) {
 	
 			spectrumBufferMutex.lock();
 			specBuf = buffer;
-		//	averager->ProcessDBAverager(specBuf, specBuf);
 			computeDisplayBins(specBuf, waterBuf);
 			spectrumBufferMutex.unlock();
 		}
@@ -4161,7 +4156,6 @@ void QGLReceiverPanel::systemStateChanged(
 	//	m_panadapterBins.clear();
 
 	if (state == QSDR::DataEngineDown)
-		averager->clearBuffer();
 
 	if (m_serverMode != mode)
 		m_serverMode = mode;

@@ -143,24 +143,24 @@ void QWDSPEngine::setupConnections() {
 			SIGNAL(ncoFrequencyChanged(int, long)),
 			this,
 			SLOT(setNCOFrequency(int, long)));
+
 	CHECKED_CONNECT(
 			set,
 			SIGNAL(sampleSizeChanged(int, int)),
 			this,
 			SLOT(setSampleSize(int, int)));
+
 	CHECKED_CONNECT(
 			set,
 			SIGNAL(framesPerSecondChanged(QObject*, int, int)),
 			this,
 			SLOT(setFramesPerSecond(QObject*, int, int)));
 
-
     CHECKED_CONNECT(
             set,
             SIGNAL(framesPerSecondChanged(QObject*, int, int)),
             this,
             SLOT(setFramesPerSecond(QObject*, int, int)));
-
 
     CHECKED_CONNECT(
             set,

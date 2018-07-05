@@ -52,9 +52,9 @@
 #include "Util/qcircularbuffer.h"
 #include "QtDSP/qtdsp_fft.h"
 #include "QtDSP/qtdsp_filter.h"
-#include "QtDSP/qtdsp_dualModeAverager.h"
 #include "AudioEngine/cusdr_audio_engine.h"
 #include "QtWDSP/qtwdsp_dspEngine.h"
+#include "cusdr_WidebandProcessor.h"
 
 #ifdef LOG_DATA_ENGINE
 #   define DATA_ENGINE_DEBUG qDebug().nospace() << "DataEngine::\t"
@@ -106,6 +106,8 @@ public:
 public slots:
 	bool	initDataEngine();
 	void	stop();
+	void 	setWbSpectrumAveraging(QObject*, int rx, int value);
+
 
 	// set Server parameter
 	void	setRxPeerAddress(int rx, QHostAddress address);
@@ -195,7 +197,7 @@ private:
 private:
 	DataProcessor*			m_dataProcessor;
 	WideBandDataProcessor*	m_wbDataProcessor;
-	QWDSPEngine*				m_chirpDspEngine;
+	QWDSPEngine*			m_chirpDspEngine;
 	AudioReceiver*			m_audioReceiver;
 	AudioEngine*			m_audioEngine;
 	AudioOutProcessor*		m_audioOutProcessor;
@@ -363,7 +365,7 @@ public slots:
 	void	processDeviceData();
 	void	externalDspProcessing(int rx);
 	void	externalDspProcessingBig(int rx);
-	
+
 private slots:
 	void	initDataProcessorSocket();
 	void	displayDataProcessorSocketError(QAbstractSocket::SocketError error);
@@ -483,60 +485,6 @@ signals:
 	//void	newData();
 	//void	newIQData(int rx);
 	//void	newAudioDataEvent(float *lBuf, float *rBuf);
-};
- 
-// *********************************************************************
-// Wide band data processor class
-
-class WideBandDataProcessor : public QObject {
-
-    Q_OBJECT
-
-public:
-	explicit WideBandDataProcessor(THPSDRParameter *ioData = 0, QSDR::_ServerMode serverMode = QSDR::NoServerMode, int size = 0);
-	~WideBandDataProcessor() override;
-
-public slots:
-	void	stop();
-	void	processWideBandData();
-	void	setWbSpectrumAveraging(QObject* sender, int rx, bool value);
-	
-private slots:
-	//void	initDataProcessorSocket();
-	//void	displayDataProcessorSocketError(QAbstractSocket::SocketError error);
-	void	newprocessWideBandInputBuffer(const QByteArray &buffer);
-	void	processWideBandInputBuffer(const QByteArray &buffer);
-	void 	getSpectrumdata(int size);
-	void 	new_getSpectrumData();
-
-private:
-	THPSDRParameter*	io;
-	Settings*			set;
-
-	QFFT*				wbFFT;
-	DualModeAverager*	wbAverager;
-	
-	CPX					cpxWBIn;
-	CPX					cpxWBOut;
-
-	QMutex				m_mutex;
-	QByteArray			m_WBDatagram;
-	QString				m_message;
-
-	QSDR::_ServerMode		m_serverMode;
-
-	int				m_size;
-	int				m_bytes;
-
-	bool			m_wbSpectrumAveraging;
-	volatile bool	m_stopped;
-
-	unsigned char	m_ibuffer[IO_BUFFER_SIZE * IO_BUFFERS];
-    void initWidebandAnalyzer();
-
-signals:
-	void	messageEvent(QString message);
-	void	wbSpectrumBufferChanged(const qVectorFloat &buffer);
 };
  
 

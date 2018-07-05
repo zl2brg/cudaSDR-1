@@ -405,6 +405,7 @@ void DisplayOptionsWidget::createPanSpectrumOptions() {
 
 	CHECKED_CONNECT(m_avgSlider, SIGNAL(valueChanged(int)), this, SLOT(averagingFilterCntChanged(int)));
 
+
 	QString str = "%1 ";
 	m_avgLevelLabel = new QLabel(str.arg(m_avgValue, 2, 10, QLatin1Char(' ')), this);
 	m_avgLevelLabel->setFont(m_fonts.smallFont);
@@ -585,7 +586,7 @@ void DisplayOptionsWidget::createWidebandPanOptions() {
 	m_wbAvgSlider->setTickPosition(QSlider::NoTicks);
 	m_wbAvgSlider->setFixedSize(130, 12);
 	m_wbAvgSlider->setSingleStep(1);
-	m_wbAvgSlider->setRange(1, 100);
+	m_wbAvgSlider->setRange(1, 1000);
 	m_wbAvgSlider->setValue(m_wbAvgValue);
 	m_wbAvgSlider->setStyleSheet(set->getVolSliderStyle());
 

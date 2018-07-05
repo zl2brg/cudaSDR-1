@@ -928,7 +928,6 @@ signals:
 
 	void spectrumAveragingChanged(QObject *sender, int rx, bool value);
 	void spectrumAveragingCntChanged(QObject *sender, int rx, int value);
-	
 
 	void waterfallTimeChanged(int rx, int value);
 	void waterfallOffesetLoChanged(int rx, int value);

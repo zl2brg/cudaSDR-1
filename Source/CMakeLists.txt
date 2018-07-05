@@ -54,9 +54,9 @@ set (SOURCES
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_discoverer.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_receiver.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/soundout.cpp 
-	${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.cpp 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_dualModeAverager.cpp
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_fft.cpp 
+	${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.cpp
+	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_WidebandProcessor.cpp
+	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_fft.cpp
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_filter.cpp 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_powerSpectrum.cpp 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDisplayPanel.cpp
@@ -129,10 +129,10 @@ set (HEADERS
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_receiver.h 
 	${CMAKE_SOURCE_DIR}/DataEngine/soundout.h 
 	${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.h 
-	${CMAKE_SOURCE_DIR}/DataEngine/datatypes.h 
-	${CMAKE_SOURCE_DIR}/QtDSP/fftw3.h 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_dualModeAverager.h
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_fft.h 
+	${CMAKE_SOURCE_DIR}/DataEngine/datatypes.h
+	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_WidebandProcessor.h
+	${CMAKE_SOURCE_DIR}/QtDSP/fftw3.h
+	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_fft.h
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_filter.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_powerSpectrum.h 
 	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_invsinc_coeff.h 
