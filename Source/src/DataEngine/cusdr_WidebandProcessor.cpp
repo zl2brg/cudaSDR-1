@@ -48,35 +48,19 @@ WideBandDataProcessor::WideBandDataProcessor(THPSDRParameter *ioData, QSDR::_Ser
 	, m_serverMode(serverMode)
 	, m_size(size)
 	, m_bytes(0)
-	, m_wbSpectrumAveraging(true)
 	, m_stopped(false)
 {
 	int result;
-	m_WBDatagram.resize(0);
-
-	switch (m_serverMode) {
-
-		case QSDR::SDRMode:
-			cpxWBIn.resize(WIDEBAND_BUFFER_SIZE);
-            specBuf.resize(NUM_PIXELS * 2);
-
-            XCreateAnalyzer(WIDEBAND_DISPLAY_NUMBER, &result, 262144, 1, 1, "");
-            if(result != 0) {
-                WIDEBAND_PROCESSOR_DEBUG <<  "wideband XCreateAnalyzer failed:" << result;
-            } else {
-                initWidebandAnalyzer();
-            }
-			break;
-
-		//case QSDR::ExternalDSP:
-		case QSDR::ChirpWSPR:
-		case QSDR::ChirpWSPRFile:
-			break;
-
-		case QSDR::NoServerMode:
-		case QSDR::DemoMode:
-			break;
+	m_wbSpectrumAveraging = set->getSpectrumAveragingCnt(-1);
+	cpxWBIn.resize(WIDEBAND_BUFFER_SIZE);
+	specBuf.resize(NUM_PIXELS * 2);
+	XCreateAnalyzer(WIDEBAND_DISPLAY_NUMBER, &result, 262144, 1, 1, "");
+	if(result != 0) {
+		WIDEBAND_PROCESSOR_DEBUG <<  "wideband XCreateAnalyzer failed:" << result;
+	} else {
+		initWidebandAnalyzer();
 	}
+	setWbSpectrumAveraging(this, -1,m_wbSpectrumAveraging);
 }
 
 void  WideBandDataProcessor::initWidebandAnalyzer() {
@@ -170,7 +154,7 @@ void WideBandDataProcessor::processWideBandInputBuffer(const QByteArray &buffer)
 		WIDEBAND_PROCESSOR_DEBUG << "wrong wide band buffer length: " << length << "size " << size <<  "ver " << io->hermesFW ;
 		return;
 	}
-	for (int i = 0, x = 0; i < length; i += 2) {
+	for (int i = 0; i < length; i += 2) {
 		sample = (short) ((buffer.at(i + 1) << 8)  + (short)(buffer.at(i) & 0xFF));
 		sampledouble=(double)sample/32767.0;
 		cpxWBIn[i/2].re = sampledouble;
