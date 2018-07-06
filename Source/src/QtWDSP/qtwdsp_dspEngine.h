@@ -124,10 +124,6 @@ private:
 	TReceiver	m_rxData;
 	AGCMode		m_agcMode;
 	PowerSpectrum*		spectrum;
-	QList<PowerSpectrum* >	powerSpectraList;
-	CPX		tmp1CPX;
-	CPX		tmp2CPX;
-
 
 	QMutex	m_mutex;
 

@@ -61,14 +61,14 @@ Receiver::Receiver(int rx)
 
 Receiver::~Receiver() {
 
-	inBuf.clear();
-	outBuf.clear();
 
 	if (qtwdsp) {
 
 		delete qtwdsp;
 		qtwdsp = nullptr;
 	}
+	inBuf.clear();
+	outBuf.clear();
 
 	m_stopped = false;
 }

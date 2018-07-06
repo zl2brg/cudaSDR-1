@@ -533,12 +533,7 @@ bool DataEngine::getFirmwareVersions() {
 
 	QString str = "Initializing %1 receiver(s)...please wait";
 	set->setSystemMessage(str.arg(set->getNumberOfReceivers()), rcvrs * 500);
-
 	if (!initReceivers(rcvrs)) return false;
-	if (!initReceivers(rcvrs)) return false;
-
-
-
 
 	if (!m_dataIO) createDataIO();
 		
@@ -812,7 +807,6 @@ bool DataEngine::start() {
 	m_sendState = 0;
 
 	int rcvrs = set->getNumberOfReceivers();
-	if (!initReceivers(rcvrs)) return false;
 
 	if (!m_dataIO) createDataIO();
 	
