@@ -120,20 +120,10 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
 
 QWDSPEngine::~QWDSPEngine() {
 	SetChannelState(m_rx,0,0);
-    tmp1CPX.clear();
-	tmp2CPX.clear();
-
-
-	if (!powerSpectraList.empty()) {
-
-		powerSpectraList.clear();
-	}
-
-
-
-	//if (agc)
-	//	delete agc;
-
+    CloseChannel(0);
+	destroy_nobEXT(m_rx);
+	destroy_anbEXT(m_rx);
+	qDebug() << "dspengine " << m_rx << "stop";
 }
 
 void QWDSPEngine::setupConnections() {

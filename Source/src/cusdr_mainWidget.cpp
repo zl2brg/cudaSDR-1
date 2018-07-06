@@ -1284,7 +1284,7 @@ void MainWindow::masterSwitchChanged(
 	if (power) {
 
 		if (m_dataEngine->initDataEngine()) { // start data engine
-		
+
 			//if (m_serverMode == QSDR::ExternalDSP && !m_hpsdrServer->startServer())
 			//	m_hpsdrServer->stopServer();
 			return;
