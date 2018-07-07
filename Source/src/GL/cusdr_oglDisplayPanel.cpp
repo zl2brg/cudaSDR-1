@@ -148,7 +148,6 @@ OGLDisplayPanel::OGLDisplayPanel(QWidget *parent)
     m_activeTextColor = QColor(166, 196, 208);
 	m_inactiveTextColor = QColor(68, 68, 68);//Qt::white;//
 	m_textBackgroundColor = QColor(66, 96, 208);
-
 	m_sMeterTimer.start();
 	m_sMeterMaxTimer.start();
 	m_sMeterMinTimer.start();
@@ -425,7 +424,6 @@ void OGLDisplayPanel::setupTextstrings() {
 
     m_hermesStepAttnString = QString("Hermes Step-Attn:");
     m_hermesStepAttnStringWidth = m_oglTextSmall->fontMetrics().width(m_hermesStepAttnString);
-    update();
 }
 
 void OGLDisplayPanel::initializeGL() {
@@ -472,14 +470,12 @@ void OGLDisplayPanel::paintGL() {
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-
-	//m_mutex.lock();
+//m_mutex.lock();
 	paintUpperRegion();
 	paintRxRegion();
 	paintLowerRegion();
 	paintSMeter();
 	//m_mutex.unlock();
-    update();
 
 }
 
@@ -1163,7 +1159,6 @@ void OGLDisplayPanel::paintSMeter() {
 	glEnable(GL_BLEND);
 	glDisable(GL_LINE_SMOOTH);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    update();
 }
 
 void OGLDisplayPanel::renderSMeterA() {
@@ -1793,7 +1788,6 @@ void OGLDisplayPanel::renderSMeterB() {
 
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_MULTISAMPLE);
-    update();
 }
 
 //void OGLDisplayPanel::renderSMeterB() {
@@ -2108,9 +2102,9 @@ void OGLDisplayPanel::setSMeterValue(int rx, double value) {
 			}*/
 			//qDebug() << "          tmp" << tmp;
 
-            update();
 			m_sMeterTimer.restart();
 		}
+		update();
 	}
 }
 
@@ -2497,7 +2491,6 @@ void OGLDisplayPanel::setSMeterHoldTime(int value) {
 void OGLDisplayPanel::setSyncStatus(int value) {
 
 	m_syncStatus = value;
-    update();
 
 	//QTimer::singleShot(50, this, SLOT(updateSyncStatus()));
 }
@@ -2509,13 +2502,11 @@ void OGLDisplayPanel::updateSyncStatus() {
 	else
 		m_syncStatus = 0;
 
-    update();
 }
 
 void OGLDisplayPanel::setADCStatus(int value) {
 
 	m_adcStatus = value;
-    update();
 
 	QTimer::singleShot(500, this, SLOT(updateADCStatus()));
 }
@@ -2527,14 +2518,11 @@ void OGLDisplayPanel::updateADCStatus() {
 	else
 		m_adcStatus = 0;
 
-    update();
 }
 
 void OGLDisplayPanel::setPacketLossStatus(int value) {
 
 	m_packetLossStatus = value;
-    update();
-
 	QTimer::singleShot(100, this, SLOT(updatePacketLossStatus()));
 }
 
@@ -2544,20 +2532,16 @@ void OGLDisplayPanel::updatePacketLossStatus() {
 		m_packetLossStatus = 1;
 	else
 		m_packetLossStatus = 0;
-
-    update();
 }
 
 void OGLDisplayPanel::setSendIQStatus(int value) {
 
 	m_sendIQStatus = value;
-    update();
 }
 
 void OGLDisplayPanel::setRecvAudioStatus(int value) {
 
 	m_recvAudioStatus = value;
-    update();
 }
 
 void OGLDisplayPanel::setReceivers(QObject *sender, int value) {
@@ -2565,7 +2549,6 @@ void OGLDisplayPanel::setReceivers(QObject *sender, int value) {
 	Q_UNUSED (sender)
 
 	m_receivers = value;
-    update();
 }
 
 void OGLDisplayPanel::setSampleRate(QObject *sender, int value) {
@@ -2573,7 +2556,6 @@ void OGLDisplayPanel::setSampleRate(QObject *sender, int value) {
 	Q_UNUSED (sender)
 
 	m_sample_rate = value / 1000;
-    update();
 }
 
 void OGLDisplayPanel::setMercuryAttenuator(QObject *sender, HamBand band, int value) {
@@ -2582,7 +2564,6 @@ void OGLDisplayPanel::setMercuryAttenuator(QObject *sender, HamBand band, int va
 	Q_UNUSED (band)
 
 	m_mercuryAttenuator = value;
-    update();
 }
 
 void OGLDisplayPanel::setDither(QObject *sender, int value) {
@@ -2590,7 +2571,6 @@ void OGLDisplayPanel::setDither(QObject *sender, int value) {
 	Q_UNUSED (sender)
 
 	m_dither = value;
-    update();
 }
 
 void OGLDisplayPanel::setRandom(QObject *sender, int value) {
@@ -2598,7 +2578,6 @@ void OGLDisplayPanel::setRandom(QObject *sender, int value) {
 	Q_UNUSED (sender)
 
 	m_random = value;
-    update();
 }
 
 void OGLDisplayPanel::setCurrentReceiver(QObject *sender, int value) {
@@ -2606,7 +2585,6 @@ void OGLDisplayPanel::setCurrentReceiver(QObject *sender, int value) {
 	Q_UNUSED(sender)
 
 	m_currentReceiver = value;
-    update();
 }
 
 void OGLDisplayPanel::setFrequency(QObject *sender, int mode, int rx, long freq) {
@@ -2632,7 +2610,6 @@ void OGLDisplayPanel::setFrequency(QObject *sender, int mode, int rx, long freq)
 	else*/
 		m_frequencyList[rx] = f;
 
-    update();
 }
 
 void OGLDisplayPanel::set10mhzSource(QObject *sender, int value) {
@@ -2650,7 +2627,6 @@ void OGLDisplayPanel::set10mhzSource(QObject *sender, int value) {
 			m_src10mhz = "Mercury";
 			break;
 	}
-    update();
 }
 
 void OGLDisplayPanel::set122_88mhzSource(QObject *sender, int value) {
@@ -2665,37 +2641,31 @@ void OGLDisplayPanel::set122_88mhzSource(QObject *sender, int value) {
 			m_src122_88mhz = "Mercury";
 			break;
 	}
-    update();
 }
 
 void OGLDisplayPanel::setMercuryPresence(bool value) {
 
 	m_mercury = value;
-    update();
 }
 
 void OGLDisplayPanel::setPenelopePresence(bool value) {
 
 	m_penelope = value;
-    update();
 }
 
 void OGLDisplayPanel::setPennylanePresence(bool value) {
 
 	m_pennylane = value;
-    update();
 }
 
 void OGLDisplayPanel::setAlexPresence(bool value) {
 
 	m_alex = value;
-    update();
 }
 
 void OGLDisplayPanel::setExcaliburPresence(bool value) {
 
 	m_excalibur = value;
-    update();
 }
 
 void OGLDisplayPanel::setMercuryVersion(int value) {
@@ -2777,7 +2747,6 @@ void OGLDisplayPanel::setMouseWheelFreqStep(QObject *sender, int rx, qreal value
 	if (rx == m_currentReceiver)
 		m_mouseWheelFreqStep = value;
 
-    update();
 }
 
 void OGLDisplayPanel::systemStateChanged(
@@ -2826,9 +2795,6 @@ void OGLDisplayPanel::systemStateChanged(
 
 	m_smeterUpdate = true;
 	m_smeterRenew = true;
-
-   // paintGL();
-    update();
 
 }
 

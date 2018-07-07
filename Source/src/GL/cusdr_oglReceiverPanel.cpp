@@ -2621,32 +2621,17 @@ void QGLReceiverPanel::getRegion(QPoint p) {
 	if (m_agcButtonRect.contains(p)) {
 
 		m_mouseRegion = agcButtonRegion;
-
-		/*if (m_displayTime.elapsed() >= 50) {
-
-			m_displayTime.restart();
-			update();
-		}*/
 	}
+
 	else if (m_freqScalePanRect.contains(p)) {
 
 		m_mouseRegion = freqScalePanadapterRegion;
 		
-		/*if (m_displayTime.elapsed() >= 50) {
-			
-			m_displayTime.restart();
-			update();
-		}*/
 	}
 	else if (m_dBmScalePanRect.contains(p)) {
 
 		m_mouseRegion = dBmScalePanadapterRegion;
 
-		/*if (m_displayTime.elapsed() >= 50) {
-			
-			m_displayTime.restart();
-			update();
-		}*/
 	}
 	else if (qAbs(p.x() - m_filterRect.left()) < m_snapMouse &&
 			 m_panRect.contains(p)
@@ -2664,11 +2649,6 @@ void QGLReceiverPanel::getRegion(QPoint p) {
 
 		m_mouseRegion = filterRegion;
 
-		/*if (m_displayTime.elapsed() >= 50) {
-			
-			m_displayTime.restart();
-			update();
-		}*/
 	}
 	//else if (qAbs(p.y() - m_agcThresholdPixel) < m_snapMouse && !m_crossHairCursor) {
 	else if (qAbs(p.y() - m_agcThresholdPixel) < m_snapMouse) {
@@ -2691,22 +2671,11 @@ void QGLReceiverPanel::getRegion(QPoint p) {
 	else if (m_panRect.contains(p)) {
 
 		m_mouseRegion = panadapterRegion;
-
-		/*if (m_displayTime.elapsed() >= 50) {
-			
-			m_displayTime.restart();
-			update();
-		}*/
 	}
 	else if (m_waterfallRect.contains(p)) {
 
 		m_mouseRegion = waterfallRegion;
 
-		/*if (m_displayTime.elapsed() >= 50) {
-			
-			m_displayTime.restart();
-			update();
-		}*/
 	}
 	else
 		m_mouseRegion = elsewhere;
@@ -2856,7 +2825,6 @@ void QGLReceiverPanel::enterEvent(QEvent *event) {
 	m_mouseRegion = elsewhere;
 
 	setCursor(Qt::BlankCursor);
-	update();
 
 	QOpenGLWidget::enterEvent(event);
 }
@@ -2865,9 +2833,6 @@ void QGLReceiverPanel::leaveEvent(QEvent *event) {
 
 	m_mousePos = QPoint(-100, -100);
 	m_mouseRegion = elsewhere;
-
-	update();
-
 	QOpenGLWidget::leaveEvent(event);
 }
 
@@ -2928,7 +2893,6 @@ void QGLReceiverPanel::wheelEvent(QWheelEvent* event) {
 	}
 
  	//updateGL();
-	update();
 }
 
 void QGLReceiverPanel::mousePressEvent(QMouseEvent* event) {
@@ -2982,7 +2946,6 @@ void QGLReceiverPanel::mousePressEvent(QMouseEvent* event) {
 			m_deltaF = (qreal)(1.0*m_deltaFrequency/m_sampleRate);
 			
 			set->setVFOFrequency(this, 0, m_receiver, m_vfoFrequency);		
-			update();
 		}
 		else if (event->buttons() == Qt::LeftButton) {
 
@@ -3006,7 +2969,6 @@ void QGLReceiverPanel::mousePressEvent(QMouseEvent* event) {
 		m_rulerMouseDownPos = m_freqScalePanRect.topLeft();
 		
 		if (event->buttons() == Qt::RightButton) setCursor(Qt::SplitHCursor);
-		update();
 
 		return;
 	}
@@ -3016,12 +2978,9 @@ void QGLReceiverPanel::mousePressEvent(QMouseEvent* event) {
 
 		if (event->buttons() == Qt::RightButton) 
 			setCursor(Qt::SplitVCursor);
-		update();
-
 		return;
 	}
 	
- 	update();
 }
 
 void QGLReceiverPanel::mouseReleaseEvent(QMouseEvent *event) {
@@ -3044,8 +3003,6 @@ void QGLReceiverPanel::mouseReleaseEvent(QMouseEvent *event) {
 		setCursor(Qt::BlankCursor);
 	else
 		setCursor(Qt::ArrowCursor);
-
-	update();
 }
 
 void QGLReceiverPanel::mouseDoubleClickEvent(QMouseEvent *event) {
@@ -3561,7 +3518,7 @@ void QGLReceiverPanel::mouseMoveEvent(QMouseEvent* event) {
 			break;
 	}
 
-	if (m_displayTime.elapsed() >= 50) {
+	if (m_displayTime.elapsed() >= 100) {
 
 		m_displayTime.restart();
 		update();
@@ -3604,7 +3561,7 @@ void QGLReceiverPanel::keyPressEvent(QKeyEvent* event) {
 
 	QWidget::keyPressEvent(event);
  	//updateGL();
-	update();
+//	update();
 }
 
 //void QGLReceiverPanel::timerEvent(QTimerEvent *) {
@@ -3622,7 +3579,7 @@ void QGLReceiverPanel::setSpectrumSize(QObject *sender, int value) {
 
 		GRAPHICS_DEBUG << "set spectrum size to: " << value;
 		m_spectrumSize = value;
-		update();
+//		update();
 	}
 }
 
@@ -3710,6 +3667,7 @@ void QGLReceiverPanel::setMidToVfoFrequency() {
 
 	set->setCtrFrequency(this, 0, m_receiver, m_centerFrequency);
 	set->setNCOFrequency(this, false, m_receiver, 0);
+	update();
 }
 
 void QGLReceiverPanel::setFilterFrequencies(QObject *sender, int rx, qreal lo, qreal hi) {
@@ -4133,7 +4091,6 @@ void QGLReceiverPanel::setFramesPerSecond(QObject* sender, int rx, int value) {
 	m_secWaterfallMin = -(1.0/m_fps) * m_secScaleWaterfallRect.height();
 	m_secScaleWaterfallRenew = true;
 	m_secScaleWaterfallUpdate = true;
-	update();
 }
 
 void QGLReceiverPanel::systemStateChanged(
@@ -4167,8 +4124,6 @@ void QGLReceiverPanel::systemStateChanged(
 
 	//resizeGL(width(), height());
 	m_displayTime.restart();
-	
-	update();
 }
 
 void QGLReceiverPanel::graphicModeChanged(
@@ -4187,8 +4142,6 @@ void QGLReceiverPanel::graphicModeChanged(
 
 	if (m_waterfallMode != waterfallColorMode)
 		m_waterfallMode = waterfallColorMode;
-
-	update();
 }
 
  void QGLReceiverPanel::setSpectrumAveraging(QObject* sender, int rx, bool value) {
@@ -4238,7 +4191,6 @@ void QGLReceiverPanel::setPanGridStatus(bool value, int rx) {
 		 m_panGrid = value;
 
 	 spectrumBufferMutex.unlock();
-	 update();
 }
 
 void QGLReceiverPanel::setPeakHoldStatus(bool value, int rx) {
@@ -4266,8 +4218,6 @@ void QGLReceiverPanel::setPanLockedStatus(bool value, int rx) {
 		return;
 	else
 		m_panLocked = value;
-	
-	update();
 }
 
 void QGLReceiverPanel::setClickVFOStatus(bool value, int rx) {
@@ -4278,8 +4228,6 @@ void QGLReceiverPanel::setClickVFOStatus(bool value, int rx) {
 		return;
 	else
 		m_clickVFO = value;
-
-	update();
 }
 
 void QGLReceiverPanel::setHairCrossStatus(bool value, int rx) {
@@ -4290,8 +4238,6 @@ void QGLReceiverPanel::setHairCrossStatus(bool value, int rx) {
 		return;
 	else
 		m_crossHair = value;
-
-	update();
 }
 
 void QGLReceiverPanel::sampleRateChanged(QObject *sender, int value) {
@@ -4305,17 +4251,14 @@ void QGLReceiverPanel::sampleRateChanged(QObject *sender, int value) {
 	m_panGridUpdate = true;
 	m_peakHoldBufferResize = true;
 	m_filterChanged = true;
-
-	update();
 }
 
 void QGLReceiverPanel::setMercuryAttenuator(QObject* sender, HamBand band, int value) {
 
 	Q_UNUSED(sender)
 	Q_UNUSED(band)
-	
+
 	m_mercuryAttenuator = value;
-	update();
 }
 
 void QGLReceiverPanel::setPanadapterColors() {
@@ -4357,8 +4300,6 @@ void QGLReceiverPanel::setPanadapterColors() {
 		m_panGridUpdate = true;
 	}
 	mutex.unlock();
-
-	update();
 }
 
 void QGLReceiverPanel::setWaterfallOffesetLo(int rx, int value) {
@@ -4366,7 +4307,6 @@ void QGLReceiverPanel::setWaterfallOffesetLo(int rx, int value) {
 	if (m_receiver != rx) return;
 
 	m_waterfallOffsetLo = value;
-	update();
 }
 
 void QGLReceiverPanel::setWaterfallOffesetHi(int rx, int value) {
@@ -4374,7 +4314,6 @@ void QGLReceiverPanel::setWaterfallOffesetHi(int rx, int value) {
 	if (m_receiver != rx) return;
 
 	m_waterfallOffsetHi = value;
-	update();
 }
 
 void QGLReceiverPanel::setdBmScaleMin(int rx, qreal value) {
@@ -4386,8 +4325,6 @@ void QGLReceiverPanel::setdBmScaleMin(int rx, qreal value) {
 	m_dBmScalePanadapterUpdate = true;
 	m_panGridUpdate = true;
 	m_peakHoldBufferResize = true;
-
-	update();
 }
 
 void QGLReceiverPanel::setdBmScaleMax(int rx, qreal value) {
@@ -4399,8 +4336,6 @@ void QGLReceiverPanel::setdBmScaleMax(int rx, qreal value) {
 	m_dBmScalePanadapterUpdate = true;
 	m_panGridUpdate = true;
 	m_peakHoldBufferResize = true;
-
-//	update();
 }
 
 void QGLReceiverPanel::setMouseWheelFreqStep(QObject *sender, int rx, qreal step) {
@@ -4408,9 +4343,7 @@ void QGLReceiverPanel::setMouseWheelFreqStep(QObject *sender, int rx, qreal step
 	Q_UNUSED(sender)
 
 	if (m_receiver != rx) return;
-
 	m_mouseWheelFreqStep = step;
-	update();
 }
 
 void QGLReceiverPanel::setHamBand(QObject *sender, int rx, bool byButton, HamBand band) {
@@ -4434,15 +4367,11 @@ void QGLReceiverPanel::setHamBand(QObject *sender, int rx, bool byButton, HamBan
 	m_dBmScalePanadapterUpdate = true;
 	m_panGridUpdate = true;
 	m_peakHoldBufferResize = true;
-
-	update();
 }
 
 void QGLReceiverPanel::setADCStatus(int value) {
 
 	m_adcStatus = value;
-	update();
-
 	QTimer::singleShot(50, this, SLOT(updateADCStatus()));
 }
 
@@ -4452,9 +4381,6 @@ void QGLReceiverPanel::updateADCStatus() {
 		m_adcStatus = 1;
 	else
 		m_adcStatus = 0;
-
-	//qDebug() << "m_adcStatus: " << m_adcStatus;
-//	update();
 }
 
 void QGLReceiverPanel::setAGCLineLevels(QObject *sender, int rx, qreal thresh, qreal hang) {
@@ -4466,9 +4392,6 @@ void QGLReceiverPanel::setAGCLineLevels(QObject *sender, int rx, qreal thresh, q
 
 	m_agcThresholdOld = thresh;
 	m_agcHangLevelOld = hang;
-	//GRAPHICS_DEBUG << "m_agcThresholdOld = " << m_agcThresholdOld;
-	//GRAPHICS_DEBUG << "m_agcHangLevelOld = " << m_agcHangLevelOld;
-//    update();
 }
 
 void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value) {
@@ -4479,8 +4402,6 @@ void QGLReceiverPanel::setAGCLineFixedLevel(QObject *sender, int rx, qreal value
 	if (m_agcFixedGain == value) return;
 
 	m_agcFixedGain = value;
-	//GRAPHICS_DEBUG << "m_agcFixedGain = " << m_agcFixedGain;
-//    update();
 }
 
 void QGLReceiverPanel::setADCMode(QObject *sender, int rx, ADCMode mode) {
@@ -4491,8 +4412,6 @@ void QGLReceiverPanel::setADCMode(QObject *sender, int rx, ADCMode mode) {
 
 	m_adcMode = mode;
 	m_adcModeString = set->getADCModeString(m_receiver);
-	
-//	update();
 }
 
 void QGLReceiverPanel::setAGCMode(QObject *sender, int rx, AGCMode mode, bool hangEnabled) {
@@ -4507,8 +4426,6 @@ void QGLReceiverPanel::setAGCMode(QObject *sender, int rx, AGCMode mode, bool ha
 	m_agcModeString = set->getAGCModeString(m_receiver);
 	m_agcHangEnabled = hangEnabled;
 	GRAPHICS_DEBUG << "m_agcHangEnabled = " << m_agcHangEnabled;
-	
-	update();
 }
 
 void QGLReceiverPanel::setAGCLinesStatus(QObject* sender, bool value, int rx) {
@@ -4518,8 +4435,6 @@ void QGLReceiverPanel::setAGCLinesStatus(QObject* sender, bool value, int rx) {
 	if (m_receiver != rx) return;
 
 	m_showAGCLines = value;
-
-	update();
 }
 
 void QGLReceiverPanel::setDSPMode(QObject* sender, int rx, DSPMode mode) {
@@ -4530,8 +4445,6 @@ void QGLReceiverPanel::setDSPMode(QObject* sender, int rx, DSPMode mode) {
 
 	m_dspMode = mode;
 	m_dspModeString = set->getDSPModeString(m_dspMode);
-	
-	update();
 }
 
 void QGLReceiverPanel::showRadioPopup(bool value) {

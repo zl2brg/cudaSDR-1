@@ -168,8 +168,6 @@ QGLDistancePanel::QGLDistancePanel(QWidget *parent)
 		m_scale = 1.0f;
 
 	memset(m_tmpBuf, 0, SAMPLE_BUFFER_SIZE * sizeof(float));
-
-	update();
 }
 
 QGLDistancePanel::~QGLDistancePanel() {
@@ -377,9 +375,6 @@ void QGLDistancePanel::paintGL() {
 			break;
 		
 	}
-
-    update();
-  
 }
  
 //****************************************************
@@ -402,7 +397,6 @@ void QGLDistancePanel::paintReceiverDisplay() {
 		drawCrossHair();
 
 	m_oldFreq = m_frequency;
-	   update();
  }
 
 void QGLDistancePanel::paintChirpWSPRDisplay() {
@@ -1549,7 +1543,6 @@ void QGLDistancePanel::getRegion(QPoint p) {
 		if (m_displayTime.elapsed() >= 50) {
 			
 			m_displayTime.restart();
-			update();
 		}
 	}
 	else if (m_dBmScalePanRect.contains(p)) {
@@ -1559,7 +1552,6 @@ void QGLDistancePanel::getRegion(QPoint p) {
 		if (m_displayTime.elapsed() >= 50) {
 			
 			m_displayTime.restart();
-			update();
 		}
 	}
 	else if (abs(p.x() - m_filterRect.left()) < m_snapMouse &&
@@ -1583,7 +1575,6 @@ void QGLDistancePanel::getRegion(QPoint p) {
 		if (m_displayTime.elapsed() >= 50) {
 			
 			m_displayTime.restart();
-			update();
 		}
 	}
 	
@@ -1595,7 +1586,6 @@ void QGLDistancePanel::getRegion(QPoint p) {
 		if (m_displayTime.elapsed() >= 50) {
 			
 			m_displayTime.restart();
-			update();
 		}
 	}
 
@@ -1606,7 +1596,6 @@ void QGLDistancePanel::getRegion(QPoint p) {
 		if (m_displayTime.elapsed() >= 50) {
 			
 			m_displayTime.restart();
-			update();
 		}
 	}
 	else if (m_distanceSpectrumRect.contains(p)) {
@@ -1616,7 +1605,6 @@ void QGLDistancePanel::getRegion(QPoint p) {
 		if (m_displayTime.elapsed() >= 50) {
 			
 			m_displayTime.restart();
-			update();
 		}
 	}
 	else
@@ -1758,7 +1746,6 @@ void QGLDistancePanel::enterEvent(QEvent *event) {
 
 	m_mousePos = QPoint(-1, -1);
 	m_mouseRegion = elsewhere;
-	update();
 
 	QOpenGLWidget::enterEvent(event);
 }
@@ -1767,7 +1754,6 @@ void QGLDistancePanel::leaveEvent(QEvent *event) {
 
 	m_mousePos = QPoint(-1, -1);
 	m_mouseRegion = elsewhere;
-	update();
 
 	QOpenGLWidget::leaveEvent(event);
 }
@@ -1812,8 +1798,6 @@ void QGLDistancePanel::wheelEvent(QWheelEvent* event) {
 			break;
 	}
 
- 	//updateGL();
-	update();
 }
 
 void QGLDistancePanel::mousePressEvent(QMouseEvent* event) {
@@ -1850,7 +1834,6 @@ void QGLDistancePanel::mousePressEvent(QMouseEvent* event) {
 				
 			//set->setFrequency(this, true, 0, m_frequency);
 			set->setVFOFrequency(this, 0, 0, m_frequency);
-			update();
 		}
 	}
 	else if (m_mouseRegion == freqScalePanadapterRegion) {
@@ -1858,8 +1841,6 @@ void QGLDistancePanel::mousePressEvent(QMouseEvent* event) {
 		m_rulerMouseDownPos = m_freqScalePanRect.topLeft();
 		
 		if (event->buttons() == Qt::RightButton) setCursor(Qt::SplitHCursor);
-		update();
-
 		return;
 	}
 	else if (m_mouseRegion == freqScaleDistancePanRegion) {
@@ -1867,8 +1848,6 @@ void QGLDistancePanel::mousePressEvent(QMouseEvent* event) {
 		m_rulerMouseDownPos = m_freqScaleDistancePanRect.topLeft();
 		
 		if (event->buttons() == Qt::RightButton) setCursor(Qt::SplitHCursor);
-		update();
-
 		return;
 	}
 	else if (m_mouseRegion == dBmScalePanadapterRegion) {
@@ -1876,8 +1855,6 @@ void QGLDistancePanel::mousePressEvent(QMouseEvent* event) {
 		m_rulerMouseDownPos = m_dBmScaleDistancePanRect.topLeft();
 
 		if (event->buttons() == Qt::RightButton) setCursor(Qt::SplitVCursor);
-		update();
-
 		return;
 	}
 	else if (m_mouseRegion == dBmScaleDistancePanRegion) {
@@ -1885,12 +1862,8 @@ void QGLDistancePanel::mousePressEvent(QMouseEvent* event) {
 		m_rulerMouseDownPos = m_dBmScaleDistancePanRect.topLeft();
 
 		if (event->buttons() == Qt::RightButton) setCursor(Qt::SplitVCursor);
-		update();
-
 		return;
 	}
-	
- 	update();
 }
 
 void QGLDistancePanel::mouseReleaseEvent(QMouseEvent *event) {
@@ -1917,10 +1890,8 @@ void QGLDistancePanel::mouseReleaseEvent(QMouseEvent *event) {
 		}
 		else if (event->button() == Qt::RightButton) {
 		}
-		update();
 		return;
 	}
- 	update();
 }
 
 void QGLDistancePanel::mouseMoveEvent(QMouseEvent* event) {
@@ -1936,7 +1907,6 @@ void QGLDistancePanel::mouseMoveEvent(QMouseEvent* event) {
 		case distancePanRegion:
 			//GRAPHICS_DEBUG << "distancePanRegion";
 			setCursor(Qt::ArrowCursor);
-			//update();
 			break;
 
 		case panadapterRegion:
@@ -1966,7 +1936,6 @@ void QGLDistancePanel::mouseMoveEvent(QMouseEvent* event) {
 				set->setVFOFrequency(this, 0, 0, m_frequency);
 				m_mouseDownPos = pos;
 			}
-			//update();
 			break;
 
 		case dBmScalePanadapterRegion:
@@ -2021,8 +1990,6 @@ void QGLDistancePanel::mouseMoveEvent(QMouseEvent* event) {
 			}
 			else
 				setCursor(Qt::ArrowCursor);
-
-			//update();
 			break;
 
 		case dBmScaleDistancePanRegion:
@@ -2092,7 +2059,6 @@ void QGLDistancePanel::mouseMoveEvent(QMouseEvent* event) {
 			}
 			else
 				setCursor(Qt::ArrowCursor);
-			//update();
 			break;
 
 		case freqScalePanadapterRegion:
@@ -2130,8 +2096,6 @@ void QGLDistancePanel::mouseMoveEvent(QMouseEvent* event) {
 			}
 			else
 				setCursor(Qt::ArrowCursor);
-
-			//update();
 			break;
 
 		case freqScaleDistancePanRegion:
@@ -2171,8 +2135,6 @@ void QGLDistancePanel::mouseMoveEvent(QMouseEvent* event) {
 			}
 			else
 				setCursor(Qt::ArrowCursor);
-
-			//update();
 			break;
 
 		case filterRegionLow:
@@ -2204,7 +2166,6 @@ void QGLDistancePanel::mouseMoveEvent(QMouseEvent* event) {
 		case elsewhere:
 			//GRAPHICS_DEBUG << "elsewhere";
 			
-			//update();
 			break;
 	}
 
@@ -2213,10 +2174,6 @@ void QGLDistancePanel::mouseMoveEvent(QMouseEvent* event) {
 		m_displayTime.restart();
 		update();
 	}
-	//setupDisplayRegions(size());
-	//update();
-
-	//locker.unlock();
 }
 
 void QGLDistancePanel::keyPressEvent(QKeyEvent* event) {
@@ -2254,13 +2211,10 @@ void QGLDistancePanel::keyPressEvent(QKeyEvent* event) {
  	}
 
 	QWidget::keyPressEvent(event);
- 	//updateGL();
-	update();
 }
 
 void QGLDistancePanel::timerEvent(QTimerEvent *) {
-	
-	update();
+
 }
  
 //********************************************************************
@@ -2275,8 +2229,6 @@ void QGLDistancePanel::setFrequency(QObject *sender, bool value, long freq) {
 	m_freqScalePanadapterUpdate = true;
 	m_panGridUpdate = true;
 
-	//updateGL();
-	update();
 }
 
 void QGLDistancePanel::setFilterFrequencies(QObject *sender, int rx, qreal lo, qreal hi) {
@@ -2288,8 +2240,6 @@ void QGLDistancePanel::setFilterFrequencies(QObject *sender, int rx, qreal lo, q
 		m_filterLowerFrequency = lo;
 		m_filterUpperFrequency = hi;
 	}
-
-	update();
 }
 
 void QGLDistancePanel::freqRulerPositionChanged(float pos, int rx) {
@@ -2299,7 +2249,6 @@ void QGLDistancePanel::freqRulerPositionChanged(float pos, int rx) {
 		m_freqRulerPosition = pos;
 
 		setupDisplayRegions(size());
-		update();
 	}
 }
 
@@ -2417,7 +2366,6 @@ void QGLDistancePanel::computeDisplayBins(const float *panBuffer) {
 				
 		m_panadapterBins << panBuffer[idx] - m_dBmPanMin - m_dBmPanLogGain;
 	}
-	update();	
 }
 
 void QGLDistancePanel::setDistanceSpectrumBuffer(int sampleRate, qint64 length, const float *buffer) {
@@ -2437,8 +2385,6 @@ void QGLDistancePanel::distanceSpectrumBufferChanged(int sampleRate, qint64 leng
 		m_chirpBufferLength = length;
 		memcpy(m_distanceSpectrumBuffer, buffer, m_chirpBufferLength * sizeof(float));
 	distanceSpectrumBufferMutex.unlock();
-
-	update();
 }
 
 // get waterfall colors - taken from PowerSDR/KISS Konsole
@@ -2582,8 +2528,6 @@ void QGLDistancePanel::setChirpFFTShow(bool value) {
 	distanceSpectrumBufferMutex.lock();
 		m_showChirpFFT = value;
 	distanceSpectrumBufferMutex.unlock();
-
-	update();
 }
  
 void QGLDistancePanel::systemStateChanged(
@@ -2611,8 +2555,7 @@ void QGLDistancePanel::systemStateChanged(
 
 	//resizeGL(width(), height());
 	m_displayTime.restart();
-	
-	update();
+
 }
 
  
@@ -2637,7 +2580,6 @@ void QGLDistancePanel::graphicModeChanged(
 
 	//if (!change) return;
 
-	update();
 }
 
  void QGLDistancePanel::setSpectrumAveraging(bool value) {
@@ -2682,7 +2624,6 @@ void QGLDistancePanel::setPanGridStatus(bool value) {
 
 	 spectrumBufferMutex.unlock();
 
-	 update();
 }
 
 void QGLDistancePanel::sampleRateChanged(QObject *sender, int value) {
@@ -2690,7 +2631,6 @@ void QGLDistancePanel::sampleRateChanged(QObject *sender, int value) {
 	Q_UNUSED(sender)
 	
 	m_sampleRate = value;
-	update();
 }
 
 void QGLDistancePanel::setPanadapterColors() {
@@ -2727,8 +2667,6 @@ void QGLDistancePanel::setPanadapterColors() {
 	m_blueSB  = (GLfloat)(set->getPanadapterColors().panSolidBottomColor.blue() / 256.0);
 
 	mutex.unlock();
-
-	update();
 }
 
 //void QGLDistancePanel::setWaterfallTime(int rx, int value) {

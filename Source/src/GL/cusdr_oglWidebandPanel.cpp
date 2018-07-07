@@ -68,7 +68,7 @@ QGLWidebandPanel::QGLWidebandPanel(QWidget *parent)
 		, m_currentReceiver(set->getCurrentReceiver())
 		, m_sampleRate(set->getSampleRate())
 		, m_freqScaleZoomFactor(1.0)
-		, m_dBmScaleOffset(-40.0)
+		, m_dBmScaleOffset(0.0)
 {
 //	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 
@@ -122,7 +122,7 @@ QGLWidebandPanel::QGLWidebandPanel(QWidget *parent)
 	m_wbSpectrumBuffer.fill(-1000.0f);
 	m_wbSpectrumBufferLength = m_wbSpectrumBuffer.size();
 
-	m_dBmPanLogGain = 75;//69; // allow user to calibrate this value
+	m_dBmPanLogGain = 0;//69; // allow user to calibrate this value
 	
 	if (m_specAveragingCnt > 0)
 		m_scale = 1.0f / m_specAveragingCnt;
@@ -407,7 +407,8 @@ void QGLWidebandPanel::drawSpectrum() {
 		dBmRange = qAbs(m_dBmPanMax - m_dBmPanMin);
 
 	yScale = height / dBmRange;
-	yScaleColor = 1.0f / dBmRange;
+	yScaleColor = 4.0f / dBmRange;
+
 	yTop = (float) y2;
 	if (m_dataEngineState == QSDR::DataEngineUp)
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -570,7 +571,7 @@ void QGLWidebandPanel::drawSpectrum() {
 					if (m_calibrate)
 						yvalue = m_wbSpectrumBuffer.at(idx) - m_dBmPanMinOld - m_dBmPanLogGain;
 					else
-						yvalue = m_wbSpectrumBuffer.at(idx) - m_dBmPanMin - m_dBmPanLogGain - m_dBmScaleOffset;
+						yvalue = m_wbSpectrumBuffer.at(idx) - m_dBmPanMin - m_dBmPanLogGain;
 				}
 
 				if (m_mercuryAttenuator) yvalue -= 20.0f;
@@ -1410,7 +1411,7 @@ void QGLWidebandPanel::mousePressEvent(QMouseEvent* event) {
 
 		return;
 	}
-	
+
  	update();
 }
 
@@ -1607,7 +1608,7 @@ void QGLWidebandPanel::mouseMoveEvent(QMouseEvent* event) {
 
 		case elsewhere:
 			//WBGRAPHICS_DEBUG << "elsewhere";
-			
+
 			update();
 			break;
 	}
@@ -1831,7 +1832,7 @@ void QGLWidebandPanel::systemStateChanged(
 
 	//resizeGL(width(), height());
 	m_displayTime.restart();
-	
+
 	update();
 }
 

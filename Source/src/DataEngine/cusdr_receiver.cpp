@@ -343,7 +343,7 @@ void Receiver::dspProcessing() {
 
 	if (m_receiver == set->getCurrentReceiver()) {
 		// S-Meter
-		if (m_smeterTime.elapsed() > 20) {
+		if (m_smeterTime.elapsed() > 100) {
 
 			m_sMeterValue = qtwdsp->getSMeterInstValue();
 			emit sMeterValueChanged(m_receiver, m_sMeterValue);
@@ -352,7 +352,6 @@ void Receiver::dspProcessing() {
 
 		// process output data
 		emit audioBufferSignal(m_receiver, audioOutputBuf,m_audiobuffersize);
-
 	}
 }
 

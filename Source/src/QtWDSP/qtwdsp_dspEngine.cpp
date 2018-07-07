@@ -121,9 +121,11 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
 QWDSPEngine::~QWDSPEngine() {
 	SetChannelState(m_rx,0,0);
     CloseChannel(0);
+    DestroyAnalyzer(m_rx);
+    SetRXAFMSQRun(m_rx,0);
 	destroy_nobEXT(m_rx);
 	destroy_anbEXT(m_rx);
-	qDebug() << "dspengine " << m_rx << "stop";
+
 }
 
 void QWDSPEngine::setupConnections() {
