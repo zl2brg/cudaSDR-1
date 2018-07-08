@@ -105,6 +105,7 @@ QGLDistancePanel::QGLDistancePanel(QWidget *parent)
 	m_dBmPanMin = m_rxDataList.at(0).dBmPanScaleMinList.at(band);
 	m_dBmPanMax = m_rxDataList.at(0).dBmPanScaleMaxList.at(band);
 
+
 	m_filterLowerFrequency = m_rxDataList.at(0).filterLo;
 	m_filterUpperFrequency = m_rxDataList.at(0).filterHi;
 

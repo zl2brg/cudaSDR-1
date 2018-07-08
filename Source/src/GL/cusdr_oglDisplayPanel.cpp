@@ -154,7 +154,7 @@ OGLDisplayPanel::OGLDisplayPanel(QWidget *parent)
 	m_sMeterDisplayTime.start();
 	
 	m_SMeterA = false;
-	//m_SMeterA = true;
+//	m_SMeterA = true;
 }
 
 OGLDisplayPanel::~OGLDisplayPanel() {
@@ -1061,7 +1061,6 @@ void OGLDisplayPanel::paintSMeter() {
 	
 	//float X = m_smeterRect.left() + width/2.0f;
 	//float Y = 370;
-	
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
@@ -1082,8 +1081,7 @@ void OGLDisplayPanel::paintSMeter() {
 		}
 
 		m_smeterFBO->bind();
-			renderSMeterScale();
-			//renderSMeterB();
+		renderSMeterScale();
 		m_smeterFBO->release();
 
 		m_smeterUpdate = false;
@@ -1102,7 +1100,6 @@ void OGLDisplayPanel::paintSMeter() {
 
 		// S-Meter hold value
 		glLineWidth(1);
-			
 		int min = (int)(m_sMeterMinValueB * m_unit);
 		int max = (int)(m_sMeterMaxValueB * m_unit);
 		min += min%2;
@@ -1412,7 +1409,6 @@ void OGLDisplayPanel::renderSMeterA() {
 }
 
 void OGLDisplayPanel::renderSMeterScale() {
-    qDebug() << "S meter scale";
 	GLint width = m_sMeterWidth;
 	GLint height = m_smeterRect.height();
 
@@ -1428,9 +1424,8 @@ void OGLDisplayPanel::renderSMeterScale() {
 
 	qreal dBmRange = qAbs(m_dBmPanMax - m_dBmPanMin);
 	m_unit = (qreal)(m_sMeterWidth / dBmRange);
-	
 	QRect rect = QRect(0, 0, x2-x1, y2-y1);
-	
+
 	// draw background
     if (m_dataEngineState == QSDR::DataEngineUp)
         drawGLRect(rect, Qt::black, m_bkgColor2, -3.0f, false);
@@ -1613,8 +1608,7 @@ void OGLDisplayPanel::renderSMeterScale() {
         */
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_MULTISAMPLE);
-  //  paintGL();
-  //  update();
+
 }
 
 void OGLDisplayPanel::renderSMeterB() {
@@ -1965,7 +1959,6 @@ void OGLDisplayPanel::setSMeterValue(int rx, double value) {
 
 	Q_UNUSED(rx)
 
-	//qDebug() << "setSMeterValue = " << value;
 	if (m_SMeterA) {
 	
 //		float tmp = (0.444f * value - 111.111f) * ONEPI/256.0f;
@@ -2020,7 +2013,8 @@ void OGLDisplayPanel::setSMeterValue(int rx, double value) {
 			//tmp = (1.06962f * value + 99.1537f);
 			tmp = (1.67f * value + 156.237f);
 
-		//qDebug() << "S-Meter tmp = " << tmp;
+		tmp = value + 140.0f;
+
 		if (m_sMeterTimer.elapsed() > 40) {
 
 			if (tmp < m_sMeterMinValueB) m_sMeterMinValueB = tmp;
@@ -2076,16 +2070,14 @@ void OGLDisplayPanel::setSMeterValue(int rx, double value) {
 			}*/
 
 			m_sMeterValue = tmp * 0.13f + m_sMeterValue * 0.87f;
-			//qDebug() << "scaled m_sMeterValue " << m_sMeterValue;
 
 			if (m_sMeterDisplayTime.elapsed() > 200) {
-				
+
+
 				if (m_mercuryAttenuator)
-					//m_sMeterOrgValue = value - 17.7f;
-					m_sMeterOrgValue = value - 37.7f;
+					m_sMeterOrgValue = value - 20.0f;
 				else
-					//m_sMeterOrgValue = value - 37.7f;
-					m_sMeterOrgValue = value - 17.7f;
+					m_sMeterOrgValue = value;
 
 				m_sMeterDisplayTime.restart();
 			}
@@ -2102,7 +2094,7 @@ void OGLDisplayPanel::setSMeterValue(int rx, double value) {
 			}*/
 			//qDebug() << "          tmp" << tmp;
 
-			m_sMeterTimer.restart();
+
 		}
 		update();
 	}

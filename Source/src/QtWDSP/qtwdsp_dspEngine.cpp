@@ -265,7 +265,7 @@ int error;
 
 double QWDSPEngine::getSMeterInstValue() {
 
-    return  GetRXAMeter(m_rx,RXA_S_PK) + 20.0;
+    return  GetRXAMeter(m_rx,RXA_S_PK) - 20.0f;
 
 }
 
@@ -454,7 +454,7 @@ void QWDSPEngine:: setFilter(double low,double high) {
 
 
 	if(m_dspmode == FMN) {
-		SetRXAFMDeviation(m_rx, (double)4000.0);
+		SetRXAFMDeviation(m_rx, (double)8000.0);
 		}
 	RXASetPassband(m_rx,low,high);
 	emit setAGCLineValues(m_rx);

@@ -207,7 +207,7 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 	m_secWaterfallMin = -(1.0/m_fps) * m_secScaleWaterfallRect.height();
 
 	
-	m_dBmPanLogGain = -20;//49;//69 // allow user to calibrate this value
+	m_dBmPanLogGain = -10;//49;//69 // allow user to calibrate this value
 
 	m_cameraDistance = 0;
 	m_cameraAngle = QPoint(0, 0);
@@ -3917,12 +3917,10 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 
 		QColor pColor;
 		if (m_mercuryAttenuator) {
-
 			m_panadapterBins << buffer.at(idx) - m_dBmPanMin - m_dBmPanLogGain - 20.0f;
 			pColor = getWaterfallColorAtPixel(waterfallBuffer.at(idx) - m_dBmPanLogGain - 20.0f);
 		}
 		else {
-
 			m_panadapterBins << buffer.at(idx) - m_dBmPanMin - m_dBmPanLogGain;
 			pColor = getWaterfallColorAtPixel(waterfallBuffer.at(idx) - m_dBmPanLogGain);
 		}
