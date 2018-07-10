@@ -265,7 +265,7 @@ int error;
 
 double QWDSPEngine::getSMeterInstValue() {
 
-    return  GetRXAMeter(m_rx,RXA_S_PK) - 20.0f;
+    return  GetRXAMeter(m_rx,RXA_S_PK);
 
 }
 

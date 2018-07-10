@@ -100,8 +100,7 @@ private:
 	QTime						m_displayTime;
 	QTime						m_resizeTime;
 	QTime						freqChangeTimer;
-	QTime						peakHoldTimer;
-	
+
 	QString						m_bandText;
 	QString						m_adcModeString;
 	QString						m_agcModeString;
@@ -115,7 +114,6 @@ private:
 	QList<TReceiver>			m_rxDataList;
 	
 	QVector<qreal>					m_panadapterBins;
-	QVector<qreal>					m_panPeakHoldBins;
 	QVarLengthArray<TGL_ubyteRGBA>	m_waterfallPixel;
 
 	QQueue<QVector<float> >			specAv_queue;
@@ -291,12 +289,10 @@ private:
 	bool		m_crossHair;
 	bool		m_crossHairCursor;
 	bool		m_panGrid;
-	bool		m_peakHold;
 	bool		m_filterChanged;
 	bool		m_showFilterLeftBoundary;
 	bool		m_showFilterRightBoundary;
 	bool		m_highlightFilter;
-	bool		m_peakHoldBufferResize;
 	bool		m_showAGCLines;
 	bool		m_agcHangEnabled;
 	bool		m_dragMouse;

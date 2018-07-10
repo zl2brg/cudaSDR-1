@@ -5,7 +5,24 @@
 * @author Hermann von Hasseln, DL3HVH
 * @version 0.1
 * @date 2011-10-01
+ *
+ *
 */
+
+/* Possible TODO's
+ * Client / Server archetecture
+ *- Serial port PTT switch support
+- DAW type TX audio processing
+- A high degree of customization of the spectral display
+- PureSignal linearization
+- Squelch - done
+- ASIO support
+- Focusmaster support
+- Programmable RX filter presets - done
+- User selectable filter shapes
+- Windows support
+- Multiple simultaneous CAT connections
+- MIDI controller support
 
 /*   
  *   Copyright 2011 Hermann von Hasseln, DL3HVH

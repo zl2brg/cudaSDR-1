@@ -1958,60 +1958,8 @@ void OGLDisplayPanel::renderSMeterB() {
 void OGLDisplayPanel::setSMeterValue(int rx, double value) {
 
 	Q_UNUSED(rx)
-
-	if (m_SMeterA) {
-	
-//		float tmp = (0.444f * value - 111.111f) * ONEPI/256.0f;
-//
-//		if (m_sMeterTimer.elapsed() > 40) {
-//
-//			if (tmp < m_sMeterMinValueA) m_sMeterMinValueA = tmp;
-//
-//			if (tmp > m_sMeterMaxValueA) m_sMeterMaxValueA = tmp;
-//
-//			int elapsedTimeMax = m_sMeterMaxTimer.elapsed();
-//			if (elapsedTimeMax > m_sMeterHoldTime) {
-//
-//				if (m_sMeterPrevHoldTimeMax <= 0)
-//					m_sMeterPrevHoldTimeMax = 1500;
-//
-//				m_sMeterMaxValueA -= (float)(elapsedTimeMax - m_sMeterPrevHoldTimeMax) / 40;
-//				m_sMeterPrevHoldTimeMax = elapsedTimeMax;
-//
-//				if ((qRound(m_sMeterMaxValueA) <= qRound(tmp)) || (m_sMeterMaxValueA <= tmp)) {
-//
-//					m_sMeterMaxValueA = tmp;
-//					m_sMeterMaxTimer.restart();
-//					m_sMeterPrevHoldTimeMax = 0;
-//				}
-//			}
-//
-//			if (m_sMeterMinTimer.elapsed() > m_sMeterHoldTime) {
-//
-//				m_sMeterMinValueA = tmp;
-//				m_sMeterMinTimer.restart();
-//			}
-//
-//			m_sMeterValue = tmp * 0.13f + m_sMeterValue * 0.87f;
-//
-//			QString str = "%1";
-//			//m_sMeterNumValueString = QString(str.arg(value, 0, 'g', 3));
-//			//qDebug() << "m_sMeterValue" << value;
-//
-//			update();
-//			m_sMeterTimer.restart();
-//		}
-	}
-	else {
-
 		//float tmp = (1.00423f * value + 93.3932f);
 		float tmp;
-		if (m_mercuryAttenuator)
-			//tmp = (1.67f * value + 156.237f);
-			tmp = (1.06962f * value + 99.1537f);
-		else
-			//tmp = (1.06962f * value + 99.1537f);
-			tmp = (1.67f * value + 156.237f);
 
 		tmp = value + 140.0f;
 
@@ -2021,24 +1969,18 @@ void OGLDisplayPanel::setSMeterValue(int rx, double value) {
 
 			if (tmp > m_sMeterMaxValueB) m_sMeterMaxValueB = tmp;
 
-			/*if (m_sMeterMaxTimer.elapsed() > m_sMeterHoldTime) {
-
-				m_sMeterMaxValueB = tmp;
-				m_sMeterMaxTimer.restart();
-			}*/
-
 			int elapsedTimeMax = m_sMeterMaxTimer.elapsed();
 			if (elapsedTimeMax > m_sMeterHoldTime) {
 
-				if (m_sMeterPrevHoldTimeMax <= 0) 
+				if (m_sMeterPrevHoldTimeMax <= 0)
 					m_sMeterPrevHoldTimeMax = m_sMeterHoldTime;
-				
+
 				// slowly reduce the peak hold level (taken from SDRMAX3 by (c) Cathy Moss)
 				m_sMeterMaxValueB -= (float)(elapsedTimeMax - m_sMeterPrevHoldTimeMax) / 15;
 				m_sMeterPrevHoldTimeMax = elapsedTimeMax;
 
 				if ((qRound(m_sMeterMaxValueB) <= qRound(tmp)) || (m_sMeterMaxValueB <= tmp)) {
-					
+
 					m_sMeterMaxValueB = tmp;
 					m_sMeterMaxTimer.restart();
 					m_sMeterPrevHoldTimeMax = 0;
@@ -2048,57 +1990,38 @@ void OGLDisplayPanel::setSMeterValue(int rx, double value) {
 			int elapsedTimeMin = m_sMeterMinTimer.elapsed();
 			if (elapsedTimeMin > m_sMeterHoldTime) {
 
-				if (m_sMeterPrevHoldTimeMin <= 0) 
+				if (m_sMeterPrevHoldTimeMin <= 0)
 					m_sMeterPrevHoldTimeMin = m_sMeterHoldTime;
-				
+
 				// slowly increase the minimum hold level (taken from SDRMAX3 by (c) Cathy Moss)
 				m_sMeterMinValueB += (float)(elapsedTimeMin - m_sMeterPrevHoldTimeMin) / 15;
 				m_sMeterPrevHoldTimeMin = elapsedTimeMin;
 
 				if ((qRound(m_sMeterMinValueB) >= qRound(tmp)) || (m_sMeterMinValueB >= tmp)) {
-					
+
 					m_sMeterMinValueB = tmp;
 					m_sMeterMinTimer.restart();
 					m_sMeterPrevHoldTimeMin = 0;
 				}
 			}
 
-			/*if (m_sMeterMinTimer.elapsed() > m_sMeterHoldTime) {
-
-				m_sMeterMinValueB = tmp;
-				m_sMeterMinTimer.restart();
-			}*/
-
-			m_sMeterValue = tmp * 0.13f + m_sMeterValue * 0.87f;
+		m_sMeterValue = tmp * 0.13f + m_sMeterValue * 0.87f;
 
 			if (m_sMeterDisplayTime.elapsed() > 200) {
 
-
 				if (m_mercuryAttenuator)
-					m_sMeterOrgValue = value - 20.0f;
+					m_sMeterOrgValue = value;
 				else
 					m_sMeterOrgValue = value;
 
 				m_sMeterDisplayTime.restart();
 			}
 			//m_sMeterOrgValue = value - 37.7f;
-			
-			/*m_sMeterMeanValue+= value;
-			m_sMeterMeanValueCnt++;
-
-			if (m_sMeterMeanValueCnt > 100) {
-
-				qDebug() << "m_sMeterMeanValue" << m_sMeterMeanValue/100;
-				m_sMeterMeanValue = 0.0f;
-				m_sMeterMeanValueCnt = 0;
-			}*/
-			//qDebug() << "          tmp" << tmp;
-
 
 		}
 		update();
-	}
 }
+
 
 void OGLDisplayPanel::setupDisplayRegions(QSize size) {
 

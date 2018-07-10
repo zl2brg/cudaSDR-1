@@ -86,12 +86,10 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 	, m_crossHair(set->getHairCrossStatus(m_receiver))
 	, m_crossHairCursor(false)
 	, m_panGrid(set->getPanGridStatus(m_receiver))
-	, m_peakHold(false)
 	, m_filterChanged(true)
 	, m_showFilterLeftBoundary(false)
 	, m_showFilterRightBoundary(false)
 	, m_highlightFilter(false)
-	, m_peakHoldBufferResize(true)
 	, m_dragMouse(false)
 	, m_panLocked(set->getPanLockedStatus(m_receiver))
 	, m_clickVFO(set->getClickVFOStatus(m_receiver))
@@ -200,14 +198,13 @@ QGLReceiverPanel::QGLReceiverPanel(QWidget *parent, int rx)
 
 	m_displayTime.start();
 	m_resizeTime.start();
-	peakHoldTimer.start();
 	//freqChangeTimer.start();
 	
 	m_fps = set->getFramesPerSecond(m_receiver);
 	m_secWaterfallMin = -(1.0/m_fps) * m_secScaleWaterfallRect.height();
 
 	
-	m_dBmPanLogGain = -10;//49;//69 // allow user to calibrate this value
+	m_dBmPanLogGain = 0;//49;//69 // allow user to calibrate this value
 
 	m_cameraDistance = 0;
 	m_cameraAngle = QPoint(0, 0);
@@ -814,30 +811,10 @@ void QGLReceiverPanel::drawPanadapter() {
 				vertexColorArrayBg[2*i+1].y = 0.3 * m_greenF;
 				vertexColorArrayBg[2*i+1].z = 0.3 * m_blueF;
 				
-				if (!m_peakHold) {
-				
-					vertexColorArray[i].x = m_red;
-					vertexColorArray[i].y = m_green;
-					vertexColorArray[i].z = m_blue;
+				vertexColorArray[i].x = m_red;
+				vertexColorArray[i].y = m_green;
+				vertexColorArray[i].z = m_blue;
 
-					/*vertexColorArray[i].x = m_red   * (yScaleColor * (m_panadapterBins.at(i) - m_dBmPanMin));
-					vertexColorArray[i].y = m_green * (yScaleColor * (m_panadapterBins.at(i) - m_dBmPanMin));
-					vertexColorArray[i].z = m_blue  * (yScaleColor * (m_panadapterBins.at(i) - m_dBmPanMin));*/
-				}
-				else {
-					
-					vertexColorArray[i].x = 0.7f;
-					vertexColorArray[i].y = 0.7f;
-					vertexColorArray[i].z = 0.7f;
-
-					vertexColorArrayPH[i].x = m_red;
-					vertexColorArrayPH[i].y = m_green;
-					vertexColorArrayPH[i].z = m_blue;
-
-					/*vertexColorArray[i].x = m_red   * (yScaleColor * (m_panadapterBins.at(i) - m_dBmPanMin));
-					vertexColorArray[i].y = m_green * (yScaleColor * (m_panadapterBins.at(i) - m_dBmPanMin));
-					vertexColorArray[i].z = m_blue  * (yScaleColor * (m_panadapterBins.at(i) - m_dBmPanMin));*/
-				}
 				mutex.unlock();
 
 				vertexArrayBg[2*i].x = (GLfloat)(i/m_scaleMult);
@@ -851,13 +828,6 @@ void QGLReceiverPanel::drawPanadapter() {
 				/*vertexArray[i].x = (GLfloat)(i/m_scaleMult);
 				vertexArray[i].y = (GLfloat)(yTop - yScale * m_panadapterBins.at(i));
 				vertexArray[i].z = -1.0;*/
-
-				if (m_peakHold) {
-					
-					vertexArrayPH[i].x = (GLfloat)(i/m_scaleMult);
-					vertexArrayPH[i].y = (GLfloat)(yTop - yScale * m_panPeakHoldBins.at(i));
-					vertexArrayPH[i].z = -0.5;
-				}
 			}
 			
 			glEnableClientState(GL_VERTEX_ARRAY);
@@ -867,18 +837,9 @@ void QGLReceiverPanel::drawPanadapter() {
 			glColorPointer(3, GL_FLOAT, 0, vertexColorArrayBg);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 2*vertexArrayLength);
 
-			if (m_peakHold) {
-				
-				glVertexPointer(3, GL_FLOAT, 0, vertexArrayPH);
-				glColorPointer(3, GL_FLOAT, 0, vertexColorArrayPH);
-				glDrawArrays(GL_LINE_STRIP, 0, vertexArrayLength);
-			}
-			else {
-
-				glVertexPointer(3, GL_FLOAT, 6*sizeof(float), vertexArrayBg);
-				glColorPointer(3, GL_FLOAT, 0, vertexColorArray);
-				glDrawArrays(GL_LINE_STRIP, 0, vertexArrayLength);
-			}
+			glVertexPointer(3, GL_FLOAT, 6*sizeof(float), vertexArrayBg);
+			glColorPointer(3, GL_FLOAT, 0, vertexColorArray);
+			glDrawArrays(GL_LINE_STRIP, 0, vertexArrayLength);
 
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_COLOR_ARRAY); 
@@ -890,42 +851,15 @@ void QGLReceiverPanel::drawPanadapter() {
 			for (int i = 0; i < vertexArrayLength; i++) {
 	
 				mutex.lock();
-				if (!m_peakHold) {
-				
-					vertexColorArray[i].x = m_red;
-					vertexColorArray[i].y = m_green;
-					vertexColorArray[i].z = m_blue;
+				vertexColorArray[i].x = m_red;
+				vertexColorArray[i].y = m_green;
+				vertexColorArray[i].z = m_blue;
 
-					/*vertexColorArray[i].x = m_red   * (yScaleColor * (m_panadapterBins.at(i) - m_dBmPanMin));
-					vertexColorArray[i].y = m_green * (yScaleColor * (m_panadapterBins.at(i) - m_dBmPanMin));
-					vertexColorArray[i].z = m_blue  * (yScaleColor * (m_panadapterBins.at(i) - m_dBmPanMin));*/
-
-					/*vertexColorArray[i].x = m_red   * (yScaleColor * m_panadapterBins.at(i));
-					vertexColorArray[i].y = m_green * (yScaleColor * m_panadapterBins.at(i));
-					vertexColorArray[i].z = m_blue  * (yScaleColor * m_panadapterBins.at(i));*/
-				}
-				else {
-					
-					vertexColorArray[i].x = 0.6f;
-					vertexColorArray[i].y = 0.6f;
-					vertexColorArray[i].z = 0.6f;
-
-					vertexColorArrayPH[i].x = m_red;
-					vertexColorArrayPH[i].y = m_green;
-					vertexColorArrayPH[i].z = m_blue;
-				}
 				mutex.unlock();
 				
 				vertexArray[i].x = (GLfloat)(i/m_scaleMult);
 				vertexArray[i].y = (GLfloat)(yTop - yScale * m_panadapterBins.at(i));
 				vertexArray[i].z = -1.0;
-				
-				if (m_peakHold) {
-					
-					vertexArrayPH[i].x = (GLfloat)(i/m_scaleMult);
-					vertexArrayPH[i].y = (GLfloat)(yTop - yScale * m_panPeakHoldBins.at(i));
-					vertexArrayPH[i].z = -0.5;
-				}
 			}
 		
 			glEnableClientState(GL_VERTEX_ARRAY);
@@ -935,13 +869,7 @@ void QGLReceiverPanel::drawPanadapter() {
 			glColorPointer(3, GL_FLOAT, 0, vertexColorArray);
 			glDrawArrays(GL_LINE_STRIP, 0, vertexArrayLength);
 			
-			if (m_peakHold) {
-				
-				glVertexPointer(3, GL_FLOAT, 0, vertexArrayPH);
-				glColorPointer(3, GL_FLOAT, 0, vertexColorArrayPH);
-				glDrawArrays(GL_LINE_STRIP, 0, vertexArrayLength);
-			}
-			
+
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_COLOR_ARRAY);
 
@@ -952,38 +880,18 @@ void QGLReceiverPanel::drawPanadapter() {
 			glDisable(GL_MULTISAMPLE);
 			glDisable(GL_LINE_SMOOTH);
 
+			mutex.lock();
 			for (int i = 0; i < vertexArrayLength; i++) {
 			
-				mutex.lock();
-				if (!m_peakHold) {
-					
-					vertexColorArrayBg[2*i].x = m_redST;
-					vertexColorArrayBg[2*i].y = m_greenST;
-					vertexColorArrayBg[2*i].z = m_blueST;
+				vertexColorArrayBg[2*i].x = m_redST;
+				vertexColorArrayBg[2*i].y = m_greenST;
+				vertexColorArrayBg[2*i].z = m_blueST;
 								
-					vertexColorArrayBg[2*i+1].x = m_redSB;
-					vertexColorArrayBg[2*i+1].y = m_greenSB;
-					vertexColorArrayBg[2*i+1].z = m_blueSB;
-				}
-				else {
+				vertexColorArrayBg[2*i+1].x = m_redSB;
+				vertexColorArrayBg[2*i+1].y = m_greenSB;
+				vertexColorArrayBg[2*i+1].z = m_blueSB;
 
-					vertexColorArrayBg[2*i].x = m_redSB;
-					vertexColorArrayBg[2*i].y = m_greenSB;
-					vertexColorArrayBg[2*i].z = m_blueSB;
-								
-					vertexColorArrayBg[2*i+1].x = m_redSB;
-					vertexColorArrayBg[2*i+1].y = m_greenSB;
-					vertexColorArrayBg[2*i+1].z = m_blueSB;
-
-					vertexColorArrayBgPH[2*i].x = 0.9f;//m_redST;
-					vertexColorArrayBgPH[2*i].y = 0.9f;//m_greenST;
-					vertexColorArrayBgPH[2*i].z = 0.9f;//m_blueST;
-								
-					vertexColorArrayBgPH[2*i+1].x = 0.9f;// * m_redSB;
-					vertexColorArrayBgPH[2*i+1].y = 0.9f;// * m_greenSB;
-					vertexColorArrayBgPH[2*i+1].z = 0.9f;// * m_blueSB;
-				}
-				mutex.unlock();
+			mutex.unlock();
 
 				vertexArrayBg[2*i].x = (GLfloat)(i/m_scaleMult);
 				vertexArrayBg[2*i].y = (GLfloat)(yTop - yScale * m_panadapterBins.at(i));
@@ -994,17 +902,6 @@ void QGLReceiverPanel::drawPanadapter() {
 				//vertexArrayBg[2*i+1].y = (GLfloat)(m_panRect.bottom());
 				//vertexArrayBg[2*i].y = (GLfloat)(yScale * m_panadapterBins.at(i));
 				vertexArrayBg[2*i+1].z = -1.0f;
-
-				if (m_peakHold) {
-					
-					vertexArrayBgPH[2*i].x = (GLfloat)(i/m_scaleMult);
-					vertexArrayBgPH[2*i].y = (GLfloat)(yTop - yScale * m_panPeakHoldBins.at(i));
-					vertexArrayBgPH[2*i].z = -2.0f;
-
-					vertexArrayBgPH[2*i+1].x = (GLfloat)(i/m_scaleMult);
-					vertexArrayBgPH[2*i+1].y = (GLfloat)yTop;
-					vertexArrayBgPH[2*i+1].z = -2.0f;
-				}
 			}
 			
 			glEnableClientState(GL_VERTEX_ARRAY);
@@ -1014,13 +911,6 @@ void QGLReceiverPanel::drawPanadapter() {
 			glColorPointer(3, GL_FLOAT, 0, vertexColorArrayBg);
 			//glDrawArrays(GL_QUAD_STRIP, 0, 2*vertexArrayLength);
 			glDrawArrays(GL_LINES, 0, 2*vertexArrayLength);
-
-			if (m_peakHold) {
-
-				glVertexPointer(3, GL_FLOAT, 0, vertexArrayBgPH);
-				glColorPointer(3, GL_FLOAT, 0, vertexColorArrayBgPH);
-				glDrawArrays(GL_LINES, 0, 2*vertexArrayLength);
-			}
 
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_COLOR_ARRAY);
@@ -2698,8 +2588,7 @@ void QGLReceiverPanel::resizeGL(int iWidth, int iHeight) {
 
 	m_spectrumVertexColorUpdate = true;
 	m_waterfallUpdate = true;
-	m_peakHoldBufferResize = true;
-	
+
 	glFinish();
 
 	m_resizeTime.restart();
@@ -3247,7 +3136,6 @@ void QGLReceiverPanel::mouseMoveEvent(QMouseEvent* event) {
 				m_mouseDownPos = pos;
 				m_dBmScalePanadapterUpdate = true;
 				m_panGridUpdate = true;
-				m_peakHoldBufferResize = true;
 
 //				if (m_displayTime.elapsed() >= 50) {
 //
@@ -3282,7 +3170,6 @@ void QGLReceiverPanel::mouseMoveEvent(QMouseEvent* event) {
 				m_mouseDownPos = pos;
 				m_dBmScalePanadapterUpdate = true;
 				m_panGridUpdate = true;
-				m_peakHoldBufferResize = true;
 
 //				if (m_displayTime.elapsed() >= 50) {
 //
@@ -3314,7 +3201,6 @@ void QGLReceiverPanel::mouseMoveEvent(QMouseEvent* event) {
 				m_mouseDownPos = pos;
 				m_dBmScalePanadapterUpdate = true;
 				m_panGridUpdate = true;
-				m_peakHoldBufferResize = true;
 
 //				if (m_displayTime.elapsed() >= 50) {
 //
@@ -3428,7 +3314,6 @@ void QGLReceiverPanel::mouseMoveEvent(QMouseEvent* event) {
 				m_mouseDownPos = pos;
 				m_freqScalePanadapterUpdate = true;
 				m_panGridUpdate = true;
-				m_peakHoldBufferResize = true;
 
 //				if (m_displayTime.elapsed() >= 50) {
 //
@@ -3591,15 +3476,6 @@ void QGLReceiverPanel::setCtrFrequency(QObject *sender, int mode, int rx, long f
 	//if (sender == this) return;
 	if (m_receiver != rx) return;
 
-	if (m_peakHold) {
-		
-		//spectrumBufferMutex.lock();
-		m_panPeakHoldBins.clear();
-		m_panPeakHoldBins.resize(m_panSpectrumBinsLength);
-		m_panPeakHoldBins.fill(-500.0);
-		//spectrumBufferMutex.unlock();
-	}
-
 	for (int i = 0; i < set->getNumberOfReceivers(); i++) {
 
 		m_rxDataList[i].ctrFrequency = freq;
@@ -3619,15 +3495,6 @@ void QGLReceiverPanel::setVFOFrequency(QObject *sender, int mode, int rx, long f
 	
 	//if (sender == this) return;
 	if (m_receiver != rx) return;
-
-	if (m_peakHold) {
-		
-		//spectrumBufferMutex.lock();
-		m_panPeakHoldBins.clear();
-		m_panPeakHoldBins.resize(m_panSpectrumBinsLength);
-		m_panPeakHoldBins.fill(-500.0);
-		//spectrumBufferMutex.unlock();
-	}
 
 	for (int i = 0; i < set->getNumberOfReceivers(); i++) {
 
@@ -3881,17 +3748,6 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 
 	m_panadapterBins.clear();
 
-	if (m_peakHoldBufferResize) {
-		
-		//spectrumBufferMutex.lock();
-		m_panPeakHoldBins.clear();
-		m_panPeakHoldBins.resize(m_panSpectrumBinsLength);
-		m_panPeakHoldBins.fill(-300.0);
-		//spectrumBufferMutex.unlock();
-
-		m_peakHoldBufferResize = false;
-	}
-	
 	for (int i = 0; i < m_panSpectrumBinsLength; i++) {
 		
 		//qreal max;
@@ -3905,17 +3761,23 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 		for (int j = lIdx; j < rIdx; j++) {
 
 			if (buffer.at(j) > localMax) {
-
-				localMax = buffer.at(j);
 				idx = j;
 			}
 		}
+
 
 		// shift the beginning of the bins by half of the difference between
 		// full spectrum size and reduced spectrum size due to zooming
 		idx += deltaSampleSize/2;
 
 		QColor pColor;
+
+		float val = -0;
+//		if (buffer.at(idx) < -120)
+//		{
+//			val = -120 - buffer.at(idx);
+//			qDebug() << "calc " << buffer.at(idx) << "val  " << val;
+//		}
 		if (m_mercuryAttenuator) {
 			m_panadapterBins << buffer.at(idx) - m_dBmPanMin - m_dBmPanLogGain - 20.0f;
 			pColor = getWaterfallColorAtPixel(waterfallBuffer.at(idx) - m_dBmPanLogGain - 20.0f);
@@ -3925,12 +3787,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 			pColor = getWaterfallColorAtPixel(waterfallBuffer.at(idx) - m_dBmPanLogGain);
 		}
 
-		if (m_peakHold && (m_panadapterBins.at(i) > m_panPeakHoldBins.at(i))) {
 
-			m_panPeakHoldBins[i] = m_panadapterBins.at(i);
-		}
-				
-		
 		TGL_ubyteRGBA color;
 		color.red   = (uchar)(pColor.red());
 		color.green = (uchar)(pColor.green());
@@ -3942,6 +3799,7 @@ void QGLReceiverPanel::computeDisplayBins(QVector<float>& buffer, QVector<float>
 			m_waterfallPixel[(int)(i/m_scaleMult) + j] = color;
 		}
 	}
+
 	m_waterfallDisplayUpdate = true;
 	update();
 }
@@ -4194,18 +4052,6 @@ void QGLReceiverPanel::setPanGridStatus(bool value, int rx) {
 void QGLReceiverPanel::setPeakHoldStatus(bool value, int rx) {
 
 	if (m_receiver != rx) return;
-
-	spectrumBufferMutex.lock();
-
-	if (m_peakHold == value) 
-		return;
-	else
-		m_peakHold = value;
-	
-	m_panPeakHoldBins.clear();
-	m_panPeakHoldBins.resize(m_panSpectrumBinsLength);
-	m_panPeakHoldBins.fill(-500.0);
-	spectrumBufferMutex.unlock();
 }
 
 void QGLReceiverPanel::setPanLockedStatus(bool value, int rx) {
@@ -4247,7 +4093,6 @@ void QGLReceiverPanel::sampleRateChanged(QObject *sender, int value) {
 
 	m_freqScalePanadapterUpdate = true;
 	m_panGridUpdate = true;
-	m_peakHoldBufferResize = true;
 	m_filterChanged = true;
 }
 
@@ -4322,7 +4167,6 @@ void QGLReceiverPanel::setdBmScaleMin(int rx, qreal value) {
 
 	m_dBmScalePanadapterUpdate = true;
 	m_panGridUpdate = true;
-	m_peakHoldBufferResize = true;
 }
 
 void QGLReceiverPanel::setdBmScaleMax(int rx, qreal value) {
@@ -4333,7 +4177,6 @@ void QGLReceiverPanel::setdBmScaleMax(int rx, qreal value) {
 
 	m_dBmScalePanadapterUpdate = true;
 	m_panGridUpdate = true;
-	m_peakHoldBufferResize = true;
 }
 
 void QGLReceiverPanel::setMouseWheelFreqStep(QObject *sender, int rx, qreal step) {
@@ -4364,7 +4207,6 @@ void QGLReceiverPanel::setHamBand(QObject *sender, int rx, bool byButton, HamBan
 
 	m_dBmScalePanadapterUpdate = true;
 	m_panGridUpdate = true;
-	m_peakHoldBufferResize = true;
 }
 
 void QGLReceiverPanel::setADCStatus(int value) {
