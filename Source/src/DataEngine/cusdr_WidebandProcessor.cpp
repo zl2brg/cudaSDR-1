@@ -10,11 +10,6 @@
 void AudioOutProcessor::processDeviceData() {
 
 	forever {
-
-		//m_dataEngine->processInputBuffer(m_dataEngine->io.iq_queue.dequeue());
-		//DATA_ENGINE_DEBUG << "IQ queue length:" << m_dataEngine->io.iq_queue.count();
-		//DATA_ENGINE_DEBUG << "iq_queue length:" << m_dataEngine->io.iq_queue.dequeue().length();
-
 		m_mutex.lock();
 		if (m_stopped) {
 			m_stopped = false;

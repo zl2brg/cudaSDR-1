@@ -42,7 +42,15 @@
 //#include <QElapsedTimer>
 //#include <QFuture>
 //#include <qtconcurrentrun.h>
-
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <net/if_arp.h>
+#include <net/if.h>
+#include <ifaddrs.h>
 #include "cusdr_settings.h"
 #include "cusdr_dataIO.h"
 #include "cusdr_receiver.h"
@@ -79,7 +87,6 @@ class DataProcessor;
 class AudioOutProcessor;
 class WideBandDataProcessor;
 
-
 //Q_DECLARE_METATYPE (QAbstractSocket::SocketError)
 
 
@@ -101,7 +108,13 @@ public:
 	QList<qreal>		chirpData;
 
 	QUdpSocket*			sendSocket;
-	DataIO*					m_dataIO;
+	DataIO*				m_dataIO;
+
+    struct sockaddr_in  DataAddr;
+    int data_socket;
+
+    void    Connect();
+    void    senddata(char * buffer, int length);
 
 public slots:
 	bool	initDataEngine();
@@ -363,8 +376,6 @@ public slots:
 	void	stop();
 	void	processData();
 	void	processDeviceData();
-	void	externalDspProcessing(int rx);
-	void	externalDspProcessingBig(int rx);
 
 private slots:
 	void	initDataProcessorSocket();
@@ -380,7 +391,6 @@ private slots:
 private:
 	DataEngine*		de;
 	Settings*		set;
-	QUdpSocket*		m_dataProcessorSocket;
 
 	QSDR::_Error			m_error;
 	QSDR::_ServerMode		m_serverMode;

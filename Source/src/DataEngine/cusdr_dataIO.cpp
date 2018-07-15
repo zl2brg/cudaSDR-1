@@ -188,7 +188,6 @@ void DataIO::initDataReceiverSocket() {
 			io->networkIOMutex.unlock();
 		}
 	}
-
 	if (m_dataIOSocket->bind(QHostAddress(set->getHPSDRDeviceLocalAddr()),
 							 set->getMetisPort(),
 							 QUdpSocket::DontShareAddress))
@@ -249,7 +248,7 @@ void DataIO::initDataReceiverSocket() {
 void DataIO::readDeviceData() {
 
 	while (m_dataIOSocket->hasPendingDatagrams()) {
-
+		qDebug() << "Read data";
 		QMutexLocker locker(&io->networkIOMutex);
 		if (m_dataIOSocket->readDatagram(m_datagram.data(), m_datagram.size()) == METIS_DATA_SIZE) {
 			
@@ -358,7 +357,7 @@ void DataIO::readData() {
 	int buffers = qRound((float) length/128);
 
 	DATAIO_DEBUG << "input buffer length " << length << " buffers " << buffers;
-
+   // qDebug() << "input buffer length " << length << " buffers " << buffers;
 	while (!m_stopped) {
 	
 		for (int i = 0; i < buffers; i++) {
@@ -515,7 +514,7 @@ void DataIO::writeData() {
 	else {
 
 		m_outDatagram += io->audioDatagram;
-		
+		qDebug() << "write data";
 		if (m_dataIOSocket->writeDatagram(m_outDatagram, set->getCurrentMetisCard().ip_address, DEVICE_PORT) < 0) {
 			DATAIO_DEBUG << "error sending data to device: " << m_dataIOSocket->errorString();
 		}

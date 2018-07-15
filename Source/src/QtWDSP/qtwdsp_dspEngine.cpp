@@ -80,7 +80,7 @@ QWDSPEngine::QWDSPEngine(QObject *parent, int rx, int size)
 
     WDSP_ENGINE_DEBUG << "Opening WDSP channel" << m_rx << "m_size=" << m_size << "Sample rate=" << m_samplerate;
     OpenChannel(m_rx,
-                size,
+                m_size,
                 2048, // ,
                 m_samplerate,
                 48000, // dsp rate
@@ -253,6 +253,7 @@ void QWDSPEngine::setupConnections() {
 void QWDSPEngine::processDSP(CPX &in, CPX &out) {
 
 int error;
+
 	m_mutex.lock();
     fexchange0(m_rx, (double *) in.data(),  (double *) out.data(), &error);
     if(error!=0) {
@@ -260,12 +261,13 @@ int error;
     }
     Spectrum0(1, m_rx, 0, 0,(double *) in.data());
 	m_mutex.unlock();
+
 }
 
 
 double QWDSPEngine::getSMeterInstValue() {
 
-    return  GetRXAMeter(m_rx,RXA_S_PK);
+    return  GetRXAMeter(m_rx,RXA_S_AV);
 
 }
 

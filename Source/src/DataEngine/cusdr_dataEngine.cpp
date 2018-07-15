@@ -1591,11 +1591,11 @@ void DataEngine::createDataProcessor() {
 
 	m_dataProcessor = new DataProcessor(this, m_serverMode, m_hwInterface);
 	sendSocket = new QUdpSocket();
-
+	Connect();
 	CHECKED_CONNECT(
 			sendSocket,
-			SIGNAL(error(QAbstractSocket::SocketError)), 
-			m_dataProcessor, 
+			SIGNAL(error(QAbstractSocket::SocketError)),
+			m_dataProcessor,
 			SLOT(displayDataProcessorSocketError(QAbstractSocket::SocketError)));
 
 	switch (m_serverMode) {
@@ -1613,29 +1613,13 @@ void DataEngine::createDataProcessor() {
 				SIGNAL(iqDataReady(int)),
 				SLOT(dttSPDspProcessing(int)),
 				Qt::DirectConnection);*/
-			
+
 			break;
 			
 		case QSDR::NoServerMode:
 		case QSDR::DemoMode:
 			break;
 
-		/*
-		case QSDR::ExternalDSP:
-		
-			CHECKED_CONNECT_OPT(
-						this,
-						SIGNAL(iqDataReady(int)),
-						m_dataProcessor,
-						SLOT(externalDspProcessing(int)),
-						Qt::DirectConnection);
-		
-			break;
-
-		case QSDR::ChirpWSPR:
-		case QSDR::ChirpWSPRFile:
-			break;
-		*/
 	}
 
 	m_dataProcThread = new QThreadEx();
@@ -1661,7 +1645,6 @@ void DataEngine::createDataProcessor() {
 			break;
 	}
 	
-	//m_dataProcessor->connect(m_dataProcThread, SIGNAL(started()), SLOT(initDataProcessorSocket()));
 }
 
 bool DataEngine::startDataProcessor(QThread::Priority prio) {
@@ -1773,18 +1756,11 @@ void DataEngine::createAudioOutProcessor() {
 	switch (m_hwInterface) {
 
 		case QSDR::NoInterfaceMode:
-			/*m_audioOutProcessor->connect(
-									m_audioOutProcThread, 
-									SIGNAL(started()), 
-									SLOT(processData()));*/
+
 			break;
 			
 		case QSDR::Metis:
 		case QSDR::Hermes:
-			/*m_audioOutProcessor->connect(
-									m_audioOutProcThread, 
-									SIGNAL(started()), 
-									SLOT(processDeviceData()));*/
 			break;
 	}
 }
@@ -2568,7 +2544,6 @@ DataProcessor::DataProcessor(
 	: QObject()
 	, de(de)
 	, set(Settings::instance())
-	, m_dataProcessorSocket(0)
 	, m_serverMode(serverMode)
 	, m_hwInterface(hwMode)
 	, m_socketConnected(false)
@@ -2619,29 +2594,8 @@ void DataProcessor::stop() {
 
 void DataProcessor::initDataProcessorSocket() {
 
-	m_dataProcessorSocket = new QUdpSocket();
-
-	/*m_dataProcessorSocket->bind(QHostAddress(set->getHPSDRDeviceLocalAddr()),
-								  23000, 
-								  QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
-
-	int newBufferSize = 64 * 1024;
-
-	if (::setsockopt(m_dataProcessorSocket->socketDescriptor(), SOL_SOCKET,
-                     SO_RCVBUF, (char *)&newBufferSize, sizeof(newBufferSize)) == -1) {
-						 
-						 DATA_ENGINE_DEBUG << "initDataProcessorSocket error setting m_dataProcessorSocket buffer size.";
-	}*/
-
-	//m_dataProcessorSocket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-	//m_dataProcessorSocket->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
-
-	CHECKED_CONNECT(
-		m_dataProcessorSocket, 
-		SIGNAL(error(QAbstractSocket::SocketError)), 
-		this, 
-		SLOT(displayDataProcessorSocketError(QAbstractSocket::SocketError)));
 }
+
 
 void DataProcessor::displayDataProcessorSocketError(QAbstractSocket::SocketError error) {
 
@@ -2650,13 +2604,13 @@ void DataProcessor::displayDataProcessorSocketError(QAbstractSocket::SocketError
 
 void DataProcessor::processDeviceData() {
 
-	//if (m_serverMode == QSDR::ExternalDSP)
-	//	initDataProcessorSocket();
 
 	DATA_PROCESSOR_DEBUG << "Data Processor thread: " << this->thread();
 	forever {
 
+//		qDebug() << " got here";
 		//m_dataEngine->processInputBuffer(m_dataEngine->io.iq_queue.dequeue());
+
 		QByteArray buf = de->io.iq_queue.dequeue();
 		//de->processInputBuffer(buf.left(BUFFER_SIZE/2));
 		//de->processInputBuffer(buf.right(BUFFER_SIZE/2));
@@ -2664,15 +2618,16 @@ void DataProcessor::processDeviceData() {
 		processInputBuffer(buf.left(BUFFER_SIZE/2));
 		processInputBuffer(buf.right(BUFFER_SIZE/2));
 
-		if (de->io.iq_queue.isFull()) { 
+		if (de->io.iq_queue.isFull()) {
 			DATA_PROCESSOR_DEBUG << "IQ queue full!";
 		}
-		
+
 		QMutexLocker locker(&m_mutex);
 		if (m_stopped) {
 			m_stopped = false;
 			break;
 		}
+		SleeperThread::usleep(100);
 	}
 
 //	if (m_serverMode == QSDR::ExternalDSP) {
@@ -2702,123 +2657,8 @@ void DataProcessor::processData() {
 	}
 }
 
-void DataProcessor::externalDspProcessing(int rx) {
-
-	// keep UDP packets < 512 bytes 
-	// 8 bytes sequency number, 2 bytes offset, 2 bytes length, 500 bytes data
-
-	if (!m_socketConnected) {
-
-		m_dataProcessorSocket->connectToHost(de->RX[rx]->getPeerAddress(), de->RX[rx]->getIQPort());
-
-#if defined(Q_OS_WIN32)
-		//int newBufferSize = 64 * 1024;
-		int newBufferSize = 16 * 1024;
-
-		if (::setsockopt(m_dataProcessorSocket->socketDescriptor(), SOL_SOCKET,
-                     SO_RCVBUF, (char *)&newBufferSize, sizeof(newBufferSize)) == -1) {
-				 
-		  DATA_PROCESSOR_DEBUG << "externalDspProcessing error setting m_dataProcessorSocket buffer size.";
-		}
-#endif
-
-		m_socketConnected = true;
-	}
-	
-#ifndef __linux__
-	m_sequenceHi = 0L;
-#endif
-	
-	/*QUdpSocket socket;
-	CHECKED_CONNECT(&socket, 
-			SIGNAL(error(QAbstractSocket::SocketError)), 
-			this, 
-			SLOT(displayDataProcessorSocketError(QAbstractSocket::SocketError)));*/
-
-	m_offset = 0;
-	//m_IQDatagram.append(reinterpret_cast<const char*>(&m_dataEngine->rxList[rx]->input_buffer), sizeof(m_dataEngine->rxList[rx]->input_buffer));
-	m_IQDatagram.append(reinterpret_cast<const char*>(&de->RX[rx]->inBuf), sizeof(de->RX[rx]->inBuf));
-
-	m_IQDatagram.append(reinterpret_cast<const char*>(&de->RX[rx]->inBuf), sizeof(de->RX[rx]->inBuf));
-		
-	while (m_offset < m_IQDatagram.size()) {
-	
-		m_length = m_IQDatagram.size() - m_offset;
-		
-		if (m_length > 500)  
-			m_length = 500;
-
-		QByteArray datagram;
-		datagram += QByteArray(reinterpret_cast<const char*>(&m_IQSequence), sizeof(m_IQSequence));
-		datagram += QByteArray(reinterpret_cast<const char*>(&m_sequenceHi), sizeof(m_sequenceHi));
-		datagram += QByteArray(reinterpret_cast<const char*>(&m_offset), sizeof(m_offset));
-		datagram += QByteArray(reinterpret_cast<const char*>(&m_length), sizeof(m_length));
-		datagram += m_IQDatagram.mid(m_offset, m_length);
-		
-		if (m_dataProcessorSocket->write(datagram) < 0)
-		/*if (m_dataProcessorSocket->writeDatagram(datagram,
-											m_dataEngine->rxList[rx]->getPeerAddress(),
-											m_dataEngine->rxList[rx]->getIQPort()) < 0)*/
-		//if (socket.writeDatagram(datagram,
-		//						 m_dataEngine->rxList[rx]->getPeerAddress(),
-		//						 m_dataEngine->rxList[rx]->getIQPort()) < 0)
-		{
-			if (!de->io.sendIQ_toggle) {  // toggles the sendIQ signal
-
-				de->set->setSendIQ(2);
-				de->io.sendIQ_toggle = true;
-			}
-
-			DATA_ENGINE_DEBUG	<< "externalDspProcessing error sending data to client:" 
-								<< m_dataProcessorSocket->errorString();
-		}
-		else {
-		
-			//socket.flush();
-			if (de->io.sendIQ_toggle) { // toggles the sendIQ signal
-				
-				de->set->setSendIQ(1);
-				de->io.sendIQ_toggle = false;
-			}
-		}
-		m_offset += m_length;
-	}
-	m_IQDatagram.resize(0);
-	m_IQSequence++;
-}
-
-void DataProcessor::externalDspProcessingBig(int rx) {
-	
-	m_IQDatagram.append(reinterpret_cast<const char*>(&de->RX[rx]->in), sizeof(de->RX[rx]->in));
-		
-	if (m_dataProcessorSocket->writeDatagram(m_IQDatagram.data(), 
-										m_IQDatagram.size(), 
-										de->RX[rx]->getPeerAddress(),
-										de->RX[rx]->getIQPort()) < 0)
-										
-	{		
-		if (!de->io.sendIQ_toggle) {  // toggles the sendIQ signal
-
-			de->set->setSendIQ(2);
-			de->io.sendIQ_toggle = true;
-		}
-
-		DATA_PROCESSOR_DEBUG << "error sending data to client:" << m_dataProcessorSocket->errorString();
-	}
-	else {
-	
-		m_dataProcessorSocket->flush();
-		if (de->io.sendIQ_toggle) { // toggles the sendIQ signal
-				
-			de->set->setSendIQ(1);
-			de->io.sendIQ_toggle = false;
-		}
-	}
-	m_IQDatagram.resize(0);
-}
-
 void DataProcessor::processInputBuffer(const QByteArray &buffer) {
-	
+
 	//DATA_PROCESSOR_DEBUG << "processInputBuffer: " << this->thread();
 	int s = 0;
 
@@ -2939,7 +2779,6 @@ void DataProcessor::processInputBuffer(const QByteArray &buffer) {
 				for (int r = 0; r < de->io.receivers; r++) {
 
 					if (de->RX.at(r)->qtwdsp) {
-						
 						QMetaObject::invokeMethod(de->RX.at(r), "dspProcessing", Qt::DirectConnection);// Qt::QueuedConnection);
 					}
 				}
@@ -3143,6 +2982,7 @@ void DataProcessor::setOutputBuffer(int rx, const CPX &buffer) {
 
 	if (rx == de->io.currentReceiver) {
 		processOutputBuffer(buffer);
+
 	}
 }
 
@@ -3210,7 +3050,7 @@ void DataProcessor::setAudioBuffer(int rx, const CPX &buffer, int buffersize){
 
 void DataProcessor::processOutputBuffer(const CPX &buffer) {
 
-	//DATA_PROCESSOR_DEBUG << "processOutputBuffer: " << this->thread();
+	DATA_PROCESSOR_DEBUG << "processOutputBuffer: " << this->thread();
 
 	qint16 leftRXSample;
     qint16 rightRXSample;
@@ -3666,7 +3506,7 @@ void DataProcessor::writeData() {
 		//QUdpSocket socket;
 		//DATA_PROCESSOR_DEBUG << "writeData: " << this->thread();
 		m_outDatagram += de->io.audioDatagram;
-		
+
 		if (de->sendSocket->writeDatagram(m_outDatagram, m_deviceAddress, DEVICE_PORT) < 0) {
 			DATA_PROCESSOR_DEBUG << "error sending data to device: " << de->sendSocket->errorString();
 		}
@@ -3708,4 +3548,40 @@ void AudioOutProcessor::stop() {
 	m_stopped = true;
 }
 
+
+void DataEngine::Connect(){
+	qDebug() << "protocol1: Connect";
+	data_socket=socket(PF_INET,SOCK_DGRAM,IPPROTO_UDP);
+    if(data_socket< 0) {
+        qDebug() << "protocol1: create socket failed for data_socket";
+        return;
+    }
+
+    int optval = 1;
+    if(setsockopt(data_socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval))<0) {
+        perror("data_socket: SO_REUSEADDR");
+    }
+    if(setsockopt(data_socket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval))<0) {
+        perror("data_socket: SO_REUSEPORT");
+    }
+
+	inet_pton(AF_INET, "192.168.1.11", &DataAddr.sin_addr);
+ //   DataAddr.sin_addr.s_addr = io.hpsdrDeviceIPAddress.toIPv4Address();
+    DataAddr.sin_port = htons(1024);
+    DataAddr.sin_family = AF_INET;
+	int result = bind(data_socket,(struct sockaddr*)&DataAddr,16);
+	if (result < 0){
+		perror("error");
+		qDebug() << "protocol1: bind socket failed for data_socket " << result;
+	}
+	else qDebug() << "bind ok";
+}
+
+void DataEngine::senddata(char * buffer, int length) {
+
+    if(sendto(data_socket,&buffer,length,0,(struct sockaddr*)&DataAddr,sizeof(DataAddr))!=length) {
+        perror("sendto socket failed for metis_send_data\n");
+    }
+
+}
 

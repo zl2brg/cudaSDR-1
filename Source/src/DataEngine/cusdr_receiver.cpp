@@ -324,9 +324,10 @@ void Receiver::dspProcessing() {
 	int spectrumDataReady;
 	//RECEIVER_DEBUG << "dspProcessing: " << this->thread();
     qtwdsp->processDSP(inBuf, audioOutputBuf);
-	// spectrum
+
 
 	if (highResTimer->getElapsedTimeInMicroSec() >= getDisplayDelay()) {
+		m_mutex.lock();
 		GetPixels(0,0,qtwdsp->spectrumBuffer.data(), &spectrumDataReady);
 		if (spectrumDataReady) {
 			memcpy(
@@ -336,6 +337,8 @@ void Receiver::dspProcessing() {
 			);
 			emit spectrumBufferChanged(m_receiver, newSpectrum);
 		}
+
+		m_mutex.unlock();
 		highResTimer->start();
 	}
 
@@ -343,7 +346,7 @@ void Receiver::dspProcessing() {
 
 	if (m_receiver == set->getCurrentReceiver()) {
 		// S-Meter
-		if (m_smeterTime.elapsed() > 100) {
+		if (m_smeterTime.elapsed() > 200) {
 
 			m_sMeterValue = qtwdsp->getSMeterInstValue();
 			emit sMeterValueChanged(m_receiver, m_sMeterValue);

@@ -39,8 +39,6 @@ public slots:
     void	processWideBandData();
 
 private slots:
-    //void	initDataProcessorSocket();
-    //void	displayDataProcessorSocketError(QAbstractSocket::SocketError error);
     void	processWideBandInputBuffer(const QByteArray &buffer);
 
     void 	getSpectrumData();
