@@ -116,6 +116,7 @@ private:
 
 signals:
 	void	messageEvent(QString message);
+	void    readydata();
 };
 
 #endif // _CUSDR_DATAIO_H

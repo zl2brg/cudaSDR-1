@@ -1515,11 +1515,12 @@ void DataEngine::createDataIO() {
 	switch (m_hwInterface) {
 
 		case QSDR::NoInterfaceMode:
-
+/*
 			m_dataIO->connect(
 						m_dataIOThread,
 						SIGNAL(started()), 
 						SLOT(readData()));
+						*/
 			break;
 			
 		case QSDR::Metis:
@@ -1637,10 +1638,19 @@ void DataEngine::createDataProcessor() {
 			
 		case QSDR::Metis:
 		case QSDR::Hermes:
+
+		    /*
 			m_dataProcessor->connect(
 						m_dataProcThread, 
 						SIGNAL(started()), 
 						SLOT(processDeviceData()));
+*/
+
+            CHECKED_CONNECT(
+                    m_dataIO,
+                    SIGNAL(readydata()),
+                    m_dataProcessor,
+                    SLOT(processReadData()));
 
 			break;
 	}
@@ -2615,8 +2625,8 @@ void DataProcessor::processDeviceData() {
 		//de->processInputBuffer(buf.left(BUFFER_SIZE/2));
 		//de->processInputBuffer(buf.right(BUFFER_SIZE/2));
 
-		processInputBuffer(buf.left(BUFFER_SIZE/2));
-		processInputBuffer(buf.right(BUFFER_SIZE/2));
+		processInputBuffer(buf.left(BUFFER_SIZE));
+	//	processInputBuffer(buf.right(BUFFER_SIZE/2));
 
 		if (de->io.iq_queue.isFull()) {
 			DATA_PROCESSOR_DEBUG << "IQ queue full!";
@@ -2627,7 +2637,6 @@ void DataProcessor::processDeviceData() {
 			m_stopped = false;
 			break;
 		}
-		SleeperThread::usleep(100);
 	}
 
 //	if (m_serverMode == QSDR::ExternalDSP) {
@@ -2641,21 +2650,6 @@ void DataProcessor::processDeviceData() {
 //	}
 }
 
-void DataProcessor::processData() {
-
-	forever {
-
-		de->processFileBuffer(de->io.data_queue.dequeue());
-
-		m_mutex.lock();
-		if (m_stopped) {
-			m_stopped = false;
-			m_mutex.unlock();
-			break;
-		}
-		m_mutex.unlock();
-	}
-}
 
 void DataProcessor::processInputBuffer(const QByteArray &buffer) {
 
@@ -3585,3 +3579,12 @@ void DataEngine::senddata(char * buffer, int length) {
 
 }
 
+void DataProcessor::processReadData()
+{
+    QByteArray buf;
+    while(de->io.iq_queue.isEmpty() == false) {
+        buf = de->io.iq_queue.dequeue();
+        processInputBuffer(buf.left(BUFFER_SIZE / 2));
+        processInputBuffer(buf.right(BUFFER_SIZE / 2));
+    }
+}

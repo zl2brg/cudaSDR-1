@@ -248,7 +248,6 @@ void DataIO::initDataReceiverSocket() {
 void DataIO::readDeviceData() {
 
 	while (m_dataIOSocket->hasPendingDatagrams()) {
-		qDebug() << "Read data";
 		QMutexLocker locker(&io->networkIOMutex);
 		if (m_dataIOSocket->readDatagram(m_datagram.data(), m_datagram.size()) == METIS_DATA_SIZE) {
 			
@@ -283,6 +282,7 @@ void DataIO::readDeviceData() {
 					// enqueue one frame from the HPSDR device
 					if (!io->iq_queue.isFull()) {
 						io->iq_queue.enqueue(m_datagram.mid(METIS_HEADER_SIZE, BUFFER_SIZE));
+						emit (readydata());
 					}
 
 					// collect two HPSDR frames

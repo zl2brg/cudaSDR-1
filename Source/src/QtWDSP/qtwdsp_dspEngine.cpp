@@ -253,13 +253,12 @@ void QWDSPEngine::setupConnections() {
 void QWDSPEngine::processDSP(CPX &in, CPX &out) {
 
 int error;
-
 	m_mutex.lock();
     fexchange0(m_rx, (double *) in.data(),  (double *) out.data(), &error);
     if(error!=0) {
         WDSP_ENGINE_DEBUG << "WDSP channel read error " << error;
     }
-    Spectrum0(1, m_rx, 0, 0,(double *) in.data());
+    else  Spectrum0(1, m_rx, 0, 0, (double *) in.data());
 	m_mutex.unlock();
 
 }

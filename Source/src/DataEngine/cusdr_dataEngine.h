@@ -117,6 +117,7 @@ public:
     void    senddata(char * buffer, int length);
 
 public slots:
+
 	bool	initDataEngine();
 	void	stop();
 	void 	setWbSpectrumAveraging(QObject*, int rx, int value);
@@ -374,8 +375,9 @@ public:
 
 public slots:
 	void	stop();
-	void	processData();
+	void	processReadData();
 	void	processDeviceData();
+
 
 private slots:
 	void	initDataProcessorSocket();
