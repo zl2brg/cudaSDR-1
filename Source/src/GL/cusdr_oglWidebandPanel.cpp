@@ -586,6 +586,8 @@ void QGLWidebandPanel::drawSpectrum() {
 				if (m_mercuryAttenuator)
 					yvalue -= 20.0;
 
+                qDebug() << "y value" << yvalue << yTop << yScale;
+
 
                 q3[2 * i] = (float) (i/scaleMult);
                 q3[2 * i + 1] = (float) (yTop - yScale * yvalue) ;
