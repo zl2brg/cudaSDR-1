@@ -548,14 +548,13 @@ void QGLWidebandPanel::drawSpectrum() {
             int frequencyScaleTop = m_panRect.height()- bottomMargin;
             m_glHistogramSpectrumMatrix.setToIdentity();
             m_glHistogramSpectrumMatrix.translate(
-                    -1.0f + ((float)(2*10)   / (float) m_panRect.width()),
-                    1.0f - ((float)(2 * 20) / (float) m_panRect.height())
+                    -1.0f + ((float)(1)   / (float) m_panRect.width()),
+                    -1.0f - ((float)(1 ) / (float) m_panRect.height())
             );
-            m_glHistogramSpectrumMatrix.scale(
-					((float) 2 * 200),
-					((float) 2* 200)
+           m_glHistogramSpectrumMatrix.scale(
+					((float) 2/ (m_panRect.width() )),
+					((float) 2/100)
             );
-
 
 			for (int i = 0; i < vertexArrayLength; i++) {
 
@@ -589,9 +588,7 @@ void QGLWidebandPanel::drawSpectrum() {
 
                 q3[2 * i] = (float) (i/scaleMult);
                 q3[2 * i + 1] = (float) (yTop - yScale * yvalue) ;
-                qDebug() << q3[2 * i] << "val " << q3[2 * i + 1]  ;
-
-            }
+           }
 
             QVector4D color(0.5f, 1.0f, 0.25f, (float) 100.0f);
             m_spectrum->drawPolyline(m_glHistogramSpectrumMatrix, color, q3, vertexArrayLength);
