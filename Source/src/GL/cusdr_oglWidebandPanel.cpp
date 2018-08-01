@@ -29,7 +29,7 @@
 // use: WBGRAPHICS_DEBUG
 
 #include "cusdr_oglWidebandPanel.h"
-
+#include "glshadersimple.h"
 //#include <QtGui>
 #include <QDebug>
 //#include <QFileInfo>
@@ -108,10 +108,11 @@ QGLWidebandPanel::QGLWidebandPanel(QWidget *parent)
 	m_oglTextTiny = new OGLText(m_fonts.tinyFont);
 	m_oglTextSmall = new OGLText(m_fonts.smallFont);
 	m_oglTextNormal = new OGLText(m_fonts.normalFont);
-	
+    m_q3FFT.allocate(2*4096);
 
-	timer = 0;
 
+    timer = 0;
+    m_spectrum = new(GLShaderSimple);
 	setupConnections();
 
 	m_panTimer.start();
@@ -301,6 +302,7 @@ void QGLWidebandPanel::initializeGL() {
 	glDepthFunc(GL_LESS);
     glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
+	m_spectrum->initializeGL();
 
 	m_cnt = 0;
 
@@ -358,7 +360,9 @@ void QGLWidebandPanel::paintGL() {
 //************************************************************************
 void QGLWidebandPanel::drawSpectrum() {
 
-	GLint width  = m_panRect.width();
+    GLfloat *q3 = m_q3FFT.m_array;
+
+    GLint width  = m_panRect.width();
 	GLint height = m_panRect.height();
 
 	GLint x1 = m_panRect.left();
@@ -538,66 +542,62 @@ void QGLWidebandPanel::drawSpectrum() {
 
 			break;
 
-		case (PanGraphicsMode) Line:
+		case (PanGraphicsMode) Line: {
+
+            int bottomMargin = m_panRect.height();
+            int frequencyScaleTop = m_panRect.height()- bottomMargin;
+            m_glHistogramSpectrumMatrix.setToIdentity();
+            m_glHistogramSpectrumMatrix.translate(
+                    -1.0f + ((float)(2*10)   / (float) m_panRect.width()),
+                    1.0f - ((float)(2 * 20) / (float) m_panRect.height())
+            );
+            m_glHistogramSpectrumMatrix.scale(
+					((float) 2 * 200),
+					((float) 2* 200)
+            );
+
 
 			for (int i = 0; i < vertexArrayLength; i++) {
 
-				lIdx = (int)floor((qreal)(i * scale));
-				rIdx = (int)floor((qreal)(i * scale) + scale);
+				lIdx = qFloor((qreal)(i * scale));
+				rIdx = qFloor((qreal)(i * scale) + scale);
+				qDebug() << "Lidx" << lIdx << scale;
+				qDebug() << "ridx" << rIdx;
 
-				// max value; later we try mean value also!
+				// max value
 				localMax = -10000.0F;
 				for (int j = lIdx; j < rIdx; j++) {
+
 					if (m_wbSpectrumBuffer.at(j) > localMax) {
 
 						localMax = m_wbSpectrumBuffer.at(j);
 						idx = j;
 					}
 				}
-				idx += deltaIdx;
 
-				mutex.lock();
+
+				idx += deltaIdx;
 
 				qreal yvalue = 0;
 				if (idx < m_wbSpectrumBufferLength)
-					yvalue = m_wbSpectrumBuffer.at(idx) - m_dBmPanMin;
+					yvalue = m_wbSpectrumBuffer.at(idx) - m_dBmPanMin - m_dBmPanLogGain;
+				//yvalue = mean - m_dBmPanMin - m_dBmPanLogGain;
 
-				vertexColorArray[i].x = m_r	* (yScaleColor * yvalue);
-				vertexColorArray[i].y = m_g * (yScaleColor * yvalue);
-				vertexColorArray[i].z = m_b * (yScaleColor * yvalue);
+				if (m_mercuryAttenuator)
+					yvalue -= 20.0;
 
-				if (idx < m_wbSpectrumBufferLength) {
 
-					if (m_calibrate)
-						yvalue = m_wbSpectrumBuffer.at(idx) - m_dBmPanMinOld - m_dBmPanLogGain;
-					else
-						yvalue = m_wbSpectrumBuffer.at(idx) - m_dBmPanMin - m_dBmPanLogGain;
-				}
+                q3[2 * i] = (float) (i/scaleMult);
+                q3[2 * i + 1] = (float) (yTop - yScale * yvalue) ;
+                qDebug() << q3[2 * i] << "val " << q3[2 * i + 1]  ;
 
-				if (m_mercuryAttenuator) yvalue -= 20.0f;
+            }
 
-				vertexArray[i].x = (GLfloat)(i/scaleMult);
-				vertexArray[i].y = (GLfloat)(yTop - yScale * yvalue);
-				vertexArray[i].z = -1.0;
+            QVector4D color(0.5f, 1.0f, 0.25f, (float) 100.0f);
+            m_spectrum->drawPolyline(m_glHistogramSpectrumMatrix, color, q3, vertexArrayLength);
+        }
 
-				mutex.unlock();
-			}
-		
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_COLOR_ARRAY);
-				
-			glVertexPointer(3, GL_FLOAT, 0, vertexArray);
-			glColorPointer(3, GL_FLOAT, 0, vertexColorArray);
-			glDrawArrays(GL_LINE_STRIP, 0, vertexArrayLength);
-			
-			glDisableClientState(GL_VERTEX_ARRAY);
-			glDisableClientState(GL_COLOR_ARRAY);
 
-			delete[] vertexArray;
-			delete[] vertexColorArray;
-			delete[] vertexArrayBg;
-			delete[] vertexColorArrayBg;
-			
 			break;
 
 

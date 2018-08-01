@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 set (QT_USE_QTOPENGL TRUE)
 add_definitions(-O3 -D_FILE_OFFSET_BITS=64 -fPIC)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -pg")
 set (CMAKE_BUILD_TYPE Debug)
 
 find_package(PkgConfig)
@@ -64,8 +64,9 @@ set (SOURCES
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglInfo.cpp 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglReceiverPanel.cpp 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglText.cpp 
-	${CMAKE_SOURCE_DIR}/GL/cusdr_oglWidebandPanel.cpp 
-	${CMAKE_SOURCE_DIR}/cusdr_alexAntennaWidget.cpp 
+	${CMAKE_SOURCE_DIR}/GL/cusdr_oglWidebandPanel.cpp
+	${CMAKE_SOURCE_DIR}/GL/glshadersimple.cpp
+	${CMAKE_SOURCE_DIR}/cusdr_alexAntennaWidget.cpp
 	${CMAKE_SOURCE_DIR}/cusdr_alexFilterWidget.cpp 
 	${CMAKE_SOURCE_DIR}/cusdr_alexTabWidget.cpp 
 	${CMAKE_SOURCE_DIR}/cusdr_chirpWidget.cpp 
@@ -142,8 +143,9 @@ set (HEADERS
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglInfo.h 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglReceiverPanel.h 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglText.h 
-	${CMAKE_SOURCE_DIR}/GL/cusdr_oglUtils.h 
-	${CMAKE_SOURCE_DIR}/GL/cusdr_oglWidebandPanel.h 
+	${CMAKE_SOURCE_DIR}/GL/cusdr_oglUtils.h
+	${CMAKE_SOURCE_DIR}/GL/cusdr_oglWidebandPanel.h
+    ${CMAKE_SOURCE_DIR}/GL/glshadersimple.h
 	${CMAKE_SOURCE_DIR}/cusdr_alexAntennaWidget.h 
 	${CMAKE_SOURCE_DIR}/cusdr_alexFilterWidget.h 
 	${CMAKE_SOURCE_DIR}/cusdr_alexTabWidget.h 

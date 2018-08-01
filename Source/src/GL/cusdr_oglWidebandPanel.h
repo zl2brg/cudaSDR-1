@@ -44,6 +44,11 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
+#include <QMatrix4x4>
+#include <QVector4D>
+
+#include "glshadersimple.h"
+#include "incrementalarray.h"
 
 #ifdef LOG_WBGRAPHICS
 #   define WBGRAPHICS_DEBUG qDebug().nospace() << "WB-Graphics::\t"
@@ -102,8 +107,10 @@ private:
 	QGLFramebufferObject*		m_dBmScaleFBO;
 	QGLFramebufferObject*		m_gridFBO;
 	QPainter*					painter;
+    IncrementalArray<GLfloat>   m_q3FFT;
+    QMatrix4x4  m_glHistogramSpectrumMatrix;
 
-	CFonts		*fonts;
+    CFonts		*fonts;
 	TFonts		m_fonts;
 
 	QTime		m_panTimer;
@@ -155,6 +162,7 @@ private:
 	GLfloat		m_bkgRed;
 	GLfloat		m_bkgGreen;
 	GLfloat		m_bkgBlue;
+	GLShaderSimple *m_spectrum;
 
 	enum Region {
 
