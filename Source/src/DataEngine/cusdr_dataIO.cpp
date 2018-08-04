@@ -248,7 +248,6 @@ void DataIO::initDataReceiverSocket() {
 void DataIO::readDeviceData() {
 
 	while (m_dataIOSocket->hasPendingDatagrams()) {
-		qDebug() << "Read data";
 		QMutexLocker locker(&io->networkIOMutex);
 		if (m_dataIOSocket->readDatagram(m_datagram.data(), m_datagram.size()) == METIS_DATA_SIZE) {
 			
