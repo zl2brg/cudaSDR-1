@@ -548,38 +548,21 @@ void QGLWidebandPanel::drawSpectrum() {
             int frequencyScaleTop = m_panRect.height()- bottomMargin;
             m_glHistogramSpectrumMatrix.setToIdentity();
             m_glHistogramSpectrumMatrix.translate(
-                    -1.0f + ((float)(1)   / (float) m_panRect.width()),
-                    -1.0f - ((float)(1 ) / (float) m_panRect.height())
+                    -1.0f + ((float)(2 * m_panRect.left())   / (float) m_panRect.width()),
+                    1.0f - ((float)(1 ) / (float) m_panRect.height())
             );
            m_glHistogramSpectrumMatrix.scale(
 					((float) 2/ (m_panRect.width() )),
-					((float) 2/100)
+					((float) 2/m_panRect.height())
             );
 
-			for (int i = 0; i < vertexArrayLength; i++) {
-
-				lIdx = qFloor((qreal)(i * scale));
-				rIdx = qFloor((qreal)(i * scale) + scale);
-				qDebug() << "Lidx" << lIdx << scale;
-				qDebug() << "ridx" << rIdx;
+			for (int i = 0; i < m_wbSpectrumBufferLength/2; i++) {
 
 				// max value
 				localMax = -10000.0F;
-				for (int j = lIdx; j < rIdx; j++) {
-
-					if (m_wbSpectrumBuffer.at(j) > localMax) {
-
-						localMax = m_wbSpectrumBuffer.at(j);
-						idx = j;
-					}
-				}
-
-
-				idx += deltaIdx;
 
 				qreal yvalue = 0;
-				if (idx < m_wbSpectrumBufferLength)
-					yvalue = m_wbSpectrumBuffer.at(idx) - m_dBmPanMin - m_dBmPanLogGain;
+					yvalue = m_wbSpectrumBuffer.at(i) - m_dBmPanMin - m_dBmPanLogGain;
 				//yvalue = mean - m_dBmPanMin - m_dBmPanLogGain;
 
 				if (m_mercuryAttenuator)
@@ -589,11 +572,11 @@ void QGLWidebandPanel::drawSpectrum() {
 
 
                 q3[2 * i] = (float) (i/scaleMult);
-                q3[2 * i + 1] = (float) (yTop - yScale * yvalue) ;
+                q3[2 * i + 1] = (float) (yvalue - yTop  * yScale) ;
            }
 
             QVector4D color(0.5f, 1.0f, 0.25f, (float) 100.0f);
-            m_spectrum->drawPolyline(m_glHistogramSpectrumMatrix, color, q3, vertexArrayLength);
+            m_spectrum->drawPolyline(m_glHistogramSpectrumMatrix, color, q3, 4096);
         }
 
 
