@@ -6,9 +6,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 11)
 set (QT_USE_QTOPENGL TRUE)
-add_definitions(-O3 -D_FILE_OFFSET_BITS=64 -fPIC -pg)
+add_definitions(-O3 -D_FILE_OFFSET_BITS=64 -fPIC -g)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -pg")
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -g")
 set (CMAKE_BUILD_TYPE Debug)
 
 find_package(PkgConfig)
@@ -40,25 +40,19 @@ set (SOURCES
 	${CMAKE_SOURCE_DIR}/Util/cusdr_painter.cpp 
 	${CMAKE_SOURCE_DIR}/Util/cusdr_splash.cpp 
 	${CMAKE_SOURCE_DIR}/Util/cusdr_cpuUsage.cpp 
-	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_engine.cpp 
-	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_settingsdialog.cpp 
-	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_spectrumanalyser.cpp 
-	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_utils.cpp 
+	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_settingsdialog.cpp
+	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_utils.cpp
 	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_waveform.cpp 
 	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_wavfile.cpp 
 	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_fspectrum.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_audioReceiver.cpp 
-	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_chirpProcessor.cpp 
-	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_dataEngine.cpp 
+	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_dataEngine.cpp
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_dataIO.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_discoverer.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_receiver.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/soundout.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.cpp
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_WidebandProcessor.cpp
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_fft.cpp
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_filter.cpp 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_powerSpectrum.cpp 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDisplayPanel.cpp
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDistancePanel.cpp 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglInfo.cpp 
@@ -68,8 +62,7 @@ set (SOURCES
 	${CMAKE_SOURCE_DIR}/cusdr_alexAntennaWidget.cpp 
 	${CMAKE_SOURCE_DIR}/cusdr_alexFilterWidget.cpp 
 	${CMAKE_SOURCE_DIR}/cusdr_alexTabWidget.cpp 
-	${CMAKE_SOURCE_DIR}/cusdr_chirpWidget.cpp 
-	${CMAKE_SOURCE_DIR}/cusdr_displayWidget.cpp 
+	${CMAKE_SOURCE_DIR}/cusdr_displayWidget.cpp
 	${CMAKE_SOURCE_DIR}/cusdr_colorsWidget.cpp 
 	${CMAKE_SOURCE_DIR}/cusdr_hamDatabase.cpp 
 	${CMAKE_SOURCE_DIR}/cusdr_hpsdrTabWidget.cpp 
@@ -113,17 +106,13 @@ set (HEADERS
 	${CMAKE_SOURCE_DIR}/Util/cusdr_styles.h 
 	${CMAKE_SOURCE_DIR}/Util/cusdr_cpuUsage.h 
 	${CMAKE_SOURCE_DIR}/Util/qcircularbuffer.h 
-	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_engine.h 
-	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_settingsdialog.h 
-	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_spectrum.h 
-	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_spectrumanalyser.h 
-	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_utils.h 
+	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_settingsdialog.h
+	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_utils.h
 	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_waveform.h 
 	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_wavfile.h 
 	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_fspectrum.h 
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_audioReceiver.h 
-	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_chirpProcessor.h 
-	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_dataEngine.h 
+	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_dataEngine.h
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_dataIO.h 
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_discoverer.h 
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_receiver.h 
@@ -131,12 +120,6 @@ set (HEADERS
 	${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.h 
 	${CMAKE_SOURCE_DIR}/DataEngine/datatypes.h
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_WidebandProcessor.h
-	${CMAKE_SOURCE_DIR}/QtDSP/fftw3.h
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_fft.h
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_filter.h 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_powerSpectrum.h 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_invsinc_coeff.h 
-	${CMAKE_SOURCE_DIR}/QtDSP/qtdsp_qComplex.h 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDisplayPanel.h
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDistancePanel.h 
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglInfo.h 
@@ -147,8 +130,7 @@ set (HEADERS
 	${CMAKE_SOURCE_DIR}/cusdr_alexAntennaWidget.h 
 	${CMAKE_SOURCE_DIR}/cusdr_alexFilterWidget.h 
 	${CMAKE_SOURCE_DIR}/cusdr_alexTabWidget.h 
-	${CMAKE_SOURCE_DIR}/cusdr_chirpWidget.h 
-	${CMAKE_SOURCE_DIR}/cusdr_displayWidget.h 
+	${CMAKE_SOURCE_DIR}/cusdr_displayWidget.h
 	${CMAKE_SOURCE_DIR}/cusdr_colorsWidget.h 
 	${CMAKE_SOURCE_DIR}/cusdr_hamDatabase.h 
 	${CMAKE_SOURCE_DIR}/cusdr_hpsdrTabWidget.h 
@@ -200,7 +182,7 @@ include_directories( ${AUTOGEN_BUILD_DIR})
 ADD_EXECUTABLE(cudasdr ${SOURCES} ${HEADERS} res/cusdr.qrc ${UI_SOURCES} )
 
 qt5_use_modules(cudasdr Core Gui Widgets OpenGL)
-target_link_libraries(cudasdr Qt5::Widgets Qt5::Network Qt5::Multimedia GL fftw3 pulse-simple pulse asound wdsp)
+target_link_libraries(cudasdr Qt5::Widgets Qt5::Network Qt5::Multimedia GL pulse-simple pulse asound wdsp)
 set_target_properties(cudasdr PROPERTIES LINKER_LANGUAGE CXX)
 
 #qt5_use_modules(Core Network)

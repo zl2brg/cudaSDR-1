@@ -46,7 +46,6 @@ extern "C" {
 
 #include "../cusdr_settings.h"
 #include "QtDSP/qtdsp_qComplex.h"
-#include "QtDSP/qtdsp_powerSpectrum.h"
 
 
 #ifdef LOG_WDSP_ENGINE
@@ -123,7 +122,6 @@ private:
 	Settings*	set;
 	TReceiver	m_rxData;
 	AGCMode		m_agcMode;
-	PowerSpectrum*		spectrum;
 
 	QMutex	m_mutex;
 

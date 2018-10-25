@@ -48,7 +48,6 @@
 #include "cusdr_radioTabWidget.h"
 #include "cusdr_displayTabWidget.h"
 #include "cusdr_serverWidget.h"
-#include "cusdr_chirpWidget.h"
 //#include "cusdr_alexTabWidget.h"
 //#include "cusdr_extCtrlWidget.h"
 //#include "cusdr_radioWidget.h"
@@ -103,10 +102,7 @@ public slots:
 	void	showWidgetEvent(QObject *sender);
 	void	closeWidgetEvent(QObject *sender);
 
-	void	loadWavFile(QObject *sender, const QString &fileName);
 	void	suspendSignal(QObject *sender);
-	void	startPlaybackSignal(QObject *sender);
-	void	showSettingsDialogSignal(QObject *sender);
 	void	showWarningDialog(const QString &msg);
 
 private:
@@ -206,7 +202,6 @@ private:
 	DataEngine*			m_dataEngine;
 	RadioPopupWidget*	m_radioPopupWidget;
 	ServerWidget*		m_serverWidget;
-	ChirpWidget*		m_chirpWidget;
 	HPSDRTabWidget*		m_hpsdrTabWidget;
 	RadioTabWidget*		m_radioTabWidget;
 	DisplayTabWidget*	m_displayTabWidget;
@@ -315,7 +310,7 @@ private slots:
 	void setNumberOfReceivers(QObject *sender, int value);
 	//void setInternalDSPMode(bool value);
 	void setSDRMode(bool);
-    void setChirpWSPRMode(bool value);
+
 	void getNetworkInterfaces();
 	void setMainVolume(int value);
 	//void setHamBand(QObject *sender, int rx, bool byButton, HamBand band);

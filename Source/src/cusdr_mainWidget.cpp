@@ -114,7 +114,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 	// control widgets
 	m_serverWidget = new ServerWidget(this);
-	m_chirpWidget = new ChirpWidget(this);
 	m_hpsdrTabWidget = new HPSDRTabWidget(this);
 	m_radioTabWidget = new RadioTabWidget(this);
 	m_displayTabWidget = new DisplayTabWidget(this);
@@ -122,7 +121,6 @@ MainWindow::MainWindow(QWidget *parent)
 	m_wbDisplay = 0;
 
 	m_serverWidget->hide();
-	m_chirpWidget->hide();
 	m_hpsdrTabWidget->hide();
 	m_radioTabWidget->hide();
 	m_displayTabWidget->hide();
@@ -154,29 +152,6 @@ void MainWindow::setupConnections() {
 		this,
 		SLOT(clearStatusBarMessage()));
 
-	CHECKED_CONNECT(
-		m_chirpWidget, 
-		SIGNAL(loadFileEvent(QObject *, const QString)), 
-		this, 
-		SLOT(loadWavFile(QObject *, const QString)));
-
-	CHECKED_CONNECT(
-		m_chirpWidget, 
-		SIGNAL(suspendSignal(QObject *)), 
-		this, 
-		SLOT(suspendSignal(QObject *)));
-
-	CHECKED_CONNECT(
-		m_chirpWidget, 
-		SIGNAL(startPlaybackSignal(QObject *)), 
-		this, 
-		SLOT(startPlaybackSignal(QObject *)));
-
-	CHECKED_CONNECT(
-		m_chirpWidget, 
-		SIGNAL(showSettingsDialogSignal(QObject *)), 
-		this, 
-		SLOT(showSettingsDialogSignal(QObject *)));
 
 	/*if (m_cudaPresence) {
 	
@@ -522,7 +497,6 @@ void MainWindow::setupLayout() {
 	dock->setStyleSheet(set->getDockStyle());
 	dock->setMaximumWidth(245);
 	dock->setMinimumWidth(245);
-	dock->setWidget(m_chirpWidget);
 	dockWidgetList.append(dock);
 
     addDockWidget(Qt::RightDockWidgetArea, dock);
@@ -753,9 +727,6 @@ void MainWindow::createMainBtnToolBar() {
     chirpBtn->setTextColor(btnCol);
 	chirpBtn->setFixedSize(btn_width1, btn_height1);
 	mainBtnList.append(chirpBtn);
-
-	if (m_serverMode != QSDR::ChirpWSPR)
-		chirpBtn->setEnabled(false);
 
 	CHECKED_CONNECT(
 		chirpBtn, 
@@ -1157,16 +1128,6 @@ void MainWindow::createModeMenu() {
 			this, 
 			SLOT(setSDRMode(bool)));
 	}
-
-	if (chirpWSPRAction->isCheckable()) {
-		
-		CHECKED_CONNECT(
-			chirpWSPRAction,
-			SIGNAL(triggered(bool)), 
-			this, 
-			SLOT(setChirpWSPRMode(bool)));
-	}
-
 }
  
 /*!
@@ -1867,24 +1828,6 @@ void MainWindow::setSDRMode(bool) {
 	//showMessage("[server]: switched to SDR mode.");
 }
 
-/*!
-	\brief set \a QSDR::_ServerMode to \a QSDR::ChirpWSPR.
-*/
-void MainWindow::setChirpWSPRMode(bool value) {
-
-        Q_UNUSED(value)
-
-	setServerMode(QSDR::ChirpWSPR);
-
-	m_oldSampleRate = set->getSampleRate();
-	setNumberOfReceivers(this, 1);
-	set->setCurrentReceiver(this, 1);
-	set->setSampleRate(this, 48000);
-	//m_dataEngine->createChirpDataProcessor();
-
-	MAIN_DEBUG << "switched to chirp decode mode";
-}
- 
 void MainWindow::setAttenuator() {
 
 	QAction *action = qobject_cast<QAction *>(sender());
@@ -2247,18 +2190,7 @@ void MainWindow::getNetworkInterfaces() {
 	
 }
 
- 
-/*!
-	\brief load a wav-file.
-*/
-void MainWindow::loadWavFile(
-		QObject *sender,				/*!<[in] the sender of the event. */
-		const QString &fileName			/*!<[in] file name of the *.wav file. */
-) {
-	Q_UNUSED(sender)
 
-	m_dataEngine->loadWavFile(fileName);
-}
  
 /*!
 	\brief suspend playing wav-file.
@@ -2270,28 +2202,7 @@ void MainWindow::suspendSignal(
 
 	m_dataEngine->suspend();
 }
- 
-/*!
-	\brief start playback.
-*/
-void MainWindow::startPlaybackSignal(
-		QObject *sender					/*!<[in] the sender of the event. */
-) {
-	Q_UNUSED(sender)
 
-	m_dataEngine->startPlayback();
-}
- 
-/*!
-	\brief show the audio settings dialog.
-*/
-void MainWindow::showSettingsDialogSignal(
-		QObject *sender					/*!<[in] the sender of the event. */
-) {
-	Q_UNUSED(sender)
-
-	m_dataEngine->showSettingsDialog();
-}
 
 void MainWindow::showNetworkIODialog() {
 
@@ -2436,13 +2347,6 @@ void MainWindow::closeEvent(
 		disconnect(m_radioTabWidget, 0, 0, 0);
 		delete m_radioTabWidget;
 		m_radioTabWidget = NULL;
-	}
-
-	if (m_chirpWidget) {
-		
-		disconnect(m_chirpWidget, 0, 0, 0);
-		delete m_chirpWidget;
-		m_chirpWidget = NULL;
 	}
 
 	/*if (m_hpsdrWidget) {

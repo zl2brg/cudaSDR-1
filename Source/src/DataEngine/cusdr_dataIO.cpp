@@ -82,6 +82,7 @@ DataIO::DataIO(THPSDRParameter *ioData)
 	//m_metisGetDataSignature[3] = (char)0x06;
 
 	m_datagram.resize(1032);
+	m_iqbuffer.resize(1024);
 	m_wbDatagram.resize(0);
 	m_twoFramesDatagram.resize(0);
 
@@ -245,12 +246,118 @@ void DataIO::initDataReceiverSocket() {
 	}
 }
 
+
+void DataIO::new_readDeviceData() {
+    qint64  size = 0;
+    while (m_dataIOSocket->hasPendingDatagrams()) {
+        QMutexLocker locker(&io->networkIOMutex);
+        size = m_dataIOSocket->readDatagram((char *)m_buffer, sizeof(m_buffer));
+        if (size == METIS_DATA_SIZE) {
+			if(m_buffer[0]==0xEF && m_buffer[1]==0xFE) {
+		//	    qDebug() << "read size " << size;
+                if (m_buffer[3] == (char)0x06) {
+
+                    m_sequence  = (m_buffer[4] & 0xFF) << 24;
+                    m_sequence += (m_buffer[5] & 0xFF) << 16;
+                    m_sequence += (m_buffer[6] & 0xFF) << 8;
+                    m_sequence += (m_buffer[7] & 0xFF);
+
+                    if (m_sequence != m_oldSequence + 1) {
+
+                        //DATAIO_DEBUG << "readData missed " << m_sequence - m_oldSequence << " packages.";
+                        //RRK cout << "readData missed " << m_sequence - m_oldSequence << " packages." << endl;
+
+                        if (m_packetLossTime.elapsed() > 100) {
+
+                            set->setPacketLoss(2);
+                            m_packetLossTime.restart();
+                        }
+                    }
+
+                    m_oldSequence = m_sequence;
+
+                    //// enqueue first half of the HPSDR frame from the HPSDR device
+                    //io->iq_queue.enqueue(m_buffer.mid(METIS_HEADER_SIZE, BUFFER_SIZE/2));
+                    //// enqueue second half of the HPSDR frame from the HPSDR device
+                    //io->iq_queue.enqueue(m_buffer.right(BUFFER_SIZE/2));
+
+                    // enqueue one frame from the HPSDR device
+
+                    if (!io->iq_queue.isFull()) {
+                           io->iq_queue.enqueue(QByteArray::fromRawData((const char *)&m_buffer[8],1024));
+                        emit (readydata());
+                    }
+
+                    // collect two HPSDR frames
+                    //if (m_firstFrame) {
+
+                    //	m_twoFramesDatagram += m_buffer.mid(METIS_HEADER_SIZE, BUFFER_SIZE);
+                    //	m_firstFrame = false;
+                    //}
+                    //else {
+
+                    //	m_twoFramesDatagram += m_buffer.mid(METIS_HEADER_SIZE, BUFFER_SIZE);
+
+                    //	//enqueue the two frames
+                    //	io->iq_queue.enqueue(m_twoFramesDatagram);
+                    //	m_firstFrame = true;
+
+                    //	m_twoFramesDatagram.resize(0);
+                    //}
+                }
+                else if (m_buffer[3] == (char)0x04) { // wide band data
+
+                    m_sequenceWideBand  = (m_buffer[4] & 0xFF) << 24;
+                    m_sequenceWideBand += (m_buffer[5] & 0xFF) << 16;
+                    m_sequenceWideBand += (m_buffer[6] & 0xFF) << 8;
+                    m_sequenceWideBand += (m_buffer[7] & 0xFF);
+
+                    if (m_sequenceWideBand != m_oldSequenceWideBand + 1) {
+
+                        DATAIO_DEBUG << "wideband readData missed " << m_sequenceWideBand - m_oldSequenceWideBand << " packages.";
+
+                        if (m_packetLossTime.elapsed() > 100) {
+
+                            set->setPacketLoss(2);
+                            m_packetLossTime.restart();
+                        }
+                    }
+
+                    m_oldSequenceWideBand = m_sequenceWideBand;
+
+                    // three 'if's from KISS Konsole
+                    if ((m_wbBuffers & m_buffer[7]) == 0)
+                    {
+                        m_sendEP4 = true;
+                        m_wbCount = 0;
+                    }
+
+                    if (m_sendEP4)
+                    {
+                    	//memcpy(m_iqbuffer.data(),m_buffer+ 8,1024);
+                        io->wb_queue.enqueue(QByteArray::fromRawData((const char *)&m_buffer[8],1024));
+                    }
+                    if (m_wbCount++ == m_wbBuffers)
+                    {
+                        // enqueue
+                        m_sendEP4 = false;
+                     //   io->wb_queue.enqueue(QByteArray::fromRawData((const char *)&m_buffer[8],1024));
+                    }
+                }
+            }
+            //DATA_RECEIVER_DEBUG << "got wrong HPSDR device signature!";
+        }
+        //DATA_RECEIVER_DEBUG << "got wrong HPSDR device data size!";
+    }
+    //DATA_RECEIVER_DEBUG << "no more pending datagrams.";
+}
+
+
 void DataIO::readDeviceData() {
 
 	while (m_dataIOSocket->hasPendingDatagrams()) {
 		QMutexLocker locker(&io->networkIOMutex);
 		if (m_dataIOSocket->readDatagram(m_datagram.data(), m_datagram.size()) == METIS_DATA_SIZE) {
-			
 			if (m_datagram.left(3) == m_metisGetDataSignature) {
 
 				if (m_datagram[3] == (char)0x06) {
@@ -280,7 +387,9 @@ void DataIO::readDeviceData() {
 					//io->iq_queue.enqueue(m_datagram.right(BUFFER_SIZE/2));
 
 					// enqueue one frame from the HPSDR device
-					if (!io->iq_queue.isFull()) {
+                 //   qDebug() << "datagram size" << m_datagram.size();
+
+                    if (!io->iq_queue.isFull()) {
 						io->iq_queue.enqueue(m_datagram.mid(METIS_HEADER_SIZE, BUFFER_SIZE));
 						emit (readydata());
 					}
@@ -514,7 +623,7 @@ void DataIO::writeData() {
 	else {
 
 		m_outDatagram += io->audioDatagram;
-		qDebug() << "write data";
+		//qDebug() << "write data";
 		if (m_dataIOSocket->writeDatagram(m_outDatagram, set->getCurrentMetisCard().ip_address, DEVICE_PORT) < 0) {
 			DATAIO_DEBUG << "error sending data to device: " << m_dataIOSocket->errorString();
 		}

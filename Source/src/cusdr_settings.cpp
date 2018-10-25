@@ -922,7 +922,7 @@ int Settings::loadSettings() {
         cstr = m_rxStringList.at(i);
         cstr.append("/averagingCnt");
         value = settings->value(cstr, 5).toInt();
-        if ((value < 1)  value = 100;
+        if (value < 1)  value = 100;
         m_receiverDataList[i].averagingCnt = value;
 
         cstr = m_rxStringList.at(i);

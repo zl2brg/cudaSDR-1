@@ -110,7 +110,6 @@ DataEngine::DataEngine(QObject *parent)
 	m_wbDataProcessor = 0;
 	m_audioReceiver = 0;
 	m_audioOutProcessor = 0;
-	m_chirpProcessor = 0;
 	//m_wbAverager = 0;
 
 	set->setMercuryVersion(0);
@@ -126,7 +125,6 @@ DataEngine::DataEngine(QObject *parent)
     //m_audioBuffer.resize(0);
     //m_audiobuf.resize(IO_BUFFER_SIZE);
 
-	initAudioEngine();
 	setupConnections();
 
 	// test
@@ -152,11 +150,6 @@ DataEngine::DataEngine(QObject *parent)
 }
 
 DataEngine::~DataEngine() {
-}
-
-void DataEngine::initAudioEngine() {
-	m_audioEngine = new AudioEngine();
-	//m_audioEngine->setSystemState(QSDR::NoError, m_hwInterface, m_serverMode, m_dataEngineState);
 }
 
 void DataEngine::setupConnections() {
@@ -345,47 +338,6 @@ void DataEngine::setupConnections() {
 		this,
 		SLOT(setTxJ6Pins(const QList<int> &)));
 
-	CHECKED_CONNECT(
-		m_audioEngine,
-		SIGNAL(formatChanged(QObject *, const QAudioFormat )), 
-		set, 
-		SLOT(setAudioFormat(QObject *, const QAudioFormat )));
-
-	CHECKED_CONNECT(
-		m_audioEngine,
-		SIGNAL(formatChanged(QObject *, const QAudioFormat )), 
-		this, 
-		SLOT(setAudioFileFormat(QObject *, const QAudioFormat )));
-
-	CHECKED_CONNECT(
-		m_audioEngine, 
-		SIGNAL(playPositionChanged(QObject *, qint64)),
-		set,
-		SLOT(setAudioPosition(QObject *, qint64)));
-
-	CHECKED_CONNECT(
-		m_audioEngine, 
-		SIGNAL(playPositionChanged(QObject *, qint64)),
-		this,
-		SLOT(setAudioFilePosition(QObject *, qint64)));
-
-	CHECKED_CONNECT(
-		m_audioEngine, 
-		SIGNAL(bufferChanged(QObject *, qint64, qint64, const QByteArray)),
-		set,
-		SLOT(setAudioBuffer(QObject *, qint64, qint64, const QByteArray)));
-
-	CHECKED_CONNECT(
-		m_audioEngine, 
-		SIGNAL(bufferChanged(QObject *, qint64, qint64, const QByteArray)),
-		this,
-		SLOT(setAudioFileBuffer(QObject *, qint64, qint64, const QByteArray)));
-
-	CHECKED_CONNECT(
-		m_audioEngine, 
-		SIGNAL(audiofileBufferChanged(const QList<qreal>)),
-		this,
-		SLOT(setAudioFileBuffer(const QList<qreal>)));
 
 
 }
@@ -412,33 +364,9 @@ bool DataEngine::startDataEngineWithoutConnection() {
 		switch (m_serverMode) {
 
 			case QSDR::SDRMode:
-			case QSDR::ChirpWSPR:
 			case QSDR::NoServerMode:
 			case QSDR::DemoMode:
 				return false;
-
-			case QSDR::ChirpWSPRFile:			
-
-				if (!m_chirpInititalized) createChirpDataProcessor();				
-
-				m_chirpProcessor->generateLocalChirp();
-				
-				if (!startChirpDataProcessor(QThread::NormalPriority)) {
-					
-					setSystemState(QSDR::ChirpDataProcessThreadError, m_hwInterface, m_serverMode, QSDR::DataEngineDown);
-					return false;
-				}
-		
-				m_chirpDspEngine = new QWDSPEngine(this, 0, 2*BUFFER_SIZE);
-
-				cpxIn.resize(2*BUFFER_SIZE);
-				cpxOut.resize(2*BUFFER_SIZE);
-
-				RX.at(0)->setConnectedStatus(true);
-				set->setRxList(RX);
-
-				m_rxSamples = 0;
-				m_chirpSamples = 0;
 
 				break;
 		}
@@ -816,9 +744,6 @@ bool DataEngine::start() {
 		createWideBandDataProcessor();
 
 
-	if ((m_serverMode == QSDR::ChirpWSPR) && !m_chirpProcessor)
-		createChirpDataProcessor();
-
 	switch (m_serverMode) {
 
 		//case QSDR::ExternalDSP:
@@ -868,28 +793,6 @@ bool DataEngine::start() {
 		case QSDR::SDRMode:
 			
 			setTimeStamp(this, false);
-			break;
-
-		case QSDR::ChirpWSPR:
-		//case QSDR::ChirpWSPRFile:
-
-			// turn time stamping on
-			setTimeStamp(this, true);
-
-			if (!startChirpDataProcessor(QThread::NormalPriority)) {
-
-				DATA_ENGINE_DEBUG << "data processor thread could not be started.";
-				return false;
-			}
-
-			//RX.at(0)->setConnectedStatus(true);
-
-			CHECKED_CONNECT(
-					set,
-					SIGNAL(ctrFrequencyChanged(QObject *, int, int, long)),
-					this,
-					SLOT(setFrequency(QObject *, int, int, long)));
-
 			break;
 
 		default:
@@ -1040,7 +943,7 @@ void DataEngine::stop() {
 				DATA_ENGINE_DEBUG << "chirp queue count: " << io.chirp_queue.count();
 
 				stopDataProcessor();
-				stopChirpDataProcessor();
+
 		}
 
 		while (!io.au_queue.isEmpty())
@@ -1500,10 +1403,6 @@ void DataEngine::createDataIO() {
 //					QString::number(set->getSampleRate()/1000)));
 			break;
 
-		case QSDR::ChirpWSPR:
-		case QSDR::ChirpWSPRFile:
-			break;
-			
 		case QSDR::NoServerMode:
 		case QSDR::DemoMode:
 			break;
@@ -1606,9 +1505,6 @@ void DataEngine::createDataProcessor() {
 		// decoded.
 
 		case QSDR::SDRMode:
-		case QSDR::ChirpWSPR:
-		case QSDR::ChirpWSPRFile:
-
 			/*connect(
 				this,
 				SIGNAL(iqDataReady(int)),
@@ -1684,7 +1580,7 @@ void DataEngine::stopDataProcessor() {
 					
 		m_dataProcessor->stop();
 		
-		if (m_serverMode == QSDR::SDRMode || m_serverMode == QSDR::ChirpWSPR) {
+		if (m_serverMode == QSDR::SDRMode ) {
 			
 			if (io.iq_queue.isEmpty()) {
 				io.iq_queue.enqueue(QByteArray(BUFFER_SIZE, 0x0));
@@ -1706,7 +1602,7 @@ void DataEngine::stopDataProcessor() {
 		delete m_dataProcessor;
 		m_dataProcessor = 0;
 
-		if (m_serverMode == QSDR::SDRMode || m_serverMode == QSDR::ChirpWSPR) {
+		if (m_serverMode == QSDR::SDRMode ) {
 
 			while (!io.iq_queue.isEmpty())
 				io.iq_queue.dequeue();
@@ -1861,97 +1757,6 @@ void DataEngine::stopWideBandDataProcessor() {
 	}
 	else
 		DATA_ENGINE_DEBUG << "wide band data processor thread wasn't started.";
-}
- 
-//********************************************************
-// create, start/stop chirp processor
-void DataEngine::createChirpDataProcessor() {
-
-	m_chirpProcessor = new ChirpProcessor(&io);
-	DATA_ENGINE_DEBUG << "chirp decoder initialized";
-	
-	CHECKED_CONNECT_OPT(
-		m_audioEngine, 
-		SIGNAL(chirpSignalChanged()),
-		m_chirpProcessor,
-		SLOT(generateLocalChirp()),
-		Qt::DirectConnection);
-
-	m_audioEngine->reset();
-	if (m_audioEngine->generateSweptTone())
-		DATA_ENGINE_DEBUG << "audio chirp signal initialized";
-	else
-		DATA_ENGINE_DEBUG << "audio chirp signal initialization failed";
-
-
-	m_chirpDataProcThread = new QThreadEx();
-	m_chirpProcessor->moveToThread(m_chirpDataProcThread);
-	m_chirpProcessor->connect(
-						m_chirpDataProcThread, 
-						SIGNAL(started()),
-						m_chirpProcessor,
-						SLOT(processChirpData()));
-
-	m_chirpInititalized = true;
-}
-
-bool DataEngine::startChirpDataProcessor(QThread::Priority prio) {
-
-	m_chirpDataProcThread->start(prio);//(QThread::TimeCriticalPriority);//(QThread::HighPriority);//(QThread::LowPriority);
-				
-	if (m_chirpDataProcThread->isRunning()) {
-					
-		m_chirpDataProcThreadRunning = true;
-		io.networkIOMutex.lock();
-		DATA_ENGINE_DEBUG << "chirp data processor thread started.";
-		io.networkIOMutex.unlock();
-
-		return true;
-	}
-	else {
-
-		m_chirpDataProcThreadRunning = false;
-		setSystemState(QSDR::DataProcessThreadError, m_hwInterface, m_serverMode, QSDR::DataEngineDown);
-		return false;
-	}
-}
-
-void DataEngine::stopChirpDataProcessor() {
-
-	if (m_chirpInititalized) {
-
-		m_chirpProcessor->stop();
-		if (io.chirp_queue.isEmpty()) {
-				
-			QList<qreal> buf;
-			for (int i = 0; i < 128; i++) buf << 0.0f;
-				io.chirp_queue.enqueue(buf);
-			}
-
-			m_chirpDataProcThread->quit();
-			m_chirpDataProcThread->wait();
-			delete m_chirpDataProcThread;
-			delete m_chirpProcessor;
-			m_chirpProcessor = 0;
-
-			if (m_hwInterface == QSDR::NoInterfaceMode) {
-
-				//freeCPX(io.cpxIn);
-				//freeCPX(io.cpxOut);
-				delete m_chirpDspEngine;
-
-				while (!io.chirp_queue.isEmpty())
-					io.chirp_queue.dequeue();
-
-				DATA_ENGINE_DEBUG << "io.cpxIn, io.cpxOut, fft deleted, io.chirp_queue empty.";
-			}
-
-			m_chirpInititalized = false;
-
-			DATA_ENGINE_DEBUG << "chirp data processor thread deleted.";
-	}
-	else
-		DATA_ENGINE_DEBUG << "chirp data processor thread wasn't started.";
 }
 
 void DataEngine::setWideBandBufferCount()
@@ -2488,62 +2293,11 @@ void DataEngine::setFrequency(QObject* sender, int mode, int rx, long frequency)
 	io.tx_freq_change = rx;
 }
 
-void DataEngine::loadWavFile(const QString &fileName) {
-
-	if (m_audioEngine->loadFile(fileName))
-		m_soundFileLoaded = true;
-	else
-		m_soundFileLoaded = false;
-}
-
 void DataEngine::suspend() {
 
-	m_audioEngine->suspend();
+
 }
 
-void DataEngine::startPlayback() {
-
-	m_audioEngine->startPlayback();
-}
-
-void DataEngine::showSettingsDialog() {
-
-	m_audioEngine->showSettingsDialog();
-}
-
-void DataEngine::setAudioFileFormat(QObject *sender, const QAudioFormat &format) {
-
-	Q_UNUSED (sender)
-	Q_UNUSED (format)
-}
-
-void DataEngine::setAudioFilePosition(QObject *sender, qint64 position) {
-
-	Q_UNUSED (sender)
-	Q_UNUSED (position)
-}
-
-void DataEngine::setAudioFileBuffer(QObject *sender, qint64 position, qint64 length, const QByteArray &buffer) {
-
-	Q_UNUSED (sender)
-
-    m_audioFileBufferPosition = position;
-    m_audioFileBufferLength = length;
-	m_audioFileBuffer = buffer;
-
-	//DATA_ENGINE_DEBUG << "audio file length" << m_audioFileBufferLength;
-}
-
-void DataEngine::setAudioFileBuffer(const QList<qreal> &buffer) {
-
-	io.inputBuffer = buffer;
-	
-	/*for (int i = 0; i < buffer.length(); i++) {
-
-		DATA_ENGINE_DEBUG << "i" << i << "audioBuffer" << io.inputBuffer.at(i);
-	}*/
-}
- 
 // *********************************************************************
 // Data processor
 
@@ -3584,7 +3338,7 @@ void DataProcessor::processReadData()
     QByteArray buf;
     while(de->io.iq_queue.isEmpty() == false) {
         buf = de->io.iq_queue.dequeue();
-        processInputBuffer(buf.left(BUFFER_SIZE / 2));
-        processInputBuffer(buf.right(BUFFER_SIZE / 2));
+      processInputBuffer(buf.left(BUFFER_SIZE / 2));
+     processInputBuffer(buf.right(BUFFER_SIZE / 2));
     }
 }

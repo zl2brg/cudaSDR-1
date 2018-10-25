@@ -6,14 +6,9 @@
 #include "cusdr_settings.h"
 #include "cusdr_dataIO.h"
 #include "cusdr_receiver.h"
-#include "cusdr_chirpProcessor.h"
 #include "cusdr_audioReceiver.h"
 #include "cusdr_discoverer.h"
 #include "Util/qcircularbuffer.h"
-#include "QtDSP/qtdsp_fft.h"
-#include "QtDSP/qtdsp_filter.h"
-#include "QtDSP/qtdsp_dualModeAverager.h"
-#include "AudioEngine/cusdr_audio_engine.h"
 #include "QtWDSP/qtwdsp_dspEngine.h"
 
 #ifndef CUDASDR_CUSDR_WIDEBANDPROCESSOR_H

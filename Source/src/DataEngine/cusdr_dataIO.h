@@ -71,7 +71,8 @@ private slots:
 	void setManualSocketBufferSize(QObject *sender, bool value);
 	void setSocketBufferSize(QObject *sender, int value);
 	void readDeviceData();
-	
+	void new_readDeviceData();
+
 private:
 	Settings*		set;
 	QUdpSocket*		m_dataIOSocket;
@@ -84,6 +85,8 @@ private:
 	QByteArray		m_outDatagram;
 	QByteArray		m_deviceSendDataSignature;
 	QString			m_message;
+	unsigned char 	m_buffer[METIS_DATA_SIZE];
+	QByteArray  	m_iqbuffer;
 
 	QTime			m_packetLossTime;
 

@@ -54,13 +54,9 @@
 #include "cusdr_settings.h"
 #include "cusdr_dataIO.h"
 #include "cusdr_receiver.h"
-#include "cusdr_chirpProcessor.h"
 #include "cusdr_audioReceiver.h"
 #include "cusdr_discoverer.h"
 #include "Util/qcircularbuffer.h"
-#include "QtDSP/qtdsp_fft.h"
-#include "QtDSP/qtdsp_filter.h"
-#include "AudioEngine/cusdr_audio_engine.h"
 #include "QtWDSP/qtwdsp_dspEngine.h"
 #include "cusdr_WidebandProcessor.h"
 
@@ -139,9 +135,8 @@ public slots:
 	void	setClientConnected(bool value);
 	void	setClientDisconnected(int client);
 	void	setFramesPerSecond(QObject *sender, int rx, int value);
-	void	createChirpDataProcessor();
 
-	// DSP processing
+    // DSP processing
 	void	processFileBuffer(const QList<qreal> data);
 	
 	// change HPSDR hardware settings
@@ -161,10 +156,7 @@ public slots:
 	void	setHamBand(QObject *sender, int rx, bool byBtn, HamBand band);
 	void	setFrequency(QObject* sender, int mode, int rx, long frequency);
 
-	void	loadWavFile(const QString &fileName);
 	void	suspend();
-	void	startPlayback();
-	void	showSettingsDialog();
 
 private:
 	void	setSystemState(
@@ -173,7 +165,6 @@ private:
 				QSDR::_ServerMode mode,
 				QSDR::_DataEngineState state);
 
-	void	initAudioEngine();
 	void	setupConnections();
 	void	connectDSPSlots();
 	void	disconnectDSPSlots();
@@ -197,14 +188,13 @@ private:
 	bool	startDataProcessor(QThread::Priority prio);
 	void	startAudioOutProcessor(QThread::Priority prio);
 	bool	startWideBandDataProcessor(QThread::Priority prio);
-	bool	startChirpDataProcessor(QThread::Priority prio);
 
 	void	stopDiscoverer();
 	void	stopDataIO();
 	void	stopDataProcessor();
 	void	stopAudioOutProcessor();
 	void	stopWideBandDataProcessor();
-	void	stopChirpDataProcessor();
+
 	void	setHPSDRConfig();
 	void    setWideBandBufferCount();
 
@@ -213,9 +203,7 @@ private:
 	WideBandDataProcessor*	m_wbDataProcessor;
 	QWDSPEngine*			m_chirpDspEngine;
 	AudioReceiver*			m_audioReceiver;
-	AudioEngine*			m_audioEngine;
 	AudioOutProcessor*		m_audioOutProcessor;
-	ChirpProcessor*			m_chirpProcessor;
 	Discoverer*				m_discoverer;
 	
 	QThreadEx*				m_discoveryThread;
@@ -330,13 +318,7 @@ private slots:
 	void	setRxJ6Pins(const QList<int> &list);
 	void	setTxJ6Pins(const QList<int> &list);
 
-	void	setAudioFileFormat(QObject *sender, const QAudioFormat &format);
-	void	setAudioFilePosition(QObject *sender, qint64 position);
-	void	setAudioFileBuffer(QObject *sender, qint64 position, qint64 length, const QByteArray &buffer);
 
-	void	setAudioFileBuffer(const QList<qreal> &buffer);
-
-	
 signals:
 	void	error(QUdpSocket::SocketError error);
 	void	masterSwitchEvent(QObject *sender, bool power);
