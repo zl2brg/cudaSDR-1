@@ -60,4 +60,5 @@ private:
     OGLTextPrivate *const d;
 };
 
+
 #endif // _CUSDR_OGL_TEXT_H

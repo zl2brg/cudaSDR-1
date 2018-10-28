@@ -278,3 +278,4 @@ void OGLText::renderText(float x, float y, float z, const QString &text) {
     glPopMatrix();
     glPopAttrib();
 }
+

@@ -59,6 +59,7 @@ class OGLDisplayPanel : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
     OGLDisplayPanel(QWidget *parent = 0);
 	~OGLDisplayPanel();
+void renderText(int x, int y, QFont &font, const QString &text);
 
 public slots:
 	QSize minimumSizeHint() const;
@@ -83,6 +84,8 @@ protected:
 	void showEvent(QShowEvent *event);
     void timerEvent(QTimerEvent *);
     void qglColor(QColor color);
+    void saveGLState();
+    void restoreGLState();
 
 private:
 	Settings*	set;
@@ -102,7 +105,7 @@ private:
 	TFonts		m_fonts;
 
 	QMutex		m_mutex;
-
+	QPainter	*painter;
 	OGLText		*m_oglTextTiny;
 	OGLText		*m_oglTextSmall;
 	OGLText		*m_oglTextSmallItalic;

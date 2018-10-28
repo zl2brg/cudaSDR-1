@@ -94,6 +94,7 @@ OGLDisplayPanel::OGLDisplayPanel(QWidget *parent)
 	setMouseTracking(true);
     setUpdateBehavior(QOpenGLWidget::PartialUpdate);
 	m_freqStringLeftPos = 20;
+	painter = new QPainter(this);
 	setupDisplayRegions(size());
 
 	fonts = new CFonts(this);
@@ -989,10 +990,9 @@ void OGLDisplayPanel::paintLowerRegion() {
 void OGLDisplayPanel::paintRxRegion() {
 
 	QString str;
-
 	GLint x1 = m_rxRect.left() + 20;
 	GLint y1 = m_rxRect.top() + m_freqDigitsPosY;
-	
+	qDebug() << "top" << y1 << m_rxRect.top() << m_rxRect.bottom() ;
 	// draw background
 	if (m_dataEngineState == QSDR::DataEngineUp) {
 
@@ -1017,7 +1017,7 @@ void OGLDisplayPanel::paintRxRegion() {
 
 	m_freqStringLeftPos = x1;
 	m_oglTextFreq1->renderText(x1, y1, f1str);
-
+	renderText(x1,y1,m_fonts.freqFont1,f1str);
 	str = "%1";
 	x1 = m_rxRect.left() + m_blankWidthf + 2*m_blankWidthf2;
 
@@ -2718,3 +2718,41 @@ void OGLDisplayPanel::qglColor(QColor color)
 {
     glColor4f(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
+
+
+void OGLDisplayPanel::saveGLState() {
+
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+}
+
+void OGLDisplayPanel::restoreGLState() {
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glPopAttrib();
+}
+
+void OGLDisplayPanel::renderText(int x, int y, QFont &font, const QString &text){
+		saveGLState();
+		painter->begin(this);
+		painter->setPen(QColor(255,255,255,255));
+		painter->setRenderHint(QPainter::TextAntialiasing ,true);
+		painter->setFont(font);
+
+		QFontMetrics fm(font);
+	qDebug() << "render text " << x << y << fm.height()  <<  text;
+		painter->drawText(int(x) , int(y) + fm.height(), text);
+//        painter->drawText(0,fm.height() + y, "top");
+//        painter->drawText(0,119, "bottom");
+
+
+		painter->end();
+		restoreGLState();
+	}
+
