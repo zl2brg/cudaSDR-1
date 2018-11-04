@@ -69,7 +69,7 @@ OGLDisplayPanel::OGLDisplayPanel(QWidget *parent)
 	, m_random(set->getMercuryRandom())
 	, m_currentReceiver(set->getCurrentReceiver())
 	, m_sMeterDeform(15)
-	, m_freqDigitsPosY(30)
+	, m_freqDigitsPosY(70)
 	, m_sMeterPosY(50)//(45)
 	, m_sMeterHoldTime(set->getSMeterHoldTime())
 	, m_sMeterPrevHoldTimeMax(0)
@@ -987,58 +987,68 @@ void OGLDisplayPanel::paintLowerRegion() {
 	}
 }
 
+
+
 void OGLDisplayPanel::paintRxRegion() {
 
 	QString str;
+	QColor fontcolor;
 	GLint x1 = m_rxRect.left() + 20;
 	GLint y1 = m_rxRect.top() + m_freqDigitsPosY;
-	qDebug() << "top" << y1 << m_rxRect.top() << m_rxRect.bottom() ;
 	// draw background
 	if (m_dataEngineState == QSDR::DataEngineUp) {
 
 		drawGLRect(m_rect, Qt::black, m_bkgColor2, -3.0f, false);
 		qglColor(m_activeTextColor);
+		fontcolor = m_activeTextColor;
 	}
 	else {
 
 		drawGLRect(m_rect, QColor(0, 0, 0, 255), -3.0f);
 		qglColor(QColor(68, 68, 68));
+		fontcolor = QColor(68, 68, 68);
 	}
+
 
 	str = "%1.%2";
 
 	int f1 = m_frequencyList[m_currentReceiver].freqMHz;
 	int f2 = m_frequencyList[m_currentReceiver].freqkHz;
-
     QString f1str = str.arg(f1/1000).arg(f1 - 1000 * (int)(f1/1000), 3, 10, QLatin1Char('0'));
 
 	if (f1 / 1000 < 10)
 		x1 += m_blankWidthf1;
 
 	m_freqStringLeftPos = x1;
-	m_oglTextFreq1->renderText(x1, y1, f1str);
-	renderText(x1,y1,m_fonts.freqFont1,f1str);
+//	m_oglTextFreq1->renderText(x1, y1, f1str);
+	renderText(x1, y1, m_fonts.freqFont1, fontcolor, f1str);
+
 	str = "%1";
 	x1 = m_rxRect.left() + m_blankWidthf + 2*m_blankWidthf2;
 
 	QString f2str = str.arg(f2, 3, 10, QLatin1Char('0'));
 	//int f2strWidth = m_oglTextFreq2->fontMetrics().tightBoundingRect(f2str).width();
 
-	m_oglTextFreq2->renderText(x1, y1 + 1, f2str);
+//	m_oglTextFreq2->renderText(x1, y1 + 1, f2str);
+	renderText(x1, y1, m_fonts.freqFont2, fontcolor, f2str);
 
 	//x1 += f2strWidth + m_blankWidthf2;
 	x1 = m_rxRect.left() + m_blankWidthf + 6*m_blankWidthf2;
-	m_oglTextFreq1->renderText(x1, y1 - 1, "MHz");
-	
+//	m_oglTextFreq1->renderText(x1, y1 - 1, "MHz");
+	renderText(x1, y1 - 1, m_fonts.freqFont1, fontcolor, "MHz");
+
 	// current mouse wheel step size
 	str = "step: %1";
-	x1 += m_fUnitStringWidth + 4*m_blankWidthf2;
+	x1 += m_fUnitStringWidth + 3 * m_blankWidthf2;
 
-	m_oglTextNormal->renderText(x1, y1 + 2, str.arg(set->getValue1000(m_mouseWheelFreqStep, 0, "Hz")));
+//	m_oglTextNormal->renderText(x1, y1 + 2, str.arg(set->getValue1000(m_mouseWheelFreqStep, 0, "Hz")));
+	renderText(x1, y1 - 2, m_fonts.normalFont, fontcolor, str.arg(set->getValue1000(m_mouseWheelFreqStep, 0, "Hz")));
 
 	// current receiver
 	str = "Rx: %1";
-	m_oglTextBig->renderText(x1, y1 + 1.5f * m_fonts.fontHeightBigFont, str.arg(m_currentReceiver + 1));
+//	m_oglTextBig->renderText(x1, y1 + 1.5f * m_fonts.fontHeightBigFont, str.arg(m_currentReceiver + 1));
+	renderText(x1, y1 - (int)(1 * m_fonts.fontHeightBigFont ) ,m_fonts.bigFont, fontcolor, str.arg(m_currentReceiver + 1));
+
 
 	// frequency info
 	if (m_oldFreq != m_frequencyList[m_currentReceiver].frequency) {
@@ -1047,7 +1057,9 @@ void OGLDisplayPanel::paintRxRegion() {
 		m_oldFreq = m_frequencyList[m_currentReceiver].frequency;
 	}
 
-	m_oglTextSmall->renderText(m_freqStringLeftPos, y1 + 1.75*m_fonts.fontHeightFreqFont1, m_bandText);
+//	m_oglTextSmall->renderText(m_freqStringLeftPos, y1 + 1.75*m_fonts.fontHeightFreqFont1, m_bandText);
+	renderText(m_freqStringLeftPos,  y1 + (int) (m_fonts.fontHeightFreqFont1) - 10 ,m_fonts.smallFont, fontcolor, m_bandText);
+
 }
 
 void OGLDisplayPanel::paintSMeter() {
@@ -2051,31 +2063,30 @@ void OGLDisplayPanel::setupDisplayRegions(QSize size) {
 	//DISPLAYPANEL_DEBUG << "m_sMeterOffset:" << m_sMeterOffset;
 
 	int x = m_rxRect.left() + 20;
-	int y = m_rxRect.top() + m_freqDigitsPosY + 10;
+	int y = m_rxRect.top() + m_freqDigitsPosY;
 
-	m_freg10000000	 = QRegion(QRect(x, y, m_blankWidthf1, m_fonts.fontHeightFreqFont1));
+	m_freg10000000	 = QRegion(QRect(x, y -  m_fonts.fontHeightFreqFont1, m_blankWidthf1, m_fonts.fontHeightFreqFont1));
+    x += m_blankWidthf1;
+	m_freg1000000	 = QRegion(QRect(x, y -  m_fonts.fontHeightFreqFont1, m_blankWidthf1, m_fonts.fontHeightFreqFont1));
 
 	x += m_blankWidthf1;
-	m_freg1000000	 = QRegion(QRect(x, y, m_blankWidthf1, m_fonts.fontHeightFreqFont1));
-
-	x += m_blankWidthf1;
-	m_freg100000	 = QRegion(QRect(x, y, m_blankWidthf1, m_fonts.fontHeightFreqFont1));
+	m_freg100000	 = QRegion(QRect(x, y -  m_fonts.fontHeightFreqFont1, m_blankWidthf1, m_fonts.fontHeightFreqFont1));
 
 	x += m_blankWidthf1 + m_pointStringWidth;
-	m_freg10000 	 = QRegion(QRect(x, y, m_blankWidthf1, m_fonts.fontHeightFreqFont1));
+	m_freg10000 	 = QRegion(QRect(x, y -  m_fonts.fontHeightFreqFont1 , m_blankWidthf1, m_fonts.fontHeightFreqFont1));
 
 	x += m_blankWidthf1;
-	m_freg1000 		 = QRegion(QRect(x, y, m_blankWidthf1, m_fonts.fontHeightFreqFont1));
+	m_freg1000 		 = QRegion(QRect(x, y -  m_fonts.fontHeightFreqFont1 , m_blankWidthf1, m_fonts.fontHeightFreqFont1));
 
 	//x += m_blankWidthf1;
 	x = m_rxRect.left() + m_blankWidthf + 2*m_blankWidthf2;
-	m_freg100 		 = QRegion(QRect(x, y, m_blankWidthf2, m_fonts.fontHeightFreqFont2));
+	m_freg100 		 = QRegion(QRect(x, y -  m_fonts.fontHeightFreqFont2, m_blankWidthf2, m_fonts.fontHeightFreqFont2));
 
 	x += m_blankWidthf2;
-	m_freg10 		 = QRegion(QRect(x, y, m_blankWidthf2, m_fonts.fontHeightFreqFont2));
+	m_freg10 		 = QRegion(QRect(x, y -  m_fonts.fontHeightFreqFont2 , m_blankWidthf2, m_fonts.fontHeightFreqFont2));
 
 	x += m_blankWidthf2;
-	m_freg1 		 = QRegion(QRect(x, y, m_blankWidthf2, m_fonts.fontHeightFreqFont2));
+	m_freg1 		 = QRegion(QRect(x, y -  m_fonts.fontHeightFreqFont2 , m_blankWidthf2, m_fonts.fontHeightFreqFont2));
 
 	m_smeterRenew = true;
 }
@@ -2738,20 +2749,13 @@ void OGLDisplayPanel::restoreGLState() {
 	glPopAttrib();
 }
 
-void OGLDisplayPanel::renderText(int x, int y, QFont &font, const QString &text){
+void OGLDisplayPanel::renderText(int x, int y, QFont &font, QColor fontcolor, const QString &text) {
 		saveGLState();
 		painter->begin(this);
-		painter->setPen(QColor(255,255,255,255));
-		painter->setRenderHint(QPainter::TextAntialiasing ,true);
+		painter->setPen(fontcolor);
 		painter->setFont(font);
-
-		QFontMetrics fm(font);
-	qDebug() << "render text " << x << y << fm.height()  <<  text;
-		painter->drawText(int(x) , int(y) + fm.height(), text);
-//        painter->drawText(0,fm.height() + y, "top");
-//        painter->drawText(0,119, "bottom");
-
-
+		painter->setRenderHint(QPainter::TextAntialiasing ,true);
+		painter->drawText(int(x) , int(y), text);
 		painter->end();
 		restoreGLState();
 	}

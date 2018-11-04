@@ -59,7 +59,7 @@ class OGLDisplayPanel : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
     OGLDisplayPanel(QWidget *parent = 0);
 	~OGLDisplayPanel();
-void renderText(int x, int y, QFont &font, const QString &text);
+void renderText(int x, int y, QFont &font, QColor fontcolor, const QString &text);
 
 public slots:
 	QSize minimumSizeHint() const;
