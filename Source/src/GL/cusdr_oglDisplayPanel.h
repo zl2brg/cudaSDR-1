@@ -44,6 +44,9 @@
 #include <QOpenGLWidget>
 #include <QtGui/QOpenGLFramebufferObject>
 #include <QOpenGLFunctions>
+#include <QMenu>
+#include <QMenuBar>
+
 
 #ifdef LOG_DISPLAYPANEL
 #   define DISPLAYPANEL_DEBUG qDebug().nospace() << "DisplayPanel::\t"

@@ -2479,6 +2479,12 @@ QString Settings::getMenuStyle() {
     return menuStyle;
 }
 
+QString Settings::getMenuBarStyle() {
+
+    return menuBarStyle;
+}
+
+
 QString Settings::getMiniButtonStyle() {
 
     return miniButtonStyle;

@@ -43,7 +43,7 @@
 
 
 OGLDisplayPanel::OGLDisplayPanel(QWidget *parent)
-	: QOpenGLWidget(parent) 
+	: QOpenGLWidget(parent)
 
 	, set(Settings::instance())
 	, m_serverMode(set->getCurrentServerMode())
@@ -1042,12 +1042,12 @@ void OGLDisplayPanel::paintRxRegion() {
 	x1 += m_fUnitStringWidth + 3 * m_blankWidthf2;
 
 //	m_oglTextNormal->renderText(x1, y1 + 2, str.arg(set->getValue1000(m_mouseWheelFreqStep, 0, "Hz")));
-	renderText(x1, y1 - 2, m_fonts.normalFont, fontcolor, str.arg(set->getValue1000(m_mouseWheelFreqStep, 0, "Hz")));
+	renderText(x1, y1 , m_fonts.normalFont, fontcolor, str.arg(set->getValue1000(m_mouseWheelFreqStep, 0, "Hz")));
 
 	// current receiver
 	str = "Rx: %1";
 //	m_oglTextBig->renderText(x1, y1 + 1.5f * m_fonts.fontHeightBigFont, str.arg(m_currentReceiver + 1));
-	renderText(x1, y1 - (int)(1 * m_fonts.fontHeightBigFont ) ,m_fonts.bigFont, fontcolor, str.arg(m_currentReceiver + 1));
+	renderText(x1, y1 - (int)( m_fonts.fontHeightBigFont ) ,m_fonts.bigFont, fontcolor, str.arg(m_currentReceiver + 1));
 
 
 	// frequency info

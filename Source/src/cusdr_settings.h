@@ -1016,6 +1016,7 @@ public:
 	QString getSpinBoxStyle();
 	QString getDoubleSpinBoxStyle();
 	QString getMenuStyle();
+    QString getMenuBarStyle();
 	QString getMiniButtonStyle();
 	QString getVolSliderStyle();
 	QString getSplitterStyle();
