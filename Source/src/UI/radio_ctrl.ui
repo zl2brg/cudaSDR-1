@@ -420,7 +420,7 @@
   <customwidget>
    <class>AeroButton</class>
    <extends>QPushButton</extends>
-   <header location="global">aerobutton.h</header>
+   <header>Util/cusdr_buttons.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
