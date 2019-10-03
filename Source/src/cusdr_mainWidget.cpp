@@ -38,7 +38,6 @@
 
 #include "cusdr_mainWidget.h"
 
-
 #define window_height1		600
 #define window_height2		750
 #define window_width1		800
@@ -73,6 +72,14 @@ MainWindow::MainWindow(QWidget *parent)
 	, m_mover(false)
 	, m_resizePosition(0)
 {	
+    setupWidget = new SetupWidget();
+    setupActions();
+    QMenuBar* menuBar = new QMenuBar();
+    QMenu *File = menuBar->addMenu(tr("FIle"));
+    menuBar->setStyleSheet(set->getMenuBarStyle());
+    File->addAction(setupAction);
+    File->setStyleSheet(set->getMenuStyle());
+    this->layout()->setMenuBar(menuBar);
 	QPalette palette;
 	QColor color = Qt::black;
 	color.setAlpha(255);
@@ -403,26 +410,21 @@ void MainWindow::setup() {
 	updateFromSettings();
 }
 
-//void MainWindow::runFFTWWisdom() {
-//
-//	QString directory = QDir::currentPath();
-//	
-//	m_currentDir = QDir(directory);
-//	qDebug() << m_currentDir;
-//	
-//	if (m_currentDir.exists("wisdom")) {
-//	
-//		qDebug() << "wisdom exists !";
-//		return;
-//	}
-//	else {
-//	
-//		qDebug() << "wisdom does not exist - running fftw-wisdom.exe ...";
-//		QProcess process;
-//		process.start("fftwf-wisdom.exe");
-//		process.waitForFinished();
-//	}
-//}
+void MainWindow::cusdr_setup()
+{
+    setupWidget->show();
+
+}
+
+void MainWindow::setupActions()
+{
+    setupAction = new QAction(tr("&Setup"), this);
+    setupAction->setStatusTip(tr("Setup Menu"));
+    connect(setupAction, &QAction::triggered, this, &MainWindow::cusdr_setup);
+
+}
+
+
  
 /*!
 	\brief updates the OpenGL widget.
@@ -645,9 +647,10 @@ void MainWindow::createMainBtnToolBar() {
 
 	mainBtnToolBar = new QToolBar(tr("Main Buttons"), this);
 	mainBtnToolBar->setObjectName("MainButtons");
-	//mainBtnToolBar->setAllowedAreas(Qt::TopToolBarArea);
+	mainBtnToolBar->setAllowedAreas(Qt::TopToolBarArea);
 	mainBtnToolBar->setMovable(false);
 	mainBtnToolBar->setStyleSheet(set->getMainBtnToolbarStyle());
+//	mainBtnToolBar->show();
 	
 	m_buttonWidget = new QWidget(this);
 

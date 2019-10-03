@@ -57,6 +57,12 @@
 #include "GL/cusdr_oglDisplayPanel.h"
 //#include "cusdr_graphicOptionsWidget.h"
 //#include "cusdr_server.h"
+//#include "ui_setup.h"
+//#include "ui_cusdr_display.h"
+//#include "ui_display_ctrl.h"
+//#include "ui_radio_ctrl.h"
+#include "setupwidget.h"
+
 
 
 #ifdef LOG_MAIN
@@ -115,7 +121,6 @@ private:
 #if defined(Q_OS_WIN32)
 	void	getCPULoadThread(LPVOID lpParam);
 #endif
-
 	void	setupConnections();
 	void	setupLayout();
 	void	createModeMenu();
@@ -130,9 +135,11 @@ private:
 	void	updateFromSettings();
 	//void	runFFTWWisdom();
 	void	setAttenuatorButton();
+    void    setupActions();
 
 private:
 	Settings*					set;
+    SetupWidget                 *setupWidget;
 
 	QSDR::_Error				m_error;
 	QSDR::_ServerMode			m_serverMode;
@@ -260,6 +267,8 @@ private:
     QAction			*alexAttn_10dBAction;
     QAction			*alexAttn_20dBAction;
     QAction			*alexAttn_30dBAction;
+    QAction         *setupAction;
+
 
     QList<QAction *> mercuryAttnActionList;
     QList<QAction *> alexAttnActionList;
@@ -302,6 +311,7 @@ private slots:
 	void updateStatusBar(short load);
 	void setFullScreen();
 	void getRegion();
+    void cusdr_setup();
 
 	void setServerMode(QSDR::_ServerMode mode);
 	//void setReceiver();
