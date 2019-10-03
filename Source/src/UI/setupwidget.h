@@ -12,12 +12,12 @@ namespace Ui {
     class SetupWidget;
 }
 
-class SetupWidget : public QWidget
+class SetupWidget : public QDialog
 {
 Q_OBJECT
 
 public:
-    SetupWidget(QWidget *parent = 0);
+    SetupWidget(QDialog *parent = 0);
     ~SetupWidget();
 
 private:
@@ -51,7 +51,7 @@ private slots:
             QSDR::_HWInterfaceMode hwmode,
             QSDR::_ServerMode mode,
             QSDR::_DataEngineState state);
-
+/*
     void	setCurrentReceiver(QObject *sender, int rx);
     void    nfModeChanged(int value);
     void    nbModeChanged(int value);
@@ -65,7 +65,7 @@ private slots:
     void    preAgcChanged(bool value);
     void    postAgcChanged(bool nalue);
     void    npeModeChanged(int value);
-
+*/
 
 
 
