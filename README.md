@@ -5,6 +5,8 @@ Updating to Qt5.x - still in progress.
 Added WDSP related functionality.
 Moved to CMake buld system.
 
+Very much work in progress.
+
 
 
 Todo :-
