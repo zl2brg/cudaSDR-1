@@ -19,6 +19,7 @@ NoiseFilterWidget::NoiseFilterWidget(QWidget *parent)
         //, m_waterColorScheme(set->getWaterfallColorScheme())
     , m_minimumWidgetWidth(set->getMinimumWidgetWidth())
     , m_minimumGroupBoxWidth(set->getMinimumGroupBoxWidth())
+
     , m_btnSpacing(5)
     , m_rx(set->getCurrentReceiver())
     , m_mouseOver(false)
@@ -75,6 +76,9 @@ NoiseFilterWidget::NoiseFilterWidget(QWidget *parent)
     ui->nr2aeCheckBox->setStyleSheet(set->getCheckBoxStyle());
     setupConnections();
     getSettings();
+    setMouseTracking(true);
+    setContentsMargins(4, 4, 4, 4);
+    setWindowOpacity(0.9);
 //    ui->frame->setFrameStyle(1);
 
 }

@@ -6,11 +6,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 11)
 set (QT_USE_QTOPENGL TRUE)
-add_definitions(-O3 -D_FILE_OFFSET_BITS=64 -fPIC -g)
+add_definitions(-O0 -D_FILE_OFFSET_BITS=64 -fPIC -g)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -g")
+set(CMAKE_CXX_FLAGS "-O0 -Wall -Wextra -g")
 set (CMAKE_BUILD_TYPE Debug)
-
+set(OpenGL_GL_PREFERENCE GLVND)
 find_package(PkgConfig)
 find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
 find_package(Qt5Gui 5.0 REQUIRED )
@@ -52,7 +52,7 @@ set (SOURCES
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_discoverer.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_receiver.cpp 
 	${CMAKE_SOURCE_DIR}/DataEngine/soundout.cpp 
-	${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.cpp
+    ${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.cpp
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_WidebandProcessor.cpp
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDisplayPanel.cpp
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDistancePanel.cpp 
@@ -85,14 +85,21 @@ set (SOURCES
 	${CMAKE_SOURCE_DIR}/cusdr_transmitOptionsWidget.cpp 
 	${CMAKE_SOURCE_DIR}/cusdr_transmitPAWidget.cpp 
 	${CMAKE_SOURCE_DIR}/main.cpp 
-        ${CMAKE_SOURCE_DIR}/Util/cusdr_cpuUsage_unix.cpp
-        ${CMAKE_SOURCE_DIR}/QtWDSP/qtwdsp_dspEngine.cpp
+    ${CMAKE_SOURCE_DIR}/Util/cusdr_cpuUsage_unix.cpp
+    ${CMAKE_SOURCE_DIR}/QtWDSP/qtwdsp_dspEngine.cpp
 #	${CMAKE_SOURCE_DIR}cusdr_NoiseFilterWidget.cpp
 	${CMAKE_SOURCE_DIR}/UI/noisefilterwidget.cpp
     ${CMAKE_SOURCE_DIR}/UI/setupwidget.cpp
+#/    ${CMAKE_SOURCE_DIR}/UI/mode_widget.cpp
+    ${CMAKE_SOURCE_DIR}/UI/mini_mode_widget.cpp
+#    ${CMAKE_SOURCE_DIR}/UI/filter_widget.cpp
+#    ${CMAKE_SOURCE_DIR}/UI/band_widget.cpp
+    ${CMAKE_SOURCE_DIR}/UI/basewidget.cpp
+    ${CMAKE_SOURCE_DIR}/UI/radio_widget.cpp
+#   ${CMAKE_SOURCE_DIR}/UI/newbandwidget.cpp
+
+
         )
-
-
 
     
 set (HEADERS 
@@ -108,7 +115,7 @@ set (HEADERS
 	${CMAKE_SOURCE_DIR}/Util/cusdr_styles.h 
 	${CMAKE_SOURCE_DIR}/Util/cusdr_cpuUsage.h 
 	${CMAKE_SOURCE_DIR}/Util/qcircularbuffer.h 
-	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_settingsdialog.h
+    ${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_settingsdialog.h
 	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_utils.h
 	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_waveform.h 
 	${CMAKE_SOURCE_DIR}/AudioEngine/cusdr_audio_wavfile.h 
@@ -119,7 +126,7 @@ set (HEADERS
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_discoverer.h 
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_receiver.h 
 	${CMAKE_SOURCE_DIR}/DataEngine/soundout.h 
-	${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.h 
+    ${CMAKE_SOURCE_DIR}/DataEngine/fractresampler.h
 	${CMAKE_SOURCE_DIR}/DataEngine/datatypes.h
 	${CMAKE_SOURCE_DIR}/DataEngine/cusdr_WidebandProcessor.h
 	${CMAKE_SOURCE_DIR}/GL/cusdr_oglDisplayPanel.h
@@ -158,9 +165,16 @@ set (HEADERS
 	#${CMAKE_SOURCE_DIR}cusdr_NoiseFilterWidget.h
 	${CMAKE_SOURCE_DIR}/UI/noisefilterwidget.h
 	${CMAKE_SOURCE_DIR}/UI/setupwidget.h
+#        ${CMAKE_SOURCE_DIR}/UI/mode_widget.h
+        ${CMAKE_SOURCE_DIR}/UI/mini_mode_widget.h
+#        ${CMAKE_SOURCE_DIR}/UI/band_widget.h
+#        ${CMAKE_SOURCE_DIR}/UI/filter_widget.h
+        ${CMAKE_SOURCE_DIR}/UI/basewidget.h
+        ${CMAKE_SOURCE_DIR}/UI/radio_widget.h
+#        ${CMAKE_SOURCE_DIR}/UI/newbandwidget.h
 
-    ${WDSP_DIR}/wdsp.h
 
+        ${WDSP_DIR}/wdsp.h
 )
 
 set(UI_SOURCES
@@ -169,7 +183,13 @@ set(UI_SOURCES
                 ${CMAKE_SOURCE_DIR}/UI/radio_ctrl.ui
                 ${CMAKE_SOURCE_DIR}/UI/setupwidget.ui
                 ${CMAKE_SOURCE_DIR}/UI/display_ctrl.ui
-		)
+                ${CMAKE_SOURCE_DIR}/UI/band_widget.ui
+#                ${CMAKE_SOURCE_DIR}/UI/mode_widget.ui
+                ${CMAKE_SOURCE_DIR}/UI/mini_mode_widget.ui
+#                ${CMAKE_SOURCE_DIR}/UI/filter_widget.ui
+#                ${CMAKE_SOURCE_DIR}/UI/newbandwidget.ui
+
+                )
 
 
 add_definitions( ${QT_DEFINITIONS} )
@@ -187,9 +207,12 @@ include_directories( ${UI_DIR})
 include_directories( ${AUTOGEN_BUILD_DIR})
 include_directories( ${WDSP_DIR})
 
+set ( MOC_HEADERS
+ ..h
+)
 
-#QT5_WRAP_UI( UI_HEADERS ${UI_SOURCES} )
-ADD_EXECUTABLE(cudasdr ${SOURCES} ${HEADERS}  res/cusdr.qrc ${UI_SOURCES} )
+QT5_WRAP_UI( UI_HEADERS ${UI_SOURCES} )
+ADD_EXECUTABLE(cudasdr ${SOURCES} ${HEADERS}  res/cusdr.qrc ${UI_SOURCES} ${UI_HEADERS})
 
 qt5_use_modules(cudasdr Core Gui Widgets OpenGL)
 target_link_libraries(cudasdr -lm -lstdc++ Qt5::Widgets Qt5::Network Qt5::Multimedia GL pulse-simple pulse asound wdsp)

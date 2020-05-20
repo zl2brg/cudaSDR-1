@@ -1325,27 +1325,6 @@ void RadioPopupWidget::bandChangedByBtn() {
 	if (str == "2 m")
         set->setVFOFrequency(this, 2, m_receiver, m_lastVfoFrequencyList.at(m2));
 	else
-	if (str == "125 cm")
-        set->setVFOFrequency(this, 2, m_receiver, m_lastVfoFrequencyList.at(cm125));
-	else
-	if (str == "70 cm")
-        set->setVFOFrequency(this, 2, m_receiver, m_lastVfoFrequencyList.at(cm70));
-	else
-	if (str == "33 cm")
-        set->setVFOFrequency(this, 2, m_receiver, m_lastVfoFrequencyList.at(cm33));
-	else
-	if (str == "23 cm")
-        set->setVFOFrequency(this, 2, m_receiver, m_lastVfoFrequencyList.at(cm23));
-	else
-	if (str == "13 cm")
-        set->setVFOFrequency(this, 2, m_receiver, m_lastVfoFrequencyList.at(cm13));
-	else
-	if (str == "10 cm")
-        set->setVFOFrequency(this, 2, m_receiver, m_lastVfoFrequencyList.at(cm10));
-	else
-	if (str == "5 cm")
-        set->setVFOFrequency(this, 2, m_receiver, m_lastVfoFrequencyList.at(cm5));
-	else
 	if (str == "Gen")
         set->setVFOFrequency(this, 2, m_receiver, m_lastVfoFrequencyList.at(gen));
 }

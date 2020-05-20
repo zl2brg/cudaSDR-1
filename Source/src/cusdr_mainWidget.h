@@ -62,8 +62,8 @@
 //#include "ui_display_ctrl.h"
 //#include "ui_radio_ctrl.h"
 #include "setupwidget.h"
-
-
+#include "mini_mode_widget.h"
+#include"radio_widget.h"
 
 #ifdef LOG_MAIN
 #define MAIN_DEBUG qDebug().nospace() << "MainWindow::\t"
@@ -159,6 +159,7 @@ private:
 
 	QDockWidget*				widebandDock;
 	QDockWidget*				rx1Dock;
+    QDockWidget*				rxDock;
 	QList<QDockWidget* >		dockWidgetList;
 	QList<QDockWidget* >		rxDockWidgetList;
 	
@@ -215,9 +216,10 @@ private:
 	OGLDisplayPanel*	m_oglDisplayPanel;
 	//CudaInfoWidget*	m_cudaInfoWidget;
 	QGLWidebandPanel*	m_wbDisplay;
-
-	NetworkIODialog*	m_netIODialog;
+    MiniModeWidget*     miniModeWidget;
+    NetworkIODialog*	m_netIODialog;
 	WarningDialog*		m_warningDialog;
+    RadioCtrl*          m_radioCtrl;
 
 	HamBand				m_currentHamBand;
 

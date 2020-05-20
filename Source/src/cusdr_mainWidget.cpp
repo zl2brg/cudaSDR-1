@@ -73,9 +73,12 @@ MainWindow::MainWindow(QWidget *parent)
 	, m_resizePosition(0)
 {	
     setupWidget = new SetupWidget();
+    miniModeWidget = new MiniModeWidget();
+    m_radioCtrl = new RadioCtrl();
+
     setupActions();
     QMenuBar* menuBar = new QMenuBar();
-    QMenu *File = menuBar->addMenu(tr("FIle"));
+    QMenu *File = menuBar->addMenu(tr("File"));
     menuBar->setStyleSheet(set->getMenuBarStyle());
     File->addAction(setupAction);
     File->setStyleSheet(set->getMenuStyle());
@@ -131,7 +134,6 @@ MainWindow::MainWindow(QWidget *parent)
 	m_hpsdrTabWidget->hide();
 	m_radioTabWidget->hide();
 	m_displayTabWidget->hide();
-
 	MAIN_DEBUG << "main window init done";
 }
 
@@ -412,7 +414,10 @@ void MainWindow::setup() {
 
 void MainWindow::cusdr_setup()
 {
-    setupWidget->show();
+ //   setupWidget->show();
+  //bandwidget->show();
+    rxDock->show();
+  //miniModeWidget->show();
 
 }
 
@@ -450,15 +455,16 @@ void MainWindow::setupLayout() {
 	QDockWidget *dock = new QDockWidget(tr("Radio Ctrl"), this);
 	dock->setObjectName("RadioCtrl");
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-	dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
-	//dock->setFeatures(QDockWidget::DockWidgetFloatable);
+    //dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    dock->setFeatures(QDockWidget::DockWidgetFloatable);
 	dock->setStyleSheet(set->getDockStyle());
 	dock->setMaximumWidth(245);
 	dock->setMinimumWidth(245);
 	dock->setWidget(m_radioTabWidget);
 	dockWidgetList.append(dock);
 
-    addDockWidget(Qt::RightDockWidgetArea, dock);
+
+    addDockWidget( Qt::LeftDockWidgetArea , dock);
 	dock->hide();
 
 	// server control widget
@@ -475,6 +481,8 @@ void MainWindow::setupLayout() {
 
     addDockWidget(Qt::RightDockWidgetArea, dock);
 	dock->hide();
+//    dock->show();
+
 
 	// HPSDR hardware control widget
 	dock = new QDockWidget(tr("HPSDR Ctrl"), this);
@@ -508,7 +516,8 @@ void MainWindow::setupLayout() {
 	dock = new QDockWidget(tr("Display Ctrl"), this);
 	dock->setObjectName("DisplayCtrl");
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-	dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+//	dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+	dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 	dock->setStyleSheet(set->getDockStyle());
 	dock->setMaximumWidth(245);
 	dock->setMinimumWidth(245);
@@ -517,6 +526,22 @@ void MainWindow::setupLayout() {
 
     addDockWidget(Qt::RightDockWidgetArea, dock);
 	dock->hide();
+
+    rxDock = new QDockWidget(tr("Band Ctrl"), this);
+    rxDock->setObjectName("bBandWidget");
+    rxDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+//	dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    rxDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+    rxDock->setStyleSheet(set->getDockStyle());
+    rxDock->setMaximumWidth(245);
+    rxDock->setMinimumWidth(245);
+//    rxDock->setWidget(filterwidget);
+    rxDock->setWidget(m_radioCtrl);
+    dockWidgetList.append(rxDock);
+
+    addDockWidget(Qt::LeftDockWidgetArea, rxDock);
+    rxDock->hide();
+
 
 	// receiver and wideband panel docks;
 	// set receiver 0 as the main receiver
@@ -665,6 +690,7 @@ void MainWindow::createMainBtnToolBar() {
     startBtn->setTextColor(btnCol);
 	startBtn->setFixedSize(btn_width1, btn_height1);
 
+
 	CHECKED_CONNECT(
 		startBtn, 
 		SIGNAL(clicked()), 
@@ -743,6 +769,7 @@ void MainWindow::createMainBtnToolBar() {
     wideBandBtn->setTextColor(btnCol);
 	wideBandBtn->setFixedSize(btn_width1, btn_height1);
 	wideBandBtn->setEnabled(false);
+
 	//mainBtnList.append(wideBandBtn);
 
 	if (m_serverMode == QSDR::ChirpWSPR)
@@ -797,6 +824,9 @@ void MainWindow::createMainBtnToolBar() {
 	displayBtn->setTextColor(btnCol);
 	displayBtn->setFixedSize(btn_width1, btn_height1);
 	mainBtnList.append(displayBtn);
+
+    miniModeWidget = new MiniModeWidget(this);
+    miniModeWidget->show();
 
 	CHECKED_CONNECT(
 		displayBtn, 
@@ -1061,6 +1091,8 @@ void MainWindow::createMainBtnToolBar() {
 
 	secondBtnLayout->addWidget(moxBtn);
 	secondBtnLayout->addWidget(tunBtn);
+    secondBtnLayout->addStretch();
+    secondBtnLayout->addWidget(miniModeWidget);
 	secondBtnLayout->addStretch();
 	secondBtnLayout->addWidget(alexBtn);
 	secondBtnLayout->addWidget(attenuatorBtn);
@@ -1093,7 +1125,6 @@ void MainWindow::createMainBtnToolBar() {
 	m_buttonWidget->setLayout(btnLayout);
 
 	mainBtnToolBar->addWidget(m_buttonWidget);
-
 	addToolBar(mainBtnToolBar);
 }
 
@@ -1137,7 +1168,6 @@ void MainWindow::createModeMenu() {
 	\brief create the receiver's dock windows view menu.
 */
 void MainWindow::createViewMenu() {
-
 	viewMenu = new QMenu(this);
 	viewMenu->setStyleSheet(set->getMenuStyle());
 	viewBtn->setMenu(viewMenu);

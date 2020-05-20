@@ -1,5 +1,5 @@
-#include "setupwidget.h"
-#include "ui_setupwidget.h"
+#include "mini_mode_widget.h"
+#include "ui_mini_mode_widget.h"
 
 #define	btn_height		20
 #define	btn_width		70
@@ -7,25 +7,40 @@
 #define	btn_width2		52
 #define	btn_width3		60
 
-SetupWidget::SetupWidget(QDialog *parent)
-    : QDialog(parent)
-    , set(Settings::instance())
+MiniModeWidget::MiniModeWidget(QWidget *parent)
+    :baseWidget(parent)
     , m_serverMode(set->getCurrentServerMode())
     , m_hwInterface(set->getHWInterface())
     , m_dataEngineState(set->getDataEngineState())
-        //, m_panadapterMode(set->getPanadapterMode())
-        //, m_waterColorScheme(set->getWaterfallColorScheme())
-    , m_minimumWidgetWidth(set->getMinimumWidgetWidth())
-    , m_minimumGroupBoxWidth(set->getMinimumGroupBoxWidth())
-    , m_btnSpacing(5)
-    , m_rx(set->getCurrentReceiver())
-    , m_mouseOver(false)
-    , ui(new Ui::SetupWidget)
+    //, m_panadapterMode(set->getPanadapterMode())
+    //, m_waterColorScheme(set->getWaterfallColorScheme())
+
+, ui(new Ui::MiniModeWidget)
+
 
 {
     setContentsMargins(4, 0, 4, 0);
-    this->setStyleSheet(set->getSDRStyle());
     ui->setupUi(this);
+    setStyleSheet(set->getDialogStyle());
+    this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    setupModeBtn(ui->mode_lsb);
+    setupModeBtn(ui->mode_usb);
+    setupModeBtn(ui->mode_dsb);
+    setupModeBtn(ui->mode_cwl);
+    setupModeBtn(ui->mode_cwu);
+    setupModeBtn(ui->mode_fm);
+    setupModeBtn(ui->mode_am);
+    setupModeBtn(ui->mode_digu);
+    setupModeBtn(ui->mode_spec);
+    setupModeBtn(ui->mode_digl);
+    setupModeBtn(ui->mode_sam);
+    setupModeBtn(ui->mode_freedv);
+    adjustSize();
+
+
+
+
+
 
 //    ui->alex_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
 //    ui->hermes_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
@@ -47,7 +62,7 @@ SetupWidget::SetupWidget(QDialog *parent)
 //    ui->sample_48k_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
 //    ui->hpsdr_search_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
 //    ui->firmware_check_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-
+/*
     ui->tabWidget->setStyleSheet(set->getTabWidgetStyle());
     ui->tabWidget->setTabEnabled(1, true);
     ui->tabWidget->setTabEnabled(2, true);
@@ -94,7 +109,7 @@ SetupWidget::SetupWidget(QDialog *parent)
     ui->skt_buffer_size_combo->setFont(QFont("Arial", 8));
     ui->skt_buffer_size_combo->setStyleSheet(set->getComboBoxStyle());
 
-
+*/
 
 /*
     ui->snbCheckBox->setStyleSheet(set->getCheckBoxStyle());
@@ -149,30 +164,21 @@ SetupWidget::SetupWidget(QDialog *parent)
 */
 }
 
-SetupWidget::~SetupWidget()
+MiniModeWidget::~MiniModeWidget()
 {
     delete ui;
 }
 
-QSize SetupWidget::sizeHint() const {
-
-    return QSize(m_minimumWidgetWidth, height());
-}
-
-QSize SetupWidget::minimumSizeHint() const {
-
-    return QSize(m_minimumWidgetWidth, height());
-}
 
 
-void SetupWidget::setupConnections() {
+void MiniModeWidget::setupConnections() {
 
 }
 
 
 
 
-void SetupWidget::systemStateChanged(
+void MiniModeWidget::systemStateChanged(
         QObject *sender,
         QSDR::_Error err,
         QSDR::_HWInterfaceMode hwmode,
@@ -195,7 +201,7 @@ void SetupWidget::systemStateChanged(
     update();
 }
 
-void SetupWidget::getSettings() {
+void MiniModeWidget::getSettings() {
     /*
     ui->nrModeComboBox->setCurrentIndex(set->getnrMode(m_rx));
     ui->nbModeComboBox->setCurrentIndex(set->getnbMode(m_rx));
@@ -213,3 +219,41 @@ void SetupWidget::getSettings() {
 */
 }
 
+
+void MiniModeWidget::modeChange(){
+    qDebug() << "Mode change";
+
+}
+
+void MiniModeWidget::test(){
+    qDebug() << "test Mode change";
+
+}
+void MiniModeWidget::FilterbtnCallback(){
+
+}
+
+void MiniModeWidget::BandbtnCallback(){
+
+
+}
+
+void MiniModeWidget::ModebtnCallback(){
+    AeroButton *button = qobject_cast<AeroButton *>(sender());
+    int btn = m_mode_btnList.indexOf(button);
+
+            foreach(AeroButton *btn, m_mode_btnList) {
+
+            btn->setBtnState(AeroButton::OFF);
+            btn->update();
+        }
+
+    set->setDSPMode(this, m_receiver, (DSPMode) btn);
+    //m_dspModeList[m_hamBand] = (DSPMode) btn;
+    //filterChanged(this, m_receiver, m_filterLo, m_filterHi);
+    //filterGroupChanged((DSPMode) btn);
+
+    button->setBtnState(AeroButton::ON);
+    button->update();
+
+}

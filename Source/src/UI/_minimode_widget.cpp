@@ -1,5 +1,5 @@
-#include "setupwidget.h"
-#include "ui_setupwidget.h"
+#include "mode_widget.h"
+#include "ui_mode_widget.h"
 
 #define	btn_height		20
 #define	btn_width		70
@@ -7,7 +7,7 @@
 #define	btn_width2		52
 #define	btn_width3		60
 
-SetupWidget::SetupWidget(QDialog *parent)
+ModeWidget::ModeWidget(QDialog *parent)
     : QDialog(parent)
     , set(Settings::instance())
     , m_serverMode(set->getCurrentServerMode())
@@ -20,34 +20,34 @@ SetupWidget::SetupWidget(QDialog *parent)
     , m_btnSpacing(5)
     , m_rx(set->getCurrentReceiver())
     , m_mouseOver(false)
-    , ui(new Ui::SetupWidget)
+    , ui(new Ui::ModeWidget)
 
 {
     setContentsMargins(4, 0, 4, 0);
     this->setStyleSheet(set->getSDRStyle());
     ui->setupUi(this);
 
-//    ui->alex_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->hermes_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->hw_none_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->mercury_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->modules_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->excalabur_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->penelopue_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->pennylane_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//   ui->hw_network_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->hw_none_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->sample_48k_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->sample_96k_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->sample_192k_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->sample_384k_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->sample_48k_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->firmware_check_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->skt_buffer_enable_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->sample_48k_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->hpsdr_search_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-//    ui->firmware_check_btn->setupModeBtn(0,btn_width3,btn_height,set->getMiniButtonStyle());
-
+//    ui->alex_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->hermes_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->hw_none_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->mercury_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->modules_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->excalabur_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->penelopue_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->pennylane_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//   ui->hw_network_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->hw_none_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->sample_48k_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->sample_96k_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->sample_192k_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->sample_384k_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->sample_48k_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->firmware_check_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->skt_buffer_enable_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->sample_48k_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->hpsdr_search_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+//    ui->firmware_check_btn->setButtonStyle(0,btn_width3,btn_height,set->getMiniButtonStyle());
+/*
     ui->tabWidget->setStyleSheet(set->getTabWidgetStyle());
     ui->tabWidget->setTabEnabled(1, true);
     ui->tabWidget->setTabEnabled(2, true);
@@ -94,7 +94,7 @@ SetupWidget::SetupWidget(QDialog *parent)
     ui->skt_buffer_size_combo->setFont(QFont("Arial", 8));
     ui->skt_buffer_size_combo->setStyleSheet(set->getComboBoxStyle());
 
-
+*/
 
 /*
     ui->snbCheckBox->setStyleSheet(set->getCheckBoxStyle());
@@ -149,30 +149,30 @@ SetupWidget::SetupWidget(QDialog *parent)
 */
 }
 
-SetupWidget::~SetupWidget()
+ModeWidget::~ModeWidget()
 {
     delete ui;
 }
 
-QSize SetupWidget::sizeHint() const {
+QSize ModeWidget::sizeHint() const {
 
     return QSize(m_minimumWidgetWidth, height());
 }
 
-QSize SetupWidget::minimumSizeHint() const {
+QSize ModeWidget::minimumSizeHint() const {
 
     return QSize(m_minimumWidgetWidth, height());
 }
 
 
-void SetupWidget::setupConnections() {
+void ModeWidget::setupConnections() {
 
 }
 
 
 
 
-void SetupWidget::systemStateChanged(
+void ModeWidget::systemStateChanged(
         QObject *sender,
         QSDR::_Error err,
         QSDR::_HWInterfaceMode hwmode,
@@ -195,7 +195,7 @@ void SetupWidget::systemStateChanged(
     update();
 }
 
-void SetupWidget::getSettings() {
+void ModeWidget::getSettings() {
     /*
     ui->nrModeComboBox->setCurrentIndex(set->getnrMode(m_rx));
     ui->nbModeComboBox->setCurrentIndex(set->getnbMode(m_rx));

@@ -2006,6 +2006,11 @@ int Settings::saveSettings() {
         str = m_rxStringList.at(i);
         str.append("/filterLo");
         settings->setValue(str, m_receiverDataList[i].filterLo);
+        str = m_rxStringList.at(i);
+
+        str.append("/filterIndex");
+        settings->setValue(str, m_receiverDataList[i].m_filterIndex);
+
 
         str = m_rxStringList.at(i);
         str.append("/averaging");
@@ -2481,7 +2486,7 @@ QString Settings::getMenuStyle() {
 
 QString Settings::getMenuBarStyle() {
 
-    return menuBarStyle;
+   // return menuBarStyle;
 }
 
 
@@ -3407,9 +3412,14 @@ void Settings::setCurrentReceiver(QObject *sender, int value) {
     emit vfoFrequencyChanged(sender, true, value, vfoF);
     emit ncoFrequencyChanged(m_currentReceiver, vfoF - ctrF);
     emit hamBandChanged(sender, m_currentReceiver, false, band);
+    getFilterGroup(m_currentReceiver);
+    getFilterMode(m_currentReceiver);
     emit dspModeChanged(sender, m_currentReceiver, mode);
+
     emit mouseWheelFreqStepChanged(sender, m_currentReceiver,
-                                   m_receiverDataList.at(m_currentReceiver).mouseWheelFreqStep);
+    m_receiverDataList.at(m_currentReceiver).mouseWheelFreqStep);
+
+
 }
 
 void Settings::setSampleRate(QObject *sender, int value) {
@@ -3599,6 +3609,7 @@ void Settings::setVfoFrequency(int rx, long frequency) {
     m_receiverDataList[rx].lastVfoFrequencyList[(int) band] = frequency;
 
     m_receiverDataList[rx].ncoFrequency = frequency - m_receiverDataList.at(rx).ctrFrequency;
+ //   setDSPMode(this,rx,m_receiverDataList[rx].dspModeList[band]);
 }
 
 void Settings::setCtrFrequency(QObject *sender, int mode, int rx, long frequency) {
@@ -3694,6 +3705,7 @@ void Settings::setHamBand(QObject *sender, int rx, bool byButton, HamBand band) 
 
     //SETTINGS_DEBUG << "sender: " << sender;
     QMutexLocker locker(&settingsMutex);
+    qDebug() << "ham band" << m_receiverDataList[rx].hamBand << "band" << band << "sender"  << sender;
     if (m_receiverDataList[rx].hamBand == band && sender != this)
         return;
 
@@ -3709,8 +3721,9 @@ void Settings::setHamBand(QObject *sender, int rx, bool byButton, HamBand band) 
         setTxAllowed(this, true);
 
     locker.unlock();
-
-    setDSPMode(this, rx, m_receiverDataList.at(rx).dspModeList.at(band));
+    getFilterMode(rx);
+    getFilterGroup(rx);
+    setRxFilterByIndex(this,rx,m_receiverDataList[rx].rxFilter.m_Index);
     setMercuryAttenuator(this, m_receiverDataList[rx].mercuryAttenuators[band]);
 
     emit hamBandChanged(sender, rx, byButton, band);
@@ -3725,10 +3738,14 @@ void Settings::setDSPMode(QObject *sender, int rx, DSPMode mode) {
 
     //SETTINGS_DEBUG << "sender: " << sender;
     HamBand band = m_receiverDataList[m_currentReceiver].hamBand;
-
     m_receiverDataList[rx].dspModeList[band] = mode;
-    setRXFilter(this, rx, m_defaultFilterList.at((int) mode).filterLo, m_defaultFilterList.at((int) mode).filterHi);
 
+
+
+    setRXFilter(this, rx, m_defaultFilterList.at((int) mode).filterLo, m_defaultFilterList.at((int) mode).filterHi);
+    getFilterMode(rx);
+    getFilterGroup(rx);
+    setRxFilterByIndex(this,rx,m_receiverDataList[rx].rxFilter.m_Index);
     emit dspModeChanged(sender, rx, mode);
 }
 
@@ -3992,6 +4009,8 @@ void Settings::setRXFilter(QObject *sender, int rx, qreal low, qreal high) {
     SETTINGS_DEBUG << "filter freq changed" << low << high;
     emit filterFrequenciesChanged(sender, rx, m_filterFrequencyLow, m_filterFrequencyHigh);
 }
+
+
 
 void Settings::setIQPort(QObject *sender, int rx, int port) {
 
@@ -5039,3 +5058,119 @@ void Settings::getConfigPath() {
     qDebug() << cfg_dir;
 }
 
+
+
+void Settings::setRxFilterByIndex(QObject *sender, int rx, int filterIndex ) {
+
+    qreal filter;
+    getFilterMode(rx);
+    getFilterGroup(rx);
+    RxFilter m_filter =  m_receiverDataList[rx].rxFilter;
+    m_filter.m_Index = filterIndex;
+
+    filter = m_filter.m_FilterPtr[filterIndex].filterWidth;
+    switch (m_filter.m_FilterMode) {
+        case M_DSB:
+            m_filter.m_filterHi = filter;
+            m_filter.m_filterLo = -filter;
+            break;
+        case M_LSB:
+            m_filter.m_filterLo =   -filter;
+            m_filter.m_filterHi = -150.0f;
+            break;
+        case M_USB:
+            m_filter.m_filterLo = 150.0f;
+            m_filter.m_filterHi = filter;
+            break;
+
+    }
+    QStringList *str =  &m_receiverDataList[rx].rxFilter.btnText;
+    str->clear();
+
+    for (int x = 0;x < 10; x++)
+    {
+        str->append(m_filter.m_FilterPtr[x].txt);
+    }
+
+    SETTINGS_DEBUG << "filter freq changed" << m_filter.m_filterLo << m_filter.m_filterHi;
+
+    emit filterFrequenciesChanged(sender, rx, m_filter.m_filterLo, m_filter.m_filterHi);
+}
+
+
+QStringList Settings::getFilterBtnText(int rx){
+    return m_receiverDataList[rx].rxFilter.btnText;
+}
+
+DSPMode Settings::getDSPMode(int rx){
+
+    HamBand band = m_receiverDataList[m_currentReceiver].hamBand;
+    return m_receiverDataList[rx].dspModeList[band];
+}
+
+filterMode Settings::getFilterMode( int rx){
+
+DSPMode dspMode =  getDSPMode(rx);
+
+filterMode FilterMode;
+    switch (dspMode) {
+
+        case (DSPMode) DSB:
+        case (DSPMode) AM:
+        case (DSPMode) SAM:
+        case (DSPMode) FMN:
+        case (DSPMode) DRM:
+        case (DSPMode) SPEC:
+
+            FilterMode = M_DSB;
+            break;
+
+        case (DSPMode) LSB:
+        case (DSPMode) DIGL:
+        case (DSPMode) CWL:
+
+            FilterMode = M_LSB;
+        break;
+
+        default:
+            FilterMode = M_USB;
+
+    }
+    m_receiverDataList[rx].rxFilter.m_FilterMode = FilterMode ;
+}
+
+
+filterGroup Settings::getFilterGroup(int rx){
+    DSPMode dspMode =  getDSPMode(rx);
+
+    switch (dspMode) {
+
+        case (DSPMode) USB:
+        case (DSPMode) LSB:
+        case (DSPMode) DIGL:
+        case (DSPMode) DIGU:
+            m_receiverDataList[rx].rxFilter.m_FilterPtr = Mid_FilterGroup;
+            m_receiverDataList[rx].rxFilter.m_FilterGroup = MID_FILTER;
+            break;
+
+        case (DSPMode) DSB:
+        case (DSPMode) AM:
+        case (DSPMode) SAM:
+        case (DSPMode) FMN:
+        case (DSPMode) DRM:
+        case (DSPMode) SPEC:
+            m_receiverDataList[rx].rxFilter.m_FilterPtr = Wide_FilterGroup;
+            m_receiverDataList[rx].rxFilter.m_FilterGroup = WIDEBAND_FILTER;
+            break;
+
+        default:
+            m_receiverDataList[rx].rxFilter.m_FilterPtr  = Narrow_FilterGroup;
+            m_receiverDataList[rx].rxFilter.m_FilterGroup = NARROW_FILTER;
+
+    }
+}
+
+
+int Settings::getFilterbtnIndex(int rx){
+    return m_receiverDataList[rx].rxFilter.m_Index;
+}

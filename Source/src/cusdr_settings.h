@@ -39,7 +39,6 @@
 
 #include "cusdr_hamDatabase.h"
 #include "fftw3.h"
-
 // test for OpenCL
 //#include "CL/qclcontext.h"
 
@@ -174,6 +173,85 @@
 //#include "cusdr_about.h"
 #include "AudioEngine/cusdr_fspectrum.h"
 #include "Util/cusdr_queue.h"
+
+
+
+
+
+typedef struct {
+    QString txt;
+    qreal filterWidth;
+
+}filterStruct;
+
+static filterStruct Narrow_FilterGroup[12]={
+
+    {"1k",1150.0f},
+    {"800",950.0f},
+    {"750",900.0f},
+    {"600",750.0f},
+    {"500",650.0f},
+    {"400",550.0f},
+    {"250",400.0f},
+    {"100",350.0f},
+    {"50",200.0f},
+    {"25",175.0f},
+    {"Var1",2000.0f},
+    {"Var2",2000.0f}
+};
+
+static filterStruct Mid_FilterGroup[12]={
+    {"5k",5150.0f},
+    {"4k4",4550.0f},
+    {"3k8",3950.0f},
+    {"3k3",3450.0f},
+    {"2k9",3050.0f},
+    {"2k7",2850.0f},
+    {"2k4",2550.0f},
+    {"2k1",2250.0f},
+    {"1k8",1950.0f},
+    {"1k",1150.0f},
+    {"Var1",10000.0f},
+    {"Var2",10000.0f}
+};
+
+static filterStruct Wide_FilterGroup[12]={
+    {"16k",8000.0f},
+    {"12k",6000.0f},
+    {"10k",5000.0f},
+    {"8k",4000.0f},
+    {"6k6",3300.0f},
+    {"5k2", 2600.0f},
+    {"4k",2000.0f},
+    {"3k3",3450.0f},
+    {"3k1",3250.0f},
+    {"2k9",3050.0f},
+    {"Var1",20000.0f},
+    {"Var2",20000.0f}
+};
+
+
+typedef enum _filterMode{
+    M_LSB,
+    M_USB,
+    M_DSB
+} filterMode;
+
+typedef enum _filterGroup{
+    NARROW_FILTER,
+    MID_FILTER,
+    WIDEBAND_FILTER
+} filterGroup;
+
+typedef struct _rxfilter{
+    int        m_Index = 0;
+    filterMode m_FilterMode;
+    filterGroup m_FilterGroup;
+    filterStruct* m_FilterPtr;
+    qreal m_filterHi;
+    qreal m_filterLo;
+    QStringList btnText = {" "," "," "," "," "," "," "," "," "," "};
+}RxFilter;
 
 
 // **************************************
@@ -500,6 +578,9 @@ typedef enum _panDetectorMode {
 
 
 
+
+
+
 Q_DECLARE_METATYPE (TNetworkDevicecard)
 Q_DECLARE_METATYPE (QList<TNetworkDevicecard>)
 
@@ -546,6 +627,10 @@ typedef struct _receiver {
 	qreal	mouseWheelFreqStep;
 	qreal	filterLo;
 	qreal	filterHi;
+    RxFilter rxFilter;
+
+
+    int     m_filterIndex;
 	qreal	acgGain;
 	qreal	acgThreshold_dB;
 	int		agcHangThreshold;
@@ -674,6 +759,7 @@ typedef enum _windowtype {
 } TWindowtype;
 
 
+
 class Receiver;
 
 // *********************************************************************
@@ -685,6 +771,9 @@ protected:
     void run() { exec(); }
 
 };
+
+
+
 
 // **************************************
 // Settings class
@@ -958,7 +1047,6 @@ public:
 
 	int 	loadSettings();
 	int 	saveSettings();
-
 	QSDR::_ServerMode			getCurrentServerMode();
 	QSDR::_HWInterfaceMode		getHWInterface();
 	QSDR::_DataEngineState		getDataEngineState();
@@ -1050,6 +1138,7 @@ public:
 	QList<int>					getTxJ6Pins()				{ return m_txJ6pinList; }
 	int							getFramesPerSecond(int rx);
 	QString						getDSPModeString(int mode);
+    DSPMode                     getDSPMode(int rx);
 
 	HamBand						getCurrentHamBand(int rx);
 	QList<int>					getMercuryAttenuators(int rx);
@@ -1095,7 +1184,7 @@ public:
 	int		getMercurySpeed()			{ return m_mercurySpeed; }
 	int		getOutputSampleIncrement()	{ return m_outputSampleIncrement; }
 	int		getNumberOfReceivers()		{ return m_mercuryReceivers; }
-	//int	getCurrentReceivers()		{ return m_mercuryReceivers; }
+    int     getCurrentReceivers()		{ return m_mercuryReceivers; }
 	int		getCurrentReceiver()		{ return m_currentReceiver; }
 	bool	getFrequencyRx1onRx2()		{ return m_frequencyRx1onRx2; }
 	int		getSampleRate()				{ return m_sampleRate; }
@@ -1174,6 +1263,7 @@ public:
 	bool getSpectrumAveraging(int rx);
 	int getSpectrumAveragingCnt(int rx);
 	int getFFTMultiplicator(int rx);//			{ return m_fft; }
+    QStringList getFilterBtnText(int rx);
 
 	QMutex 		debugMutex;
 
@@ -1337,6 +1427,8 @@ public slots:
 	void setAGCDecayTime(QObject *sender, int rx, qreal value);
 	void setAGCHangTime(QObject *sender, int rx, qreal value);
 	void setRXFilter(QObject* sender, int rx, qreal low, qreal high);
+    void setRxFilterByIndex(QObject* sender, int rx, int filterIndex);
+
 	void setfftSize(int rx, int size);
 	void setfmsqLevel(int rx, int level);
 
@@ -1432,6 +1524,11 @@ public slots:
 
 	QList<long> getCtrFrequencies();
 	QList<long> getVfoFrequencies();
+
+
+    filterMode getFilterMode( int rx );
+    filterGroup getFilterGroup(int rx);
+    int getFilterbtnIndex(int rx);
 	
 private slots:
 
@@ -1580,6 +1677,7 @@ private:
 	int		m_current_cuda_device;*/
 
 	void	checkHPSDRDevices();
+    qreal   getRxFilterBandwidth(int rx, int index);
 };
 
 
@@ -1677,5 +1775,8 @@ class SleeperThread : public QThread {
 		static void msleep(unsigned long msecs) {QThread::msleep(msecs);}
 		static void usleep(unsigned long usecs) {QThread::usleep(usecs);}
 };
+
+
+
 
 #endif  // CUSDR_SETTINGS_H

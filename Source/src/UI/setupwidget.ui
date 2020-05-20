@@ -39,7 +39,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="general">
     <attribute name="title">
@@ -295,7 +295,7 @@
   <customwidget>
    <class>AeroButton</class>
    <extends>QPushButton</extends>
-   <header>Util/cusdr_buttons.h</header>
+   <header location="global">Util/cusdr_buttons.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

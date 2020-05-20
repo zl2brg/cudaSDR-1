@@ -1,5 +1,5 @@
-#ifndef SETUPWIGDET_H
-#define SETUPWIGDET_H
+#ifndef MODEWIGDET_H
+#define MODEWIGDET_H
 
 #include <QWidget>
 #include "Util/cusdr_buttons.h"
@@ -8,19 +8,19 @@
 
 
 namespace Ui {
-    class SetupWidget;
+    class ModeWidget;
 }
 
-class SetupWidget : public QDialog
+class ModeWidget : public QDialog
 {
 Q_OBJECT
 
 public:
-    SetupWidget(QDialog *parent = 0);
-    ~SetupWidget();
+    ModeWidget(QDialog *parent = 0);
+    ~ModeWidget();
 
 private:
-    Ui::SetupWidget *ui;
+    Ui::ModeWidget *ui;
     Settings	*set;
     QSDR::_ServerMode			m_serverMode;
     QSDR::_HWInterfaceMode		m_hwInterface;
@@ -80,4 +80,4 @@ public slots:
 
 
 
-#endif // SETUPWIGDET_H
+#endif // MODEWIGDET_H

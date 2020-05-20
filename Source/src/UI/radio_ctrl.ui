@@ -1,426 +1,487 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>RadioCtrl</class>
+ <widget class="QWidget" name="RadioCtrl">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>661</width>
-    <height>468</height>
+    <width>509</width>
+    <height>573</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>8</x>
-     <y>306</y>
-     <width>529</width>
-     <height>97</height>
-    </rect>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>2</number>
    </property>
-   <property name="title">
-    <string>Filter</string>
+   <property name="leftMargin">
+    <number>2</number>
    </property>
-   <layout class="QFormLayout" name="formLayout">
-    <item row="0" column="0" colspan="2">
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="1" column="0">
-       <widget class="AeroButton" name="filter_button7">
-        <property name="text">
-         <string>2k4</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="AeroButton" name="filter_button4">
-        <property name="text">
-         <string>3k3</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="AeroButton" name="filter_button10">
-        <property name="text">
-         <string>1k</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="5">
-       <widget class="AeroButton" name="filter_button12">
-        <property name="text">
-         <string>var2</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="5">
-       <widget class="AeroButton" name="filter_button6">
-        <property name="text">
-         <string>2k7</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="AeroButton" name="filter_button5">
-        <property name="text">
-         <string>2k9</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="AeroButton" name="filter_button8">
-        <property name="text">
-         <string>2k1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="AeroButton" name="filter_button1">
-        <property name="text">
-         <string>5k</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="AeroButton" name="filter_button2">
-        <property name="text">
-         <string>4k4</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="AeroButton" name="filter_button9">
-        <property name="text">
-         <string>1k8</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="AeroButton" name="filter_button3">
-        <property name="text">
-         <string>3k8</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
-       <widget class="AeroButton" name="filter_button11">
-        <property name="text">
-         <string>var1</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_2">
-   <property name="geometry">
-    <rect>
-     <x>8</x>
-     <y>157</y>
-     <width>481</width>
-     <height>144</height>
-    </rect>
+   <property name="topMargin">
+    <number>2</number>
    </property>
-   <property name="title">
-    <string>Mode</string>
+   <property name="rightMargin">
+    <number>1</number>
    </property>
-   <layout class="QFormLayout" name="formLayout_2">
-    <item row="0" column="0" colspan="2">
-     <layout class="QGridLayout" name="gridLayout_2">
+   <property name="bottomMargin">
+    <number>2</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Band</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
-       <number>5</number>
+       <number>2</number>
       </property>
       <property name="topMargin">
        <number>5</number>
       </property>
       <property name="rightMargin">
-       <number>5</number>
+       <number>2</number>
       </property>
       <property name="bottomMargin">
+       <number>2</number>
+      </property>
+      <property name="horizontalSpacing">
+       <number>2</number>
+      </property>
+      <property name="verticalSpacing">
        <number>5</number>
       </property>
-      <property name="spacing">
-       <number>10</number>
-      </property>
+      <item row="3" column="2">
+       <widget class="AeroButton" name="bnd_125cm">
+        <property name="text">
+         <string>125 cm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="AeroButton" name="bnd_33cm">
+        <property name="text">
+         <string>33 cm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3" colspan="3">
+       <widget class="AeroButton" name="bnd_gen">
+        <property name="text">
+         <string>Gen</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="AeroButton" name="bnd_17m">
+        <property name="text">
+         <string>17 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5">
+       <widget class="AeroButton" name="bnd_10m">
+        <property name="text">
+         <string>10 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="AeroButton" name="bnd_80m">
+        <property name="text">
+         <string>80 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="AeroButton" name="bnd_70cm">
+        <property name="text">
+         <string>70 cm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="AeroButton" name="bnd_6m">
+        <property name="text">
+         <string>6 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="AeroButton" name="bnd_12m">
+        <property name="text">
+         <string>12 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="AeroButton" name="bnd_15m">
+        <property name="text">
+         <string>15 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="AeroButton" name="bnd_20m">
+        <property name="text">
+         <string>20 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="AeroButton" name="bnd_40m">
+        <property name="text">
+         <string>40 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="AeroButton" name="bnd_630m">
+        <property name="text">
+         <string>630 m</string>
+        </property>
+       </widget>
+      </item>
       <item row="4" column="2">
-       <widget class="AeroButton" name="mode__button_spare_2">
+       <widget class="AeroButton" name="bnd_5cm">
         <property name="text">
-         <string>Spare</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="AeroButton" name="mode__button_lsb">
-        <property name="text">
-         <string>LSB</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="5">
-       <widget class="AeroButton" name="mode__button_dig_4">
-        <property name="text">
-         <string>Spare</string>
+         <string>5 cm</string>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="AeroButton" name="mode__button_fmn">
+       <widget class="AeroButton" name="bnd_2m">
         <property name="text">
-         <string>FMN</string>
+         <string>2 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="AeroButton" name="bnd_160m">
+        <property name="text">
+         <string>160 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="AeroButton" name="bnd_60m">
+        <property name="text">
+         <string>60 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="5">
+       <widget class="AeroButton" name="bnd_23cm">
+        <property name="text">
+         <string>23 cm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="AeroButton" name="bnd_30m">
+        <property name="text">
+         <string>30 m</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="AeroButton" name="bnd_13cm">
+        <property name="text">
+         <string>13 cm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="AeroButton" name="bnd_2200m">
+        <property name="text">
+         <string>2200 m</string>
         </property>
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="AeroButton" name="mode__button_dig">
+       <widget class="AeroButton" name="bnd_10cm">
         <property name="text">
-         <string>DIG</string>
+         <string>10 cm</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="4">
-       <widget class="AeroButton" name="mode__button_USB">
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Mode</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="leftMargin">
+       <number>2</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>2</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <item row="0" column="1">
+       <widget class="AeroButton" name="mode_usb">
         <property name="text">
          <string>USB</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="2">
-       <widget class="AeroButton" name="mode__button_fmw">
+      <item row="0" column="0">
+       <widget class="AeroButton" name="mode_lsb">
         <property name="text">
-         <string>FMW</string>
+         <string>LSB</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="5">
-       <widget class="AeroButton" name="mode__button_am">
+      <item row="0" column="4">
+       <widget class="AeroButton" name="mode_cwu">
+        <property name="text">
+         <string>CWH</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="AeroButton" name="mode_digu">
+        <property name="text">
+         <string>DIGU</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="AeroButton" name="mode_spec">
+        <property name="text">
+         <string>SPEC</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="AeroButton" name="mode_digl">
+        <property name="text">
+         <string>DIGL</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="AeroButton" name="mode_fm">
+        <property name="text">
+         <string>FM</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="AeroButton" name="mode_dsb">
+        <property name="text">
+         <string>DSB</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="AeroButton" name="mode_cwl">
+        <property name="text">
+         <string>CWL</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="AeroButton" name="mode_am">
         <property name="text">
          <string>AM</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="4">
-       <widget class="AeroButton" name="mode__button_sam">
+      <item row="2" column="0">
+       <widget class="AeroButton" name="mode_sam">
         <property name="text">
          <string>SAM</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="5">
-       <widget class="AeroButton" name="mode__button_freedv">
+      <item row="2" column="1">
+       <widget class="AeroButton" name="mode_freedv">
         <property name="text">
-         <string>FREEDV</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="4">
-       <widget class="AeroButton" name="mode__button_spare_3">
-        <property name="text">
-         <string>Spare</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="AeroButton" name="mode__button_cw">
-        <property name="text">
-         <string>CW</string>
+         <string>FDV</string>
         </property>
        </widget>
       </item>
      </layout>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_3">
-   <property name="geometry">
-    <rect>
-     <x>8</x>
-     <y>8</y>
-     <width>657</width>
-     <height>144</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Band</string>
-   </property>
-   <layout class="QFormLayout" name="formLayout_3">
-    <item row="0" column="0">
-     <layout class="QGridLayout" name="gridLayout">
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Filter</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>2</number>
+      </property>
       <property name="leftMargin">
-       <number>5</number>
+       <number>2</number>
       </property>
       <property name="topMargin">
        <number>5</number>
       </property>
       <property name="rightMargin">
-       <number>5</number>
+       <number>2</number>
       </property>
       <property name="bottomMargin">
-       <number>5</number>
+       <number>2</number>
       </property>
-      <property name="spacing">
-       <number>10</number>
-      </property>
-      <item row="2" column="1">
-       <widget class="AeroButton" name="band_button_17m">
-        <property name="text">
-         <string>17m</string>
-        </property>
-       </widget>
+      <item>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="1" column="0">
+         <widget class="AeroButton" name="filter_6">
+          <property name="text">
+           <string>2k7</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="AeroButton" name="filter_5">
+          <property name="text">
+           <string>3k1</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="AeroButton" name="filter_9">
+          <property name="text">
+           <string>1k8</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="AeroButton" name="filter_var1">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Var1</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="AeroButton" name="filter_1">
+          <property name="text">
+           <string>5k</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="AeroButton" name="filter_3">
+          <property name="text">
+           <string>3k8</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="AeroButton" name="filter_4">
+          <property name="text">
+           <string>3k3</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="AeroButton" name="filter_8">
+          <property name="text">
+           <string>2k1</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="AeroButton" name="filter_7">
+          <property name="text">
+           <string>2k4</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="AeroButton" name="filter_10">
+          <property name="text">
+           <string>1k</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="AeroButton" name="filter_2">
+          <property name="text">
+           <string>4k4</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="AeroButton" name="filter_var2">
+          <property name="text">
+           <string>Var2</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" colspan="3">
+         <widget class="QSlider" name="Var2_Slider">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" colspan="3">
+         <widget class="QSlider" name="Var1_Slider">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
-      <item row="2" column="2">
-       <widget class="AeroButton" name="band_button_15m">
-        <property name="text">
-         <string>15m</string>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
         </property>
-       </widget>
-      </item>
-      <item row="2" column="6">
-       <widget class="AeroButton" name="band_button_General">
-        <property name="text">
-         <string>General</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
         </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="AeroButton" name="band_button_spare_3">
-        <property name="text">
-         <string>spare</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="5">
-       <widget class="AeroButton" name="band_button_6m">
-        <property name="text">
-         <string>6m</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="AeroButton" name="band_button_160m">
-        <property name="text">
-         <string>160m</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="5">
-       <widget class="AeroButton" name="band_button_40m">
-        <property name="text">
-         <string>40m</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="AeroButton" name="band_button_630m">
-        <property name="text">
-         <string>630m</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="AeroButton" name="band_button_60m">
-        <property name="text">
-         <string>60m</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="AeroButton" name="band_button_spare_4">
-        <property name="text">
-         <string>spare</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="AeroButton" name="band_button_80m">
-        <property name="text">
-         <string>80m</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
-       <widget class="AeroButton" name="band_button_spare_5">
-        <property name="text">
-         <string>spare</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3">
-       <widget class="AeroButton" name="band_button_12m">
-        <property name="text">
-         <string>12m</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="4">
-       <widget class="AeroButton" name="band_button_spare_6">
-        <property name="text">
-         <string>spare</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4">
-       <widget class="AeroButton" name="band_button_10m">
-        <property name="text">
-         <string>10m</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="6">
-       <widget class="AeroButton" name="band_button_spare_8">
-        <property name="text">
-         <string>spare</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="AeroButton" name="band_button_2200m">
-        <property name="text">
-         <string>2200m</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="5">
-       <widget class="AeroButton" name="band_button_spare_7">
-        <property name="text">
-         <string>spare</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="6">
-       <widget class="AeroButton" name="band_button_30m">
-        <property name="text">
-         <string>30m</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="AeroButton" name="band_button_spare_1">
-        <property name="text">
-         <string>spare</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="AeroButton" name="band_button_20m">
-        <property name="text">
-         <string>20m</string>
-        </property>
-       </widget>
+       </spacer>
       </item>
      </layout>
-    </item>
-   </layout>
-  </widget>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>
    <class>AeroButton</class>
    <extends>QPushButton</extends>
-   <header>Util/cusdr_buttons.h</header>
+   <header location="global">Util/cusdr_buttons.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

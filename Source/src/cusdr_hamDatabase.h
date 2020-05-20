@@ -82,6 +82,7 @@ typedef enum _dspMode {
   DIGL,			//  9
   SAM,			// 10
   DRM			// 11
+  //FREEDV        // 12
 
 } DSPMode;
 
@@ -116,7 +117,8 @@ typedef enum _defaultFilterMode {
 	filterSPEC,
 	filterDIGL,
 	filterSAM,
-	filterDRM
+	filterDRM,
+	filterFREEDV
 	
 } TDefaultFilterMode;
 
@@ -763,7 +765,7 @@ inline QList<THamBandText> getHamBandText() {
 	hamBandText.text = "All modes, SSB contest preferred";
 	hamBandText.shortText = "All modes";
 	hamBandText.freqTextList << "14130 kHz: Digital Voice Centre of Activity";
-	hamBandText.freqTextList << "14195 kHz ± 5 kHz: Priority for Dxpeditions";
+	hamBandText.freqTextList << "14195 kHz ï¿½ 5 kHz: Priority for Dxpeditions";
 	hamBandText.freqTextList << "14230 kHz: Image Centre of Activity";
 	hamBandText.freqTextList << "14285 kHz: SSB QRP Centre of Activity";
 

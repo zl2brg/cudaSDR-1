@@ -1,27 +1,27 @@
-#ifndef SETUPWIGDET_H
-#define SETUPWIGDET_H
+#ifndef BANDWIDGET_H
+#define BANDWIDGET_H
 
 #include <QWidget>
 #include "Util/cusdr_buttons.h"
+#include "basewidget.h"
 #include "cusdr_settings.h"
 #include "cusdr_fonts.h"
 
 
 namespace Ui {
-    class SetupWidget;
+    class BandWidget;
 }
 
-class SetupWidget : public QDialog
-{
+class BandWidget : public baseWidget {
 Q_OBJECT
 
 public:
-    SetupWidget(QDialog *parent = 0);
-    ~SetupWidget();
+    BandWidget(QWidget *parent = 0);
+    ~BandWidget();
 
 private:
-    Ui::SetupWidget *ui;
-    Settings	*set;
+    Ui::BandWidget *ui;
+
     QSDR::_ServerMode			m_serverMode;
     QSDR::_HWInterfaceMode		m_hwInterface;
     QSDR::_DataEngineState		m_dataEngineState;
@@ -31,17 +31,12 @@ private:
     CFonts		*fonts;
     TFonts		m_fonts;
 
-    int     m_rx;
-    int		m_minimumWidgetWidth;
-    int		m_minimumGroupBoxWidth;
-    int		m_btnSpacing;
-    int		m_fontHeight;
-    int		m_maxFontWidth;
-    int		m_currentReceiver;
-    bool	m_mouseOver;
 
     void	setupConnections();
+    HamBand m_hamBand;
 
+public slots:
+    void btnCallback();
 
 private slots:
     void	systemStateChanged(
@@ -67,17 +62,8 @@ private slots:
 */
 
 
-
-
-
-public slots:
-    QSize	sizeHint() const;
-    QSize	minimumSizeHint() const;
-
-
-
 };
 
 
 
-#endif // SETUPWIGDET_H
+#endif // BANDWIDGET_H

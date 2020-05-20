@@ -1,37 +1,56 @@
-#ifndef SETUPWIGDET_H
-#define SETUPWIGDET_H
+#ifndef RADIOCTRL_H
+#define RADIOCTRL_H
 
 #include <QWidget>
+#include <QAbstractSlider>
 #include "Util/cusdr_buttons.h"
 #include "cusdr_settings.h"
 #include "cusdr_fonts.h"
+#include "basewidget.h"
+
+#include "UI/band_widget.h"
 
 
 namespace Ui {
-    class SetupWidget;
+    class RadioCtrl;
 }
 
-class SetupWidget : public QDialog
+class RadioCtrl : public baseWidget
 {
 Q_OBJECT
 
 public:
-    SetupWidget(QDialog *parent = 0);
-    ~SetupWidget();
+    RadioCtrl(QWidget *parent = 0,int rx = 0);
+    ~RadioCtrl();
+    void updateFilterWidget();
 
 private:
-    Ui::SetupWidget *ui;
+    Ui::RadioCtrl *ui;
     Settings	*set;
     QSDR::_ServerMode			m_serverMode;
     QSDR::_HWInterfaceMode		m_hwInterface;
     QSDR::_DataEngineState		m_dataEngineState;
 
-    QList<TReceiver>	m_rxDataList;
+     QList<TReceiver>	m_rxDataList;
     void        getSettings();
     CFonts		*fonts;
     TFonts		m_fonts;
+    QList<long>			m_lastCtrFrequencyList;
+    QList<long>			m_lastVfoFrequencyList;
+    void setFilterbyMode(QString str, DSPMode mode);
+    filterGroup m_FilterGroup;
+    filterMode m_FilterMode;
+    filterStruct * m_FilterData;
+    long	m_ctrFrequency;
+    long	m_vfoFrequency;
 
-    int     m_rx;
+
+
+    qreal SetVarSlider(QAbstractSlider *slider);
+    void setFilterWidget();
+    void setModeWidget();
+    void setBandWidget();
+
     int		m_minimumWidgetWidth;
     int		m_minimumGroupBoxWidth;
     int		m_btnSpacing;
@@ -42,6 +61,18 @@ private:
 
     void	setupConnections();
 
+public slots:
+    void modeChange();
+    void ModebtnCallback();
+    void BandbtnCallback();
+    void FilterbtnCallback();
+    void vfoFrequencyChanged(QObject* sender, int mode, int rx, long frequency);
+    void ctrFrequencyChanged(QObject* sender, int mode, int rx, long frequency);
+    void filterChanged(QObject *sender, int rx, qreal low, qreal high);
+    void filterChangedByBtn();
+    void dspModeChanged(QObject *sender,int rx, DSPMode mode);
+    void slider_changed(int value);
+    void bandChanged(QObject *sender, int rx, bool byButton, HamBand band);
 
 private slots:
     void	systemStateChanged(
@@ -80,4 +111,4 @@ public slots:
 
 
 
-#endif // SETUPWIGDET_H
+#endif // RADIOCTRL_H
